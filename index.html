@@ -9,53 +9,139 @@
     <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
     <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
     <script src="css/less-1.3.0.min.js"></script>
+
+	<style type="text/css">
+	div.example {
+		margin-bottom: 40px;
+	}
+	div.widget {
+		/* border: 1px solid black; */
+		/* padding: 8px; */
+		width: 400px;
+	}
+	</style>
 </head>
 <body>
 <div id="body_wrapper" class="container">
 
-<p>At it's most simple, AutoComplete works with an array of values.</p>
-<pre>
-var fruits = ['Apple', 'Banana', 'Orange'];
-var ac1 = new AutoComplete('#example1', fruits);
-</pre>
-<div id="example1" class="widget"></div>
+<div class="example">
+	<p>At it's most simple, AutoComplete works with an array of values.</p>
+	<pre>
+var foods1 = ['Apple', 'Banana', 'Orange'];
+var ac1 = new AutoComplete('#example1', foods1);
+	</pre>
+	<div id="example1" class="widget"></div>
+</div>
 
-<p>You can put values into groups.</p>
-<pre>
-var foods1 = [
-    { group: 'Fruits', value: 'Apple' },
-    { group: 'Fruits', value: 'Banana' },
-    { group: 'Fruits', value: 'Orange' },
-    { group: 'Meats', value: 'Beef' },
-    { group: 'Meats', value: 'Chicken' },
-    { group: 'Meats', value: 'Pork' },
-    { group: 'Vegetables', value: 'Carrot' },
-    { group: 'Vegetables', value: 'Lettuce' },
-    { group: 'Vegetables', value: 'Onion' }
-];
-var ac2 = new AutoComplete('#example2', foods1);
-</pre>
-<div id="example2" class="widget"></div>
-
-<p>You can select items from a key / value list.</p>
-<pre>
+<div class="example">
+	<p>You can put values into groups.</p>
+	<pre>
 var foods2 = [
-    {
-        value: 'Fruits',
-        children: ['Apple', 'Banana', 'Orange']
-    },
-    {
-        value: 'Meats',
-        children: ['Beef', 'Chicken', 'Pork']
-    },
-    {
-        value: 'Vegetables',
-        children: ['Carrot', 'Lettuce', 'Onion']
-    }
+  { group: 'Fruits', value: 'Apple' },
+  { group: 'Fruits', value: 'Banana' },
+  { group: 'Fruits', value: 'Orange' },
+  { group: 'Meats', value: 'Beef' },
+  { group: 'Meats', value: 'Chicken' },
+  { group: 'Meats', value: 'Pork' },
+  { group: 'Vegetables', value: 'Carrot' },
+  { group: 'Vegetables', value: 'Lettuce' },
+  { group: 'Vegetables', value: 'Onion' }
 ];
-var ac3 = new AutoComplete('#example3', foods2);
-</pre>
-<div id="example3" class="widget"></div>
+var ac2 = new AutoComplete('#example2', foods2);
+	</pre>
+	<div id="example2" class="widget"></div>
+</div>
+
+<div class="example">
+	<p>You can select items from a key / value list.</p>
+	<pre>
+var foods3 = [
+  {
+    value: 'Fruits',
+    children: ['Apple', 'Banana', 'Orange']
+  },
+  {
+    value: 'Meats',
+    children: ['Beef', 'Chicken', 'Pork']
+  },
+  {
+    value: 'Vegetables',
+    children: ['Carrot', 'Lettuce', 'Onion']
+  }
+];
+var ac3 = new AutoComplete('#example3', foods3);
+	</pre>
+	<div id="example3" class="widget"></div>
+</div>
+
+<div class="example">
+	<p>Your lists can be arbitrarily nested.</p>
+	<pre>
+var foods4 = [
+  {
+    value: 'Fruits',
+    children: ['Apple', 'Banana', 'Orange']
+  },
+  {
+    value: 'Meats',
+    children: [
+      {
+        value: 'Beef',
+        children: [
+          'Hamburger',
+          'Pot Roast',
+          {
+            value: 'Steak',
+            children: [
+              'Ribeye',
+              'T-Bone'
+            ]
+          }
+        ]
+      },
+      'Chicken',
+      'Pork'
+    ]
+  },
+  {
+    value: 'Vegetables',
+    children: ['Carrot', 'Lettuce', 'Onion']
+  }
+];
+var ac4 = new AutoComplete('#example4', foods4);
+	</pre>
+	<div id="example4" class="widget"></div>
+</div>
+
+<div class="example">
+	<p>You can allow or disallow free-form input.</p>
+	<pre>
+var opts5 = {
+  values: [
+    {
+      value: "State",
+      children: ['Alabama', 'Alaska', 'Arizona']
+    },
+    {
+      value: "Street",
+      children: {
+        allowFreeform: true
+      }
+    },
+    {
+      value: "Zip Code",
+      children: {
+        allowFreeform: true
+      }
+    }
+  ]
+};
+var ac5 = new AutoComplete('#example5', opts5);
+	</pre>
+	<div id="example5" class="widget"></div>
+</div>
+
+<div style="height: 400px"></div>
 
 </div><!-- end #body_wrapper -->
 
@@ -73,37 +159,98 @@ var ac1 = new AutoComplete('#example1', fruits);
 //-------------------------------------------
 // Example 2
 //-------------------------------------------
-var foods1 = [
-    { group: 'Fruits', value: 'Apple' },
-    { group: 'Fruits', value: 'Banana' },
-    { group: 'Fruits', value: 'Orange' },
-    { group: 'Meats', value: 'Beef' },
-    { group: 'Meats', value: 'Chicken' },
-    { group: 'Meats', value: 'Pork' },
-    { group: 'Vegetables', value: 'Carrot' },
-    { group: 'Vegetables', value: 'Lettuce' },
-    { group: 'Vegetables', value: 'Onion' }
+var foods2 = [
+  { group: 'Fruits', value: 'Apple' },
+  { group: 'Fruits', value: 'Banana' },
+  { group: 'Fruits', value: 'Orange' },
+  { group: 'Meats', value: 'Beef' },
+  { group: 'Meats', value: 'Chicken' },
+  { group: 'Meats', value: 'Pork' },
+  { group: 'Vegetables', value: 'Carrot' },
+  { group: 'Vegetables', value: 'Lettuce' },
+  { group: 'Vegetables', value: 'Onion' }
 ];
-var ac2 = new AutoComplete('#example2', foods1);
+var ac2 = new AutoComplete('#example2', foods2);
 
 //-------------------------------------------
 // Example 3
 //-------------------------------------------
-var foods2 = [
-    {
-        value: 'Fruits',
-        children: ['Apple', 'Banana', 'Orange']
-    },
-    {
-        value: 'Meats',
-        children: ['Beef', 'Chicken', 'Pork']
-    },
-    {
-        value: 'Vegetables',
-        children: ['Carrot', 'Lettuce', 'Onion']
-    }
+var foods3 = [
+  {
+    value: 'Fruits',
+    children: ['Apple', 'Banana', 'Orange']
+  },
+  {
+    value: 'Meats',
+    children: ['Beef', 'Chicken', 'Pork']
+  },
+  {
+    value: 'Vegetables',
+    children: ['Carrot', 'Lettuce', 'Onion']
+  }
 ];
-var ac3 = new AutoComplete('#example3', foods2);
+var ac3 = new AutoComplete('#example3', foods3);
+
+//-------------------------------------------
+// Example 4
+//-------------------------------------------
+var foods4 = [
+  {
+    value: 'Fruits',
+    children: ['Apple', 'Banana', 'Orange']
+  },
+  {
+    value: 'Meats',
+    children: [
+      {
+        value: 'Beef',
+        children: [
+          'Hamburger',
+          'Pot Roast',
+          {
+            value: 'Steak',
+            children: [
+              'Ribeye',
+              'T-Bone'
+            ]
+          }
+        ]
+      },
+      'Chicken',
+      'Pork'
+    ]
+  },
+  {
+    value: 'Vegetables',
+    children: ['Carrot', 'Lettuce', 'Onion']
+  }
+];
+var ac4 = new AutoComplete('#example4', foods4);
+
+//-------------------------------------------
+// Example 5
+//-------------------------------------------
+var opts5 = {
+  values: [
+    {
+	  value: "State",
+	  children: ['Alabama', 'Alaska', 'Arizona']
+	},
+	{
+	  value: "Street",
+	  children: {
+	    allowFreeform: true
+	  }
+	},
+	{
+	  value: "Zip Code",
+	  children: {
+	    allowFreeform: true
+      }
+    }
+  ]
+};
+var ac5 = new AutoComplete('#example5', opts5);
 
 }; // end init()
 $(document).ready(init);

@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>AutoComplete Widget &raquo; Markup Examples</title>
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
+    <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
+    <script src="css/less-1.3.0.min.js"></script>
+
+	<style type="text/css">
+	div.example {
+		padding: 40px 0px;
+		//border-bottom: 1px solid #ccc;
+	}
+	div.widget {
+		/* border: 1px solid black; */
+		width: 600px;
+	}
+	</style>
+</head>
+<body>
+<div id="body_wrapper" class="container">
+
+<div class="example">
+	<div class="widget" style="width: 300px">
+		<div class="autocomplete_internal_container">
+			<div class="pieces_container">
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Apple</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Banana</span>
+				</div>
+				<div class="chunk selected">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Orange</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Banana</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Orange</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Apple</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Kiwi</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Orange</span>
+				</div>
+            </div>
+			<input type="text" class="input_proxy" style="" />
+			<div class="clearfix"></div>
+			<ul class="autocomplete_list" style="display:none"></ul>
+		</div>
+	</div>
+</div>
+
+<div class="example">
+	<div class="widget">
+		<div class="autocomplete_internal_container">
+			<div class="pieces_container">
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Apple</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Banana</span>
+				</div>
+				<div class="chunk selected">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Orange</span>
+				</div>
+			</div>
+			<input type="text" class="input_proxy" style="display:none" />
+			<div class="clearfix"></div>
+			<ul class="autocomplete_list" style="display:none"></ul>
+		</div>
+	</div>
+</div>
+
+<div class="example">
+	<div class="widget">
+		<div class="autocomplete_internal_container">
+			<div class="pieces_container">
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Fruit</span>
+					<span class="child-indicator">:</span>
+					<span class="piece">Apple</span>
+				</div>
+				<div class="chunk">
+					<span class="remove-chunk">x</span>
+					<span class="piece">Meats</span>
+					<span class="child-indicator">:</span>
+					<span class="piece">Chicken</span>
+				</div>
+			</div>
+			<input type="text" class="input_proxy" id="input_proxy2" />
+			<div class="clearfix"></div>
+			<ul class="autocomplete_list" id="ac_list2">
+                <li class="group">Fruits</li>
+                <li class="value">Apple</li>
+                <li class="value highlighted">Banana</li>
+                <li class="value">Orange</li>
+                <li class="group">Meats</li>
+                <li class="value">Beef</li>
+                <li class="value">Chicken</li>
+                <li class="value">Pork</li>
+                <li class="group">Vegetables</li>
+                <li class="value">Carrot</li>
+                <li class="value">Lettuce</li>
+                <li class="value">Onion</li>
+            </ul>
+		</div>
+	</div>
+</div>
+
+</div><!-- end #body_wrapper -->
+
+<script src="js/jquery-1.8.2.min.js"></script>
+<script>
+$('#ac_list2').css({
+    display: '',
+    top: $('#input_proxy2').height() + 8,
+    left: $('#input_proxy2').position().left
+});
+</script>
+</body>
+</html>
