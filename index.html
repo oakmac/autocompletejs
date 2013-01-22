@@ -7,16 +7,16 @@
     <meta name="viewport" content="width=device-width">
 
     <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
+	<link rel="stylesheet" href="css/shCoreDefault.css" />
     <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
     <script src="css/less-1.3.0.min.js"></script>
 
 	<style type="text/css">
 	div.example {
-		margin-bottom: 40px;
+		padding: 50px 0px;
+		border-bottom: 2px solid #ccc;
 	}
 	div.widget {
-		/* border: 1px solid black; */
-		/* padding: 8px; */
 		width: 400px;
 	}
 	</style>
@@ -24,19 +24,25 @@
 <body>
 <div id="body_wrapper" class="container">
 
+<!-------------------------------------------------
+  -- Example 1
+  ------------------------------------------------>
 <div class="example">
-	<p>At it's most simple, AutoComplete works with an array of values.</p>
-	<pre>
-var foods1 = ['Apple', 'Banana', 'Orange'];
-var ac1 = new AutoComplete('#example1', foods1);
-	</pre>
-	<div id="example1" class="widget"></div>
+<p>At it's most simple, AutoComplete works with an array of values.</p>
+<pre class="brush:js;">
+var fruits = ['Apple', 'Banana', 'Orange'];
+var widget1 = new AutoComplete('#example1', fruits);
+</pre>
+<div id="example1" class="widget"></div>
 </div>
 
+<!-------------------------------------------------
+  -- Example 2
+  ------------------------------------------------>
 <div class="example">
-	<p>You can put values into groups.</p>
-	<pre>
-var foods2 = [
+<p>You can organize values into groups.</p>
+<pre class="brush:js;">
+var groupedFruits = [
   { group: 'Fruits', value: 'Apple' },
   { group: 'Fruits', value: 'Banana' },
   { group: 'Fruits', value: 'Orange' },
@@ -47,98 +53,105 @@ var foods2 = [
   { group: 'Vegetables', value: 'Lettuce' },
   { group: 'Vegetables', value: 'Onion' }
 ];
-var ac2 = new AutoComplete('#example2', foods2);
-	</pre>
-	<div id="example2" class="widget"></div>
+var widget2 = new AutoComplete('#example2', groupedFruits);
+</pre>
+<div id="example2" class="widget"></div>
 </div>
 
+<!-------------------------------------------------
+  -- Example 3
+  ------------------------------------------------>
 <div class="example">
-	<p>You can select items from a key / value list.</p>
-	<pre>
-var foods3 = [
-  {
-    value: 'Fruits',
-    children: ['Apple', 'Banana', 'Orange']
-  },
-  {
-    value: 'Meats',
-    children: ['Beef', 'Chicken', 'Pork']
-  },
-  {
-    value: 'Vegetables',
-    children: ['Carrot', 'Lettuce', 'Onion']
+<p>You can have nested lists.  This example works like selecting from a key / value list.</p>
+<pre class="brush:js;">
+var ex3Options = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+    fruits: ['Apple', 'Banana', 'Orange'],
+    meats: ['Beef', 'Chicken', 'Pork'],
+    vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
-];
-var ac3 = new AutoComplete('#example3', foods3);
-	</pre>
-	<div id="example3" class="widget"></div>
-</div>
-
-<div class="example">
-	<p>Your lists can be arbitrarily nested.</p>
-	<pre>
-var foods4 = [
-  {
-    value: 'Fruits',
-    children: ['Apple', 'Banana', 'Orange']
-  },
-  {
-    value: 'Meats',
-    children: [
-      {
-        value: 'Beef',
-        children: [
-          'Hamburger',
-          'Pot Roast',
-          {
-            value: 'Steak',
-            children: [
-              'Ribeye',
-              'T-Bone'
-            ]
-          }
-        ]
-      },
-      'Chicken',
-      'Pork'
-    ]
-  },
-  {
-    value: 'Vegetables',
-    children: ['Carrot', 'Lettuce', 'Onion']
-  }
-];
-var ac4 = new AutoComplete('#example4', foods4);
-	</pre>
-	<div id="example4" class="widget"></div>
-</div>
-
-<div class="example">
-	<p>You can allow or disallow free-form input.</p>
-	<pre>
-var opts5 = {
-  values: [
-    {
-      value: "State",
-      children: ['Alabama', 'Alaska', 'Arizona']
-    },
-    {
-      value: "Street",
-      children: {
-        allowFreeform: true
-      }
-    },
-    {
-      value: "Zip Code",
-      children: {
-        allowFreeform: true
-      }
-    }
-  ]
 };
-var ac5 = new AutoComplete('#example5', opts5);
-	</pre>
-	<div id="example5" class="widget"></div>
+var widget3 = new AutoComplete('#example3', ex3Options);
+</pre>
+<div id="example3" class="widget"></div>
+</div>
+
+<!-------------------------------------------------
+  -- Example 4
+  ------------------------------------------------>
+<div class="example">
+<p>Your lists can be arbitrarily nested.  In this example we have more specific choices for beef and steak than the other foods.</p>
+<pre class="brush:js;">
+var ex4Options = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+	
+    fruits: ['Apple', 'Banana', 'Orange'],
+	
+    meats: [
+	  { value: 'Beef', children: 'beef' },
+	  'Chicken',
+	  'Pork'
+	],
+	
+    vegetables: ['Carrot', 'Lettuce', 'Onion'],
+	
+	beef: [
+	  'Hamburger',
+	  'Pot Roast',
+	  { value: 'Steak', children: 'steak' }
+	],
+	
+	steak: ['NY Strip', 'Ribeye', 'T-Bone']
+  }
+};
+var widget4 = new AutoComplete('#example4', ex4Options);
+</pre>
+<div id="example4" class="widget"></div>
+</div>
+
+<!-------------------------------------------------
+  -- Example 5
+  ------------------------------------------------>
+<div class="example">
+<p>You can force the user to pick from a list, allow free-form input, or do a hybrid.</p>
+<p>In this example we have pre-set choices for breakfast, suggestions for lunch (but you are allowed to type in anything you want), and anything goes for dinner.</p>
+<pre class="brush:js;">
+var ex5Options = {
+  initialList: 'meals',
+  lists: {
+    meals: [
+	  { value: 'Breakfast', children: 'breakfast' },
+	  { value: 'Lunch', children: 'lunch' },
+	  { value: 'Dinner', children: 'dinner' }
+	],
+	breakfast: {
+	  allowFreeform: false, // NOTE: this is the default
+	  values: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
+	},
+	lunch: {
+	  allowFreeform: true,
+	  values: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
+	},
+	dinner: {
+	  allowFreeform: true
+	}
+  }
+};
+var widget5 = new AutoComplete('#example5', ex5Options);
+</pre>
+<div id="example5" class="widget"></div>
 </div>
 
 <div style="height: 400px"></div>
@@ -146,6 +159,8 @@ var ac5 = new AutoComplete('#example5', opts5);
 </div><!-- end #body_wrapper -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/shCore.js"></script>
+<script src="js/shBrushJScript.js"></script>
 <script src="js/autocomplete.js"></script>
 <script>
 var init = function() {
@@ -153,13 +168,20 @@ var init = function() {
 //-------------------------------------------
 // Example 1
 //-------------------------------------------
+(function() {
+	
 var fruits = ['Apple', 'Banana', 'Orange'];
-var ac1 = new AutoComplete('#example1', fruits);
+var widget1 = new AutoComplete('#example1', fruits);
+
+})();
+
 
 //-------------------------------------------
 // Example 2
 //-------------------------------------------
-var foods2 = [
+(function() {
+	
+var groupedFruits = [
   { group: 'Fruits', value: 'Apple' },
   { group: 'Fruits', value: 'Banana' },
   { group: 'Fruits', value: 'Orange' },
@@ -170,87 +192,103 @@ var foods2 = [
   { group: 'Vegetables', value: 'Lettuce' },
   { group: 'Vegetables', value: 'Onion' }
 ];
-var ac2 = new AutoComplete('#example2', foods2);
+var widget2 = new AutoComplete('#example2', groupedFruits);
+	
+})();
 
 //-------------------------------------------
 // Example 3
 //-------------------------------------------
-var foods3 = [
-  {
-    value: 'Fruits',
-    children: ['Apple', 'Banana', 'Orange']
-  },
-  {
-    value: 'Meats',
-    children: ['Beef', 'Chicken', 'Pork']
-  },
-  {
-    value: 'Vegetables',
-    children: ['Carrot', 'Lettuce', 'Onion']
+(function() {
+	
+var ex3Options = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+    fruits: ['Apple', 'Banana', 'Orange'],
+    meats: ['Beef', 'Chicken', 'Pork'],
+    vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
-];
-var ac3 = new AutoComplete('#example3', foods3);
+};
+var widget3 = new AutoComplete('#example3', ex3Options);
+	
+})();
 
 //-------------------------------------------
 // Example 4
 //-------------------------------------------
-var foods4 = [
-  {
-    value: 'Fruits',
-    children: ['Apple', 'Banana', 'Orange']
-  },
-  {
-    value: 'Meats',
-    children: [
-      {
-        value: 'Beef',
-        children: [
-          'Hamburger',
-          'Pot Roast',
-          {
-            value: 'Steak',
-            children: [
-              'Ribeye',
-              'T-Bone'
-            ]
-          }
-        ]
-      },
-      'Chicken',
-      'Pork'
-    ]
-  },
-  {
-    value: 'Vegetables',
-    children: ['Carrot', 'Lettuce', 'Onion']
+(function() {
+	
+var ex4Options = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+	
+    fruits: ['Apple', 'Banana', 'Orange'],
+	
+    meats: [
+	  { value: 'Beef', children: 'beef' },
+	  'Chicken',
+	  'Pork'
+	],
+	
+    vegetables: ['Carrot', 'Lettuce', 'Onion'],
+	
+	beef: [
+	  'Hamburger',
+	  'Pot Roast',
+	  { value: 'Steak', children: 'steak' }
+	],
+	
+	steak: ['NY Strip', 'Ribeye', 'T-Bone']
   }
-];
-var ac4 = new AutoComplete('#example4', foods4);
+};
+var widget4 = new AutoComplete('#example4', ex4Options);
+	
+})();
 
 //-------------------------------------------
 // Example 5
 //-------------------------------------------
-var opts5 = {
-  values: [
-    {
-	  value: "State",
-	  children: ['Alabama', 'Alaska', 'Arizona']
+(function() {
+	
+var ex5Options = {
+  initialList: 'meals',
+  lists: {
+	meals: [
+	  { value: 'Breakfast', children: 'breakfast' },
+	  { value: 'Lunch', children: 'lunch' },
+	  { value: 'Dinner', children: 'dinner' }
+	],
+	breakfast: {
+	  allowFreeform: false, // NOTE: this is the default
+	  values: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
 	},
-	{
-	  value: "Street",
-	  children: {
-	    allowFreeform: true
-	  }
+	lunch: {
+	  allowFreeform: true,
+	  values: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
 	},
-	{
-	  value: "Zip Code",
-	  children: {
-	    allowFreeform: true
-      }
-    }
-  ]
+	dinner: {
+	  allowFreeform: true
+	}
+  }
 };
-var ac5 = new AutoComplete('#example5', opts5);
+var widget5 = new AutoComplete('#example5', ex5Options);
+	
+})();
+
+// end examples
+
+// turn on syntax highlighter
+SyntaxHighlighter.all();
 
 }; // end init()
 $(document).ready(init);

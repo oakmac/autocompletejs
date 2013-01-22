@@ -5,6 +5,9 @@ if(!Array.isArray) {
   };
 }
 
+// TODO: add forEach
+//       or remove it completely from the code
+
 /*
 var widget = new AutoComplete(options);
 widget.val();   // get the current value
@@ -17,59 +20,106 @@ widget.reload(opts); // reload with a new options object
 
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
 
-
+var KEYS = {
+    BACKSPACE: 8,
+    DELETE: 46,
+    DOWN_ARROW: 40,
+    ENTER: 13,
+    ESCAPE: 27,
+    UP_ARROW: 38,
+    TAB: 9
+};
 
 // initialization sanity checks
 // TODO: make sure jQuery is defined
 // TODO: make sure JSON is defined
 // TODO: make sure element exists in the DOM
 // TODO: make sure opts are formatted correctly
+// TODO: use unique error codes for easy internet searching
+// TODO: allow them to set the initial value of the widget
+// TODO: show an error when a value.children is not a valid list option
 
 
-
-// expand values into the data structure we're expecting
-// NOTE: recursive function
-var expandValues = function(values) {
-    for (var i = 0; i < values.length; i++) {
-        // single string becomes both the name and the value
-        if (typeof values[i] === 'string') {
-            values[i] = {
-                value: values[i]
-            };
-        }
-
-        // TODO: skip value if it is not an object literal with a .value property
-
-        // if value is a string and no name specified, then name gets value
-        if (typeof values[i].value === 'string' &&
-            (values[i].hasOwnProperty('name') === false || typeof values[i].name !== 'string') ) {
-            values[i].name = values[i].value;
-        }
-
-        // group becomes false if it does not exist
-        if (typeof values[i].group !== 'string') {
-            values[i].group = false;
-        }
-
-		// add the index to the value object
-		values[i].index = i;
-
-        // convert children if they exist
-        // NOTE: recursive
-        if (values[i].hasOwnProperty('children') === true) {
-            values[i].children = expandValues(values[i].children);
-        }
+// expand a single value object
+var expandValue = function(value) {
+    // string becomes both the name and the value
+    if (typeof value === 'string') {
+        value = {
+            value: value
+        };
     }
 
-    return values;
+    // if value is a string and no name specified, then name gets value
+    if (typeof value.value === 'string' &&
+        (value.hasOwnProperty('name') === false || typeof value.name !== 'string')) {
+        value.name = value.value;
+    }
+
+    if (typeof value.group !== 'string') {
+        value.group = false;
+    }
+
+    return value;
 };
 
-// expand values
-var VALUES = opts.values;
-if (Array.isArray(opts) === true) {
-    VALUES = opts;
-}
-VALUES = expandValues(VALUES);
+// expand lists into the data structure we're expecting
+var expandList = function(list) {
+	if (Array.isArray(list) === true) {
+		list = {
+			values: list
+		};
+	}
+	
+	// set an empty array for values if they are not set
+	if (Array.isArray(list.values) !== true) {
+		list.values = [];
+	}
+	
+	// default for allowFreeform is false
+	if (list.allowFreeform !== true) {
+		list.allowFreeform = false;
+	}
+	
+	// expand values
+	if (Array.isArray(list.values) === true) {
+		for (var i = 0; i < list.values.length; i++) {
+			list.values[i] = expandValue(list.values[i]);
+		}
+	}
+	
+	return list;
+};
+
+var expandOptions = function(options) {
+	// expand if using array shorthand
+	if (Array.isArray(options) === true) {
+		options = {
+			initialList: 'default',
+			lists: {
+				'default': options
+			}
+		};
+	}
+	
+	// TODO: make options.lists mandatory and throw error if it's not there?
+	
+	// expand lists
+	for (var i in options.lists) {
+		if (options.lists.hasOwnProperty(i) !== true) continue;
+		options.lists[i] = expandList(options.lists[i]);
+	}
+	
+	return options;
+};
+
+
+
+
+// expand options
+opts = expandOptions(opts);
+
+
+
 
 // class prefix
 var CLASS_PREFIX = 'autocomplete';
@@ -78,19 +128,13 @@ if (typeof opts.classPrefix === 'string' && opts.classPrefix !== '') {
 }
 
 // max number of items to show in the autocomplete list
-var LIST_MAX_LENGTH = 10;
-if (opts.listMax === false || (typeof opts.listMax === 'number' && opts.listMax >= 0)) {
-    LIST_MAX_LENGTH = opts.listMax;
-}
+//var LIST_MAX_LENGTH = 10;
+//if (opts.listMax === false || (typeof opts.listMax === 'number' && opts.listMax >= 0)) {
+//    LIST_MAX_LENGTH = opts.listMax;
+//}
 
 // get the container element
 var containerEl = $(containerElId);
-
-// this is a stateful variable that contains the current value of the widget
-var WIDGET_VALUE = [];
-
-// this is a stateful variable that contains the values for the current dropdown list
-var CURRENT_VALUES = VALUES;
 
 var CURRENT_CHUNK = 1;
 
@@ -137,7 +181,7 @@ var arrayUnique = function(arr) {
 var buildMarkup = function() {
     var html = '' +
     '<div class="' + CLASS_PREFIX + '_internal_container">' +
-      '<div class="pieces_container"></div>' +
+      '<div class="pieces_container" data-value="[]"></div>' +
       '<input type="text" class="input_proxy" style="visibility:hidden" />' +
 	  '<div class="clearfix"></div>' +
       '<ul class="autocomplete_list" style="display:none"></ul>' +
@@ -150,7 +194,7 @@ var buildMarkup = function() {
 containerEl.html(buildMarkup());
 
 // grab elements in memory
-var inputProxyEl = containerEl.find('input.input_proxy');
+var inputEl = containerEl.find('input.input_proxy');
 var listEl = containerEl.find('ul.autocomplete_list');
 var piecesEl = containerEl.find('div.pieces_container');
 
@@ -158,8 +202,8 @@ var piecesEl = containerEl.find('div.pieces_container');
 // and show it
 var showAutocompleteEl = function() {
     // get position and height of input proxy element
-    var pos = inputProxyEl.position();
-    var height = parseInt(inputProxyEl.height(), 10);
+    var pos = inputEl.position();
+    var height = parseInt(inputEl.height(), 10);
 
     // put the autocomplete list direclty beneath the input proxy
     listEl.css({
@@ -170,69 +214,120 @@ var showAutocompleteEl = function() {
     });
 };
 
+// returns the current value of the widget
+var getValue = function() {
+	return JSON.parse(piecesEl.attr('data-value'));
+};
+
+// set the current value of the widget
+var setValue = function(value) {
+	piecesEl.attr('data-value', JSON.stringify(value));
+}
+
 // returns a sorted array of groups from an array of values
 var getGroups = function(values) {
 	var groups = [];
-	values.forEach(function(value) {
-		if (value !== false) {
-			groups.push(value);
+	for (var i = 0; i < values.length; i++) {
+		if (typeof values[i].group === 'string') {
+			groups.push(values[i].group);
 		}
-	});
+	}
 	groups = arrayUnique(groups);
 	return groups.sort();
 };
 
-var buildOption = function(name, valuesIndex, highlighted) {
-    var html = '<li class="value';
-    if (highlighted === true) {
-        html += ' highlighted';
-    }
-    html += '" data-index="' + valuesIndex + '">' + encode(name) + '</li>';
+var buildOption = function(value) {
+    var html = '<li class="value"' +
+	' data-value="' + encode(JSON.stringify(value.value)) + '"' +
+	' data-name="' + encode(value.name) + '"';
+	
+	if (value.children) {
+		html += ' data-children="' + encode(value.children) + '"';
+	}
+	
+	html += '>' + encode(value.name);
+	
+	if (value.children) {
+		html += '<span class="children-indicator">&rarr;</span>';
+	}
+	
+	html += '</li>';
 
     return html;
 };
 
 // build autocomplete options
-// TODO: sort by groups
-var buildValuesList = function(values, numResults) {
+// TODO: allow custom group sort
+var buildValuesList = function(values) {
     var html = '';
-    var current_group = '';
-    for (var i = 0; i < values.length; i++) {
-        // group <li>
-        if (values[i].group && values[i].group !== current_group) {
-            html += '<li class="group">' +
-                encode(values[i].group) + '</li>';
-            current_group = values[i].group;
-        }
+	var groups = getGroups(values);
+	var i;
+	
+	// build all options without groups first
+	for (i = 0; i < values.length; i++) {
+		if (values[i].group === false) {
+			html += buildOption(values[i]);
+		}
+	}
+	
+	// build the groups
+	for (i = 0; i < groups.length; i++) {
+		html += '<li class="group">' +
+			encode(groups[i]) + '</li>';
+			
+		for (var j = 0; j < values.length; j++) {
+			if (groups[i] === values[j].group) {
+				html += buildOption(values[j]);
+			}
+		}
+	}
 
-        if (i === 0) {
-            html += buildOption(values[i].name, values[i].index, true);
-        }
-        else {
-            html += buildOption(values[i].name, values[i].index);
-        }
-    }
     return html;
 };
 
-// open an input element and prep it for typing
+// start autocomplete for a list
 var startAutocomplete = function() {
+	// get the current list
+	var list = opts.lists[opts.initialList];
+	var currentValue = getValue();
+	if (currentValue.length > 0
+		&& typeof currentValue[currentValue.length-1] === 'string') {
+		
+		list = opts.lists[ currentValue[currentValue.length-1] ];
+	}
+	
     // empty the input element
     // unhide it
     // put the focus on it
-    inputProxyEl.val('').css('visibility', '').focus();
+    inputEl.val('');
+    inputEl.css({
+        visibility: '',
+        width: '100px'
+    });
+    inputEl.focus();
 
     // fill the autocomplete container with elements
-    listEl.html(buildValuesList(CURRENT_VALUES));
+    listEl.html(buildValuesList(list.values));
+	
+	// highlight the first element
+	listEl.find('li.value').filter(':first').addClass('highlighted');
 
     // show the autocomplete container
     showAutocompleteEl();
 
+    // remove highlight from any chunks
+    clearChunkHighlight();
+
+    // toggle state
     INPUT_HAPPENING = true;
 };
 
-var endAutocomplete = function() {
-    inputProxyEl.css('visibility', 'hidden').blur();
+var closeAutocomplete = function() {
+    inputEl.css({
+        visibility: 'hidden',
+        width: '0px'
+    });
+    inputEl.blur();
     listEl.css('display', 'none').html('');
     INPUT_HAPPENING = false;
 };
@@ -242,9 +337,14 @@ var clickContainerElement = function(e) {
 	// prevent any clicks inside the container from bubbling up to the html element
 	e.stopPropagation();
 
-	// start autocomplete
-	// TODO: should we not start autocomplete if it's already open?
-    startAutocomplete();
+	// start autocomplete if it's not already happening
+    if (INPUT_HAPPENING === false) {
+        startAutocomplete();
+    }
+    // else just put the focus on the text input
+    else {
+        inputEl.focus();
+    }
 };
 
 var buildPiece = function(piece) {
@@ -256,61 +356,37 @@ var buildPiece = function(piece) {
 };
 
 var buildPieces = function() {
+	var value = getValue();
     var html = '';
+	
 	var chunkNum = 0;
-    for (var i = 0; i < WIDGET_VALUE.length; i++) {
-		var piece = WIDGET_VALUE[i];
+    for (var i = 0; i < value.length; i++) {
+		var piece = value[i];
+		
+		if (typeof piece === 'string') {
+			html += '<span class="child-indicator">:</span>' +
+			'</div>';
+			continue;
+		}
 
 		// start a new chunk
 		if (i === 0 || piece.chunk !== chunkNum) {
-			html += '<div class="chunk">' +
-            '<span class="remove-chunk">x</span>';
 			chunkNum++;
+			html += '<div class="chunk" data-chunknum="' + chunkNum + '">' +
+            '<span class="remove-chunk">x</span>';
 		}
 
         html += buildPiece(piece);
 
-		if (WIDGET_VALUE[i+1] && WIDGET_VALUE[i+1].chunk === chunkNum) {
+		if (value[i+1] && value[i+1].chunk === chunkNum) {
 			html += '<span class="child-indicator">:</span>';
 		}
 
-		if ((i+1) === WIDGET_VALUE.length || WIDGET_VALUE[i+1].chunk !== chunkNum) {
+		if ((i+1) === value.length || (value[i+1].chunk && value[i+1].chunk !== chunkNum)) {
 			html += '</div>'; // end .chunk
 		}
     }
-	//html += '<div class="clearfix"></div>';
     return html;
-};
-
-var addPiece = function(piece) {
-	// add the piece to the widget value
-	WIDGET_VALUE.push(piece);
-
-	// update the display
-	piecesEl.html(buildPieces());
-};
-
-// returns the highlighted piece
-// false if there is no highlighted piece
-var getHighlightedPiece = function() {
-    // get the highlighted value
-    var highlightedEl = listEl.find('li.highlighted');
-
-	// nothing highlighted
-    if (highlightedEl.length !== 1) {
-		return false;
-	}
-
-    // get the index of the current selection
-    var index = parseInt($(highlightedEl[0]).attr('data-index'), 10);
-
-    // bail if we do not find the index in CURRENT_VALUES
-    // NOTE: this should never happen
-    if (! CURRENT_VALUES[index]) {
-		return false;
-	}
-
-	return CURRENT_VALUES[index];
 };
 
 var addHighlightedValue = function() {
@@ -319,83 +395,53 @@ var addHighlightedValue = function() {
 
     // do nothing if no entry is highlighted
     if (highlightedEl.length !== 1) return;
-
-    // get the index of the current selection
-    var index = parseInt($(highlightedEl[0]).attr('data-index'), 10);
-
-    // bail if we do not find the index in CURRENT_VALUES
-    // NOTE: this should never happen
-    if (! CURRENT_VALUES[index]) return;
-
-	// see if this piece has children
-	var hasChildren = false;
-	if (CURRENT_VALUES[index].children) {
-		hasChildren = true;
+	
+	// get values from the option
+	var name = highlightedEl.attr('data-name');
+	var value = JSON.parse(highlightedEl.attr('data-value'));
+	
+	// get the current widget value
+	var currentValue = getValue();
+	var newPiece = {
+		name: name,
+		value: value,
+		chunk: 1
+	};
+	
+	if (currentValue.length > 0
+		&& typeof currentValue[currentValue.length-1] === 'string') {
+		currentValue.pop();
+		
+		if (currentValue[currentValue.length-1]
+			&& typeof currentValue[currentValue.length-1].chunk === 'number') {
+			newPiece.chunk = currentValue[currentValue.length-1].chunk;
+		}
 	}
-
-	// add the selection to the widget
-	WIDGET_VALUE.push({
-		name: CURRENT_VALUES[index].name,
-		value: CURRENT_VALUES[index].value,
-		chunk: CURRENT_CHUNK
-	});
-
-	// update the widget's display
-	piecesEl.html(buildPieces());
-
-    // end the input
-    endAutocomplete();
-
-    // if this piece has children, then open a new autocomplete with them
-    if (CURRENT_VALUES[index].children) {
-        CURRENT_VALUES = CURRENT_VALUES[index].children;
-    }
-    // else reset to the default values and start a new chunk
-    else {
-        CURRENT_VALUES = VALUES;
-		CURRENT_CHUNK++;
-    }
-
-	// start a new autocomplete
-	startAutocomplete();
-};
-
-var addPiece = function(piece) {
-	// get the highlighted value
-	var value = getHighlightedPiece();
-
-	// no highlighted value and free-form input is allowed
-    if (value === false && CURRENT_VALUES.allowFreeform === true) {
-		value = {
-			value: inputProxyEl.val()
-		};
+	else if (currentValue.length > 0
+			 && typeof currentValue[currentValue.length-1] !== 'string'
+			 && typeof currentValue[currentValue.length-1].chunk === 'number') {
+		newPiece.chunk = currentValue[currentValue.length-1].chunk + 1;
 	}
-
-	// exit if we have nothing to add
-	if (value === false) return;
-
-	// set the current chunk
-	value.chunk = CURRENT_CHUNK;
-
-	WIDGET_VALUE.push(value);
-
-	// update the widget's display
+	
+	// add the new piece
+	currentValue.push(newPiece);
+	
+	// see if we're at the end of the chunk
+	var children = highlightedEl.attr('data-children');
+	if (typeof children === 'string' && children !== '') {
+		currentValue.push(children);
+	}
+	
+	// set the new value
+	setValue(currentValue);
+	
+	// update the widget display
 	piecesEl.html(buildPieces());
-
-    // end the input
-    endAutocomplete();
-
-    // if this piece has children, then open a new autocomplete with them
-    if (CURRENT_VALUES[index].children) {
-        CURRENT_VALUES = CURRENT_VALUES[index].children;
-    }
-    // else reset to the default values and start a new chunk
-    else {
-        CURRENT_VALUES = VALUES;
-		CURRENT_CHUNK++;
-    }
-
-	// start a new autocomplete
+	
+	// close autocomplete
+	closeAutocomplete();
+	
+	// start autocomplete
 	startAutocomplete();
 };
 
@@ -437,7 +483,26 @@ var pressDownArrow = function() {
 
 // press the escape key
 var pressEscapeKey = function() {
-    endAutocomplete();
+    closeAutocomplete();
+    clearChunkHighlight();
+};
+
+var clearChunkHighlight = function() {
+    piecesEl.find('div.chunk').removeClass('selected');
+};
+
+var clickChunk = function(e) {
+    // remove highlight from other chunks
+    clearChunkHighlight();
+
+    // highlight this chunk
+    $(this).addClass('selected');
+
+    // stop autocomplete
+    closeAutocomplete();
+
+    // stop propagation
+    e.stopPropagation();
 };
 
 // user clicks an autocomplete value with their mouse
@@ -458,10 +523,11 @@ var keyupInputElement = function(e) {
 	if (INPUT_HAPPENING !== true) return;
 
 	// do nothing if they have pressed a control character
-	// TODO: break out these codes into a global array
-	if (inArray(e.which, [9, 13, 40, 38, 27]) !== false) return;
+    // TODO: code smell? this seems fishy
+    var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
+	if (inArray(e.which, cntrlChars) !== false) return;
 
-	var filteredValues = filterValues(inputProxyEl.val(), CURRENT_VALUES);
+	var filteredValues = filterValues(inputEl.val(), CURRENT_LIST);
 
 	// fill the autocomplete container with elements
     listEl.html(buildValuesList(filteredValues));
@@ -481,8 +547,56 @@ var filterValues = function(str, values) {
 	return results;
 };
 
+var highlightLastChunk = function() {
+    var chunksEl = piecesEl.find('div.chunk');
+    chunksEl.removeClass('selected');
+    chunksEl.filter(':last').addClass('selected');
+};
+
+var backspaceEmptyField = function() {
+    closeAutocomplete();
+    if (isChunkHighlighted() === true) {
+        removeHighlightedChunk();
+    }
+    else {
+        highlightLastChunk();
+    }
+};
+
 var pressEnterOrTab = function() {
+    // TODO: check for freeForm here
     addHighlightedValue();
+};
+
+// returns true if a chunk is highlighted
+// false otherwise
+var isChunkHighlighted = function() {
+    return (piecesEl.find('div.selected').length === 1);
+};
+
+var removeHighlightedChunk = function() {
+    piecesEl.find('div.selected').remove();
+
+    // TODO: reset the chunk numbers
+};
+
+// keydown anywhere on the page
+var keydownWindow = function(e) {
+    var keyCode = e.which;
+
+    // backspace or delete with a highlighted chunk
+    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE)
+        && isChunkHighlighted() === true) {
+        e.preventDefault();
+        removeHighlightedChunk();
+        return;
+    }
+
+    // escape key
+    if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
+        clearChunkHighlight();
+        return;
+    }
 };
 
 // keydown on the input element
@@ -490,32 +604,34 @@ var keydownInputElement = function(e) {
     var keyCode = e.which;
 
     // enter or tab
-    if (keyCode === 9 || keyCode === 13) {
+    if (keyCode === KEYS.ENTER || keyCode === KEYS.TAB) {
         e.preventDefault();
 		pressEnterOrTab();
         return;
     }
 
     // backspace on an empty field
-    if (keyCode === 8 && inputProxyEl.val() === '') {
-        console.log("backspace on empty field");
+    if (keyCode === KEYS.BACKSPACE && inputEl.val() === '') {
+        e.preventDefault();
+        e.stopPropagation();
+        backspaceEmptyField();
         return;
     }
 
     // down arrow
-    if (keyCode === 40) {
+    if (keyCode === KEYS.DOWN_ARROW) {
         pressDownArrow();
         return;
     }
 
     // up arrow
-    if (keyCode === 38) {
+    if (keyCode === KEYS.UP_ARROW) {
         pressUpArrow();
         return;
     }
 
     // escape
-    if (keyCode === 27) {
+    if (keyCode === KEYS.ESCAPE) {
         pressEscapeKey();
         return;
     }
@@ -526,7 +642,7 @@ var keydownInputElement = function(e) {
 //      right now this doesn't work with multiple widgets on the same page
 var clickPage = function(e) {
 	// hide the autocomplete
-	endAutocomplete();
+	closeAutocomplete();
 };
 
 // event handlers
@@ -534,9 +650,13 @@ containerEl.on('click', clickContainerElement);
 containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
 containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
 containerEl.on('click', 'li.value', clickValue);
+containerEl.on('click', 'div.chunk', clickChunk);
 
 // catch all clicks on the page
 $('html').on('click', clickPage);
+
+// catch global keydown
+$(window).on('keydown', keydownWindow);
 
 // end window.AutoComplete()
 };
