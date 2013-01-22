@@ -1,0 +1,1 @@
+At it's most simple, AutoComplete works with an array of values.
