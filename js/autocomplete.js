@@ -5,9 +5,6 @@ if(!Array.isArray) {
   };
 }
 
-// TODO: add forEach
-//       or remove it completely from the code
-
 /*
 var widget = new AutoComplete(options);
 widget.val();   // get the current value
@@ -16,9 +13,11 @@ widget.clear(); // clear the input of the bar
 widget.reload(opts); // reload with a new options object
 */
 
-
-
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
+
+//--------------------------------------------------------------
+// Module scope variables
+//--------------------------------------------------------------
 
 var KEYS = {
     BACKSPACE: 8,
@@ -30,117 +29,11 @@ var KEYS = {
     TAB: 9
 };
 
-// initialization sanity checks
-// TODO: make sure jQuery is defined
-// TODO: make sure JSON is defined
-// TODO: make sure element exists in the DOM
-// TODO: make sure opts are formatted correctly
-// TODO: use unique error codes for easy internet searching
-// TODO: allow them to set the initial value of the widget
-// TODO: show an error when a value.children is not a valid list option
+// hold DOM elements
+var containerEl, piecesEl, inputEl, listEl;
 
-
-// expand a single value object
-var expandValue = function(value) {
-    // string becomes both the name and the value
-    if (typeof value === 'string') {
-        value = {
-            value: value
-        };
-    }
-
-    // if value is a string and no name specified, then name gets value
-    if (typeof value.value === 'string' &&
-        (value.hasOwnProperty('name') === false || typeof value.name !== 'string')) {
-        value.name = value.value;
-    }
-
-    if (typeof value.group !== 'string') {
-        value.group = false;
-    }
-
-    return value;
-};
-
-// expand lists into the data structure we're expecting
-var expandList = function(list) {
-	if (Array.isArray(list) === true) {
-		list = {
-			values: list
-		};
-	}
-	
-	// set an empty array for values if they are not set
-	if (Array.isArray(list.values) !== true) {
-		list.values = [];
-	}
-	
-	// default for allowFreeform is false
-	if (list.allowFreeform !== true) {
-		list.allowFreeform = false;
-	}
-	
-	// expand values
-	if (Array.isArray(list.values) === true) {
-		for (var i = 0; i < list.values.length; i++) {
-			list.values[i] = expandValue(list.values[i]);
-		}
-	}
-	
-	return list;
-};
-
-var expandOptions = function(options) {
-	// expand if using array shorthand
-	if (Array.isArray(options) === true) {
-		options = {
-			initialList: 'default',
-			lists: {
-				'default': options
-			}
-		};
-	}
-	
-	// TODO: make options.lists mandatory and throw error if it's not there?
-	
-	// expand lists
-	for (var i in options.lists) {
-		if (options.lists.hasOwnProperty(i) !== true) continue;
-		options.lists[i] = expandList(options.lists[i]);
-	}
-	
-	return options;
-};
-
-
-
-
-// expand options
-opts = expandOptions(opts);
-
-
-
-
-// class prefix
-var CLASS_PREFIX = 'autocomplete';
-if (typeof opts.classPrefix === 'string' && opts.classPrefix !== '') {
-    CLASS_PREFIX = opts.classPrefix;
-}
-
-// max number of items to show in the autocomplete list
-//var LIST_MAX_LENGTH = 10;
-//if (opts.listMax === false || (typeof opts.listMax === 'number' && opts.listMax >= 0)) {
-//    LIST_MAX_LENGTH = opts.listMax;
-//}
-
-// get the container element
-var containerEl = $(containerElId);
-
-var CURRENT_CHUNK = 1;
-
-// stateful variable
+// stateful
 var INPUT_HAPPENING = false;
-
 
 //--------------------------------------------------------------
 // Util Functions
@@ -155,7 +48,19 @@ var tmpl = function(str, obj) {
 
 // html escape
 var encode = function(str) {
-    return (str + '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var entities = [
+        [/&/g, '&amp;'],
+        [/</g, '&lt;'],
+        [/>/g, '&gt;'],
+        [/"/g, '&quot;'],
+        [/'/g, '&#39;'],
+        [/\//g, '&#x2F']
+    ];
+    str = str + '';
+    for (var i = 0; i < entities.length; i++) {
+        str = str.replace(entities[i][0], entities[i][1]);
+    }
+    return str;
 };
 
 var inArray = function(needle, haystack) {
@@ -177,35 +82,235 @@ var arrayUnique = function(arr) {
 	return arr2;
 };
 
+//--------------------------------------------------------------
+// Sanity Checks
+//--------------------------------------------------------------
+
+var showError = function(code, msg) {
+    window.alert('AutoComplete Error ' + code + ': ' + msg);
+};
+
+// NOTE: all of the errors have unique codes so that people who search
+//       for them can find them easily :)
+var sanityChecks = function() {
+    // container ID must be a string
+    if (typeof containerElId !== 'string' || containerElId === '') {
+        showError(1001, 'Container element id must be a non-empty string');
+        return false;
+    }
+
+    // make sure the container element exists in the DOM
+    if (! document.getElementById(containerElId)) {
+        showError(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
+        return false;
+    }
+
+    // TODO: make sure jQuery is defined
+    // TODO: make sure JSON is defined
+    // TODO: make sure opts are formatted correctly
+    // TODO: allow them to set the initial value of the widget
+    // TODO: show an error when a value.children is not a valid list option
+
+    return true;
+};
+
+//--------------------------------------------------------------
+// Expand Input / Set Default Options
+//--------------------------------------------------------------
+
+// expand a single value object
+var expandValue = function(value) {
+    // string becomes the value
+    if (typeof value === 'string') {
+        value = {
+            value: value
+        };
+    }
+
+    // if value is a string and no name specified, then name gets value
+    if (typeof value.value === 'string' &&
+        (value.hasOwnProperty('name') === false || typeof value.name !== 'string')) {
+        value.name = value.value;
+    }
+
+	// group is either true or false
+    if (typeof value.group !== 'string') {
+        value.group = false;
+    }
+
+    return value;
+};
+
+var expandList = function(list) {
+	// an array is the values
+	if (Array.isArray(list) === true) {
+		list = {
+			values: list
+		};
+	}
+
+	// set an empty array for values if they are not set
+	if (Array.isArray(list.values) !== true) {
+		list.values = [];
+	}
+
+	// default for allowFreeform is false
+	if (list.allowFreeform !== true) {
+		list.allowFreeform = false;
+	}
+
+	// expand values
+	for (var i = 0; i < list.values.length; i++) {
+		list.values[i] = expandValue(list.values[i]);
+	}
+
+	return list;
+};
+
+var initOptions = function() {
+	// an array is a single list option
+	if (Array.isArray(opts) === true) {
+		opts = {
+			initialList: 'default',
+			lists: {
+				'default': opts
+			}
+		};
+	}
+
+	// TODO: make options.lists mandatory and throw error if it's not there?
+
+    // class prefix
+    if (typeof opts.classPrefix !== 'string' || opts.classPrefix === '') {
+        opts.classPrefix = 'autocomplete';
+    }
+
+	// expand lists
+	for (var i in opts.lists) {
+		if (opts.lists.hasOwnProperty(i) !== true) continue;
+		opts.lists[i] = expandList(opts.lists[i]);
+	}
+};
+
+//--------------------------------------------------------------
+// Markup Building Functions
+//--------------------------------------------------------------
+
 // build the markup inside the container
-var buildMarkup = function() {
+var buildWidget = function() {
     var html = '' +
-    '<div class="' + CLASS_PREFIX + '_internal_container">' +
+    '<div class="' + opts.classPrefix + '_internal_container">' +
       '<div class="pieces_container" data-value="[]"></div>' +
       '<input type="text" class="input_proxy" style="visibility:hidden" />' +
 	  '<div class="clearfix"></div>' +
-      '<ul class="autocomplete_list" style="display:none"></ul>' +
+      '<ul class="dropdown" style="display:none"></ul>' +
     '</div>';
 
     return html;
 };
 
-// build the markup inside the container
-containerEl.html(buildMarkup());
+var buildOption = function(value) {
+    var html = '<li class="value"' +
+	' data-value="' + encode(JSON.stringify(value.value)) + '"' +
+	' data-name="' + encode(value.name) + '"';
 
-// grab elements in memory
-var inputEl = containerEl.find('input.input_proxy');
-var listEl = containerEl.find('ul.autocomplete_list');
-var piecesEl = containerEl.find('div.pieces_container');
+	if (value.children) {
+		html += ' data-children="' + encode(value.children) + '"';
+	}
 
-// move the autocomplete container directly underneath the input element
-// and show it
-var showAutocompleteEl = function() {
-    // get position and height of input proxy element
+	html += '>' + encode(value.name);
+
+	if (value.children) {
+		html += '<span class="children-indicator">&rarr;</span>';
+	}
+
+	html += '</li>';
+
+    return html;
+};
+
+// build dropdown options
+// TODO: allow custom group sort
+var buildDropdown = function(values) {
+    var html = '';
+	var groups = getGroups(values);
+	var i;
+
+	// build all options without groups first
+	for (i = 0; i < values.length; i++) {
+		if (values[i].group === false) {
+			html += buildOption(values[i]);
+		}
+	}
+
+	// build the groups
+	for (i = 0; i < groups.length; i++) {
+		html += '<li class="group">' +
+			encode(groups[i]) + '</li>';
+
+		for (var j = 0; j < values.length; j++) {
+			if (groups[i] === values[j].group) {
+				html += buildOption(values[j]);
+			}
+		}
+	}
+
+    return html;
+};
+
+var buildPiece = function(piece) {
+    var html = '<span class="piece">' +
+    encode(piece.name) +
+    '</span>';
+
+    return html;
+};
+
+// TODO: re-write this
+var buildPieces = function() {
+	var value = getValue();
+    var html = '';
+
+	var chunkNum = 0;
+    for (var i = 0; i < value.length; i++) {
+		var piece = value[i];
+
+		if (typeof piece === 'string') {
+			html += '<span class="child-indicator">:</span>' +
+			'</div>'; // end div.chunk
+			continue;
+		}
+
+		// start a new chunk
+		if (i === 0 || piece.chunk !== chunkNum) {
+			chunkNum++;
+			html += '<div class="chunk" data-chunk="' + chunkNum + '">' +
+            '<span class="remove-chunk">&times;</span>';
+		}
+
+        html += buildPiece(piece);
+
+		if (value[i+1] && value[i+1].chunk === chunkNum) {
+			html += '<span class="child-indicator">:</span>';
+		}
+
+		if ((i+1) === value.length || (value[i+1].chunk && value[i+1].chunk !== chunkNum)) {
+			html += '</div>'; // end div.chunk
+		}
+    }
+    return html;
+};
+
+//--------------------------------------------------------------
+// Control Flow / DOM Manipulation
+//--------------------------------------------------------------
+
+var showDropdown = function() {
+    // get position and height of input element
     var pos = inputEl.position();
     var height = parseInt(inputEl.height(), 10);
 
-    // put the autocomplete list direclty beneath the input proxy
+    // put the dropdown directly beneath the input element
     listEl.css({
         display: '',
         // TODO: work on the CSS here
@@ -236,69 +341,26 @@ var getGroups = function(values) {
 	return groups.sort();
 };
 
-var buildOption = function(value) {
-    var html = '<li class="value"' +
-	' data-value="' + encode(JSON.stringify(value.value)) + '"' +
-	' data-name="' + encode(value.name) + '"';
-	
-	if (value.children) {
-		html += ' data-children="' + encode(value.children) + '"';
-	}
-	
-	html += '>' + encode(value.name);
-	
-	if (value.children) {
-		html += '<span class="children-indicator">&rarr;</span>';
-	}
-	
-	html += '</li>';
-
-    return html;
+var listExists = function(list) {
+    if (opts.lists[list]) {
+        return true;
+    }
+    return false;
 };
 
-// build autocomplete options
-// TODO: allow custom group sort
-var buildValuesList = function(values) {
-    var html = '';
-	var groups = getGroups(values);
-	var i;
-	
-	// build all options without groups first
-	for (i = 0; i < values.length; i++) {
-		if (values[i].group === false) {
-			html += buildOption(values[i]);
-		}
-	}
-	
-	// build the groups
-	for (i = 0; i < groups.length; i++) {
-		html += '<li class="group">' +
-			encode(groups[i]) + '</li>';
-			
-		for (var j = 0; j < values.length; j++) {
-			if (groups[i] === values[j].group) {
-				html += buildOption(values[j]);
-			}
-		}
-	}
-
-    return html;
-};
-
-// start autocomplete for a list
-var startAutocomplete = function() {
+var startInput = function() {
 	// get the current list
 	var list = opts.lists[opts.initialList];
 	var currentValue = getValue();
 	if (currentValue.length > 0
 		&& typeof currentValue[currentValue.length-1] === 'string') {
-		
-		list = opts.lists[ currentValue[currentValue.length-1] ];
+
+        if (listExists(currentValue[currentValue.length-1]) === true) {
+            list = opts.lists[ currentValue[currentValue.length-1] ];
+        }
 	}
-	
-    // empty the input element
-    // unhide it
-    // put the focus on it
+
+    // empty the input element, unhide it, put the focus on it
     inputEl.val('');
     inputEl.css({
         visibility: '',
@@ -306,14 +368,14 @@ var startAutocomplete = function() {
     });
     inputEl.focus();
 
-    // fill the autocomplete container with elements
-    listEl.html(buildValuesList(list.values));
-	
+    // fill the dropdown with values
+    listEl.html(buildDropdown(list.values));
+
 	// highlight the first element
 	listEl.find('li.value').filter(':first').addClass('highlighted');
 
-    // show the autocomplete container
-    showAutocompleteEl();
+    // show the dropdown
+    showDropdown();
 
     // remove highlight from any chunks
     clearChunkHighlight();
@@ -322,215 +384,23 @@ var startAutocomplete = function() {
     INPUT_HAPPENING = true;
 };
 
-var closeAutocomplete = function() {
+var stopInput = function() {
+    // hide the input element and make it small so it doesn't wrap
     inputEl.css({
         visibility: 'hidden',
         width: '0px'
     });
-    inputEl.blur();
+    inputEl.blur(); // NOTE: I don't think this line is necessary?
+
+    // hide the dropdown list
     listEl.css('display', 'none').html('');
+
+    // toggle state
     INPUT_HAPPENING = false;
-};
-
-// click on the container
-var clickContainerElement = function(e) {
-	// prevent any clicks inside the container from bubbling up to the html element
-	e.stopPropagation();
-
-	// start autocomplete if it's not already happening
-    if (INPUT_HAPPENING === false) {
-        startAutocomplete();
-    }
-    // else just put the focus on the text input
-    else {
-        inputEl.focus();
-    }
-};
-
-var buildPiece = function(piece) {
-    var html = '<span class="piece">' +
-    encode(piece.name) +
-    '</span>';
-
-    return html;
-};
-
-var buildPieces = function() {
-	var value = getValue();
-    var html = '';
-	
-	var chunkNum = 0;
-    for (var i = 0; i < value.length; i++) {
-		var piece = value[i];
-		
-		if (typeof piece === 'string') {
-			html += '<span class="child-indicator">:</span>' +
-			'</div>';
-			continue;
-		}
-
-		// start a new chunk
-		if (i === 0 || piece.chunk !== chunkNum) {
-			chunkNum++;
-			html += '<div class="chunk" data-chunknum="' + chunkNum + '">' +
-            '<span class="remove-chunk">x</span>';
-		}
-
-        html += buildPiece(piece);
-
-		if (value[i+1] && value[i+1].chunk === chunkNum) {
-			html += '<span class="child-indicator">:</span>';
-		}
-
-		if ((i+1) === value.length || (value[i+1].chunk && value[i+1].chunk !== chunkNum)) {
-			html += '</div>'; // end .chunk
-		}
-    }
-    return html;
-};
-
-var addHighlightedValue = function() {
-    // get the highlighted value
-    var highlightedEl = listEl.find('li.highlighted');
-
-    // do nothing if no entry is highlighted
-    if (highlightedEl.length !== 1) return;
-	
-	// get values from the option
-	var name = highlightedEl.attr('data-name');
-	var value = JSON.parse(highlightedEl.attr('data-value'));
-	
-	// get the current widget value
-	var currentValue = getValue();
-	var newPiece = {
-		name: name,
-		value: value,
-		chunk: 1
-	};
-	
-	if (currentValue.length > 0
-		&& typeof currentValue[currentValue.length-1] === 'string') {
-		currentValue.pop();
-		
-		if (currentValue[currentValue.length-1]
-			&& typeof currentValue[currentValue.length-1].chunk === 'number') {
-			newPiece.chunk = currentValue[currentValue.length-1].chunk;
-		}
-	}
-	else if (currentValue.length > 0
-			 && typeof currentValue[currentValue.length-1] !== 'string'
-			 && typeof currentValue[currentValue.length-1].chunk === 'number') {
-		newPiece.chunk = currentValue[currentValue.length-1].chunk + 1;
-	}
-	
-	// add the new piece
-	currentValue.push(newPiece);
-	
-	// see if we're at the end of the chunk
-	var children = highlightedEl.attr('data-children');
-	if (typeof children === 'string' && children !== '') {
-		currentValue.push(children);
-	}
-	
-	// set the new value
-	setValue(currentValue);
-	
-	// update the widget display
-	piecesEl.html(buildPieces());
-	
-	// close autocomplete
-	closeAutocomplete();
-	
-	// start autocomplete
-	startAutocomplete();
-};
-
-// press the up arrow in the input proxy
-var pressUpArrow = function() {
-    // get the highlighted element
-    var highlightedEl = listEl.find('li.highlighted');
-
-    // no row highlighted, highlight the last list element
-    if (highlightedEl.length === 0) {
-        listEl.find('li.value').last().addClass('highlighted');
-        return;
-    }
-
-    // remove the highlight from the current element
-    highlightedEl.removeClass('highlighted');
-
-    // highlight the previous .value sibling
-    highlightedEl.prevAll('li.value').first().addClass('highlighted');
-};
-
-// press the down arrow in the input proxy
-var pressDownArrow = function() {
-    // get the highlighted element
-    var highlightedEl = listEl.find('li.highlighted');
-
-    // no row highlighted, highlight the first _value list element
-    if (highlightedEl.length === 0) {
-        listEl.find('li.value').first().addClass('highlighted');
-        return;
-    }
-
-    // remove the highlight from the current element
-    highlightedEl.removeClass('highlighted');
-
-    // highlight the next _value sibling
-    highlightedEl.nextAll('li.value').first().addClass('highlighted');
-};
-
-// press the escape key
-var pressEscapeKey = function() {
-    closeAutocomplete();
-    clearChunkHighlight();
 };
 
 var clearChunkHighlight = function() {
     piecesEl.find('div.chunk').removeClass('selected');
-};
-
-var clickChunk = function(e) {
-    // remove highlight from other chunks
-    clearChunkHighlight();
-
-    // highlight this chunk
-    $(this).addClass('selected');
-
-    // stop autocomplete
-    closeAutocomplete();
-
-    // stop propagation
-    e.stopPropagation();
-};
-
-// user clicks an autocomplete value with their mouse
-var clickValue = function(e) {
-	// remove highlighted from all values in the list
-	listEl.find('li.value').removeClass('highlighted');
-
-	// add it to the value clicked
-	$(this).addClass('highlighted');
-
-	// add the piece
-	addHighlightedValue();
-};
-
-// keyup on the input elmeent
-var keyupInputElement = function(e) {
-	// do nothing if we have already hidden the input element
-	if (INPUT_HAPPENING !== true) return;
-
-	// do nothing if they have pressed a control character
-    // TODO: code smell? this seems fishy
-    var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
-	if (inArray(e.which, cntrlChars) !== false) return;
-
-	var filteredValues = filterValues(inputEl.val(), CURRENT_LIST);
-
-	// fill the autocomplete container with elements
-    listEl.html(buildValuesList(filteredValues));
 };
 
 var filterValues = function(str, values) {
@@ -553,8 +423,150 @@ var highlightLastChunk = function() {
     chunksEl.filter(':last').addClass('selected');
 };
 
-var backspaceEmptyField = function() {
-    closeAutocomplete();
+// returns true if a chunk is highlighted
+// false otherwise
+var isChunkHighlighted = function() {
+    return (piecesEl.find('div.selected').length === 1);
+};
+
+// TODO: I really don't like this kind of code
+//       need to improve the value data structure
+var removeChunk = function(chunk) {
+    var value = getValue();
+
+    var lastIndex = value.length - 1;
+    if (typeof value[lastIndex] === 'string'
+        && value[lastIndex-1] && value[lastIndex-1].chunk === chunk) {
+        value.pop();
+    }
+
+    var value2 = [];
+    for (var i = 0; i < value.length; i++) {
+        if (value[i].chunk !== chunk) {
+            value2.push(value[i]);
+        }
+    }
+
+    setValue(value2);
+};
+
+var removeHighlightedChunk = function() {
+    var highlightedEl = piecesEl.find('div.selected');
+    var chunk = parseInt(highlightedEl.attr('data-chunk'), 10);
+
+    removeChunk(chunk);
+    updatePieces();
+};
+
+var addPieceToValue = function(value, piece) {
+	// TODO: write me
+};
+
+var addHighlightedValue = function() {
+    // get the highlighted value
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // do nothing if no entry is highlighted
+    if (highlightedEl.length !== 1) return;
+
+	// get values from the option
+	var name = highlightedEl.attr('data-name');
+	var value = JSON.parse(highlightedEl.attr('data-value'));
+
+	// get the current widget value
+	var currentValue = getValue();
+	var newPiece = {
+		name: name,
+		value: value,
+		chunk: 1
+	};
+
+	// add to existing chunk
+	var lastIndex = currentValue.length - 1;
+	if (currentValue[lastIndex] && typeof currentValue[lastIndex] === 'string') {
+		currentValue[lastIndex] = newPiece;
+
+		if (currentValue[lastIndex-1]) {
+			currentValue[lastIndex].chunk = currentValue[lastIndex-1].chunk;
+		}
+	}
+	// start a new chunk
+	else {
+		currentValue.push(newPiece);
+
+		if (currentValue[currentValue.length-2]) {
+			currentValue[currentValue.length-1].chunk = currentValue[currentValue.length-2].chunk + 1;
+		}
+	}
+
+	// add the next child to the end of the chunk
+	var children = highlightedEl.attr('data-children');
+	if (typeof children === 'string' && children !== '') {
+		currentValue.push(children);
+	}
+
+	// set the new value
+	setValue(currentValue);
+
+	// update the widget display
+	updatePieces();
+
+	// close current input
+	stopInput();
+
+	// start new input
+	startInput();
+};
+
+var updatePieces = function() {
+    piecesEl.html(buildPieces());
+};
+
+//--------------------------------------------------------------
+// Input Keypresses
+//--------------------------------------------------------------
+
+var pressUpArrow = function() {
+    // get the highlighted element
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // no row highlighted, highlight the last list element
+    if (highlightedEl.length === 0) {
+        listEl.find('li.value').last().addClass('highlighted');
+        return;
+    }
+
+    // remove the highlight from the current element
+    highlightedEl.removeClass('highlighted');
+
+    // highlight the previous .value sibling
+    highlightedEl.prevAll('li.value').first().addClass('highlighted');
+};
+
+var pressDownArrow = function() {
+    // get the highlighted element
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // no row highlighted, highlight the first _value list element
+    if (highlightedEl.length === 0) {
+        listEl.find('li.value').first().addClass('highlighted');
+        return;
+    }
+
+    // remove the highlight from the current element
+    highlightedEl.removeClass('highlighted');
+
+    // highlight the next _value sibling
+    highlightedEl.nextAll('li.value').first().addClass('highlighted');
+};
+
+var pressEscapeKey = function() {
+    stopInput();
+    clearChunkHighlight();
+};
+
+var pressBackspaceOnEmptyInput = function() {
+    stopInput();
     if (isChunkHighlighted() === true) {
         removeHighlightedChunk();
     }
@@ -568,34 +580,22 @@ var pressEnterOrTab = function() {
     addHighlightedValue();
 };
 
-// returns true if a chunk is highlighted
-// false otherwise
-var isChunkHighlighted = function() {
-    return (piecesEl.find('div.selected').length === 1);
-};
+//--------------------------------------------------------------
+// Browser Events
+//--------------------------------------------------------------
 
-var removeHighlightedChunk = function() {
-    piecesEl.find('div.selected').remove();
+// click on the container
+var clickContainerElement = function(e) {
+	// prevent any clicks inside the container from bubbling up to the html element
+	e.stopPropagation();
 
-    // TODO: reset the chunk numbers
-};
-
-// keydown anywhere on the page
-var keydownWindow = function(e) {
-    var keyCode = e.which;
-
-    // backspace or delete with a highlighted chunk
-    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE)
-        && isChunkHighlighted() === true) {
-        e.preventDefault();
-        removeHighlightedChunk();
-        return;
+	// start input if it's not already happening
+    if (INPUT_HAPPENING === false) {
+        startInput();
     }
-
-    // escape key
-    if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
-        clearChunkHighlight();
-        return;
+    // else just put the focus on the input element
+    else {
+        inputEl.focus();
     }
 };
 
@@ -614,7 +614,7 @@ var keydownInputElement = function(e) {
     if (keyCode === KEYS.BACKSPACE && inputEl.val() === '') {
         e.preventDefault();
         e.stopPropagation();
-        backspaceEmptyField();
+        pressBackspaceOnEmptyInput();
         return;
     }
 
@@ -637,26 +637,115 @@ var keydownInputElement = function(e) {
     }
 };
 
+// keyup on the input elmeent
+var keyupInputElement = function(e) {
+	// do nothing if we have already hidden the input element
+	if (INPUT_HAPPENING !== true) return;
+
+	// do nothing if they have pressed a control character
+    // TODO: code smell? this seems fishy
+    var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
+	if (inArray(e.which, cntrlChars) !== false) return;
+
+	var filteredValues = filterValues(inputEl.val(), CURRENT_LIST);
+
+	// fill the dropdown
+    listEl.html(buildDropdown(filteredValues));
+};
+
+// user clicks a dropdown value
+var clickValue = function(e) {
+	// remove highlighted from all values in the list
+	listEl.find('li.value').removeClass('highlighted');
+
+	// add highlight class to the value clicked
+	$(this).addClass('highlighted');
+
+	// add the piece
+	addHighlightedValue();
+};
+
+// user clicks a chunk
+var clickChunk = function(e) {
+    // remove highlight from other chunks
+    clearChunkHighlight();
+
+    // highlight this chunk
+    $(this).addClass('selected');
+
+    // stop input
+    // NOTE: is this necessary?
+    stopInput();
+
+    // stop propagation
+    e.stopPropagation();
+};
+
 // TODO this needs to be better; should run up the DOM from the e.target
 //      and check to see if the element is within containerEl
 //      right now this doesn't work with multiple widgets on the same page
 var clickPage = function(e) {
-	// hide the autocomplete
-	closeAutocomplete();
+	// stop input
+	stopInput();
 };
 
-// event handlers
-containerEl.on('click', clickContainerElement);
-containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
-containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
-containerEl.on('click', 'li.value', clickValue);
-containerEl.on('click', 'div.chunk', clickChunk);
+// keydown anywhere on the page
+var keydownWindow = function(e) {
+    var keyCode = e.which;
 
-// catch all clicks on the page
-$('html').on('click', clickPage);
+    // backspace or delete with a highlighted chunk
+    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE)
+        && isChunkHighlighted() === true) {
+        e.preventDefault();
+        removeHighlightedChunk();
+        return;
+    }
 
-// catch global keydown
-$(window).on('keydown', keydownWindow);
+    // escape key
+    if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
+        clearChunkHighlight();
+        return;
+    }
+};
+
+var addEvents = function() {
+    containerEl.on('click', clickContainerElement);
+    containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
+    containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
+    containerEl.on('click', 'li.value', clickValue);
+    containerEl.on('click', 'div.chunk', clickChunk);
+
+    // catch all clicks on the page
+    $('html').on('click', clickPage);
+
+    // catch global keydown
+    $(window).on('keydown', keydownWindow);
+};
+
+//--------------------------------------------------------------
+// Initialization
+//--------------------------------------------------------------
+
+var initDom = function() {
+    // get the container element
+    containerEl = $('#' + containerElId);
+
+    // build the markup inside the container
+    containerEl.html(buildWidget());
+
+    // grab elements in memory
+    inputEl = containerEl.find('input.input_proxy');
+    listEl = containerEl.find('ul.dropdown');
+    piecesEl = containerEl.find('div.pieces_container');
+};
+
+var init = function() {
+    if (sanityChecks() !== true) return;
+    initOptions();
+    initDom();
+    addEvents();
+};
+init();
 
 // end window.AutoComplete()
 };

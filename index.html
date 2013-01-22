@@ -31,7 +31,7 @@
 <p>At it's most simple, AutoComplete works with an array of values.</p>
 <pre class="brush:js;">
 var fruits = ['Apple', 'Banana', 'Orange'];
-var widget1 = new AutoComplete('#example1', fruits);
+var widget1 = new AutoComplete('example1', fruits);
 </pre>
 <div id="example1" class="widget"></div>
 </div>
@@ -53,7 +53,7 @@ var groupedFruits = [
   { group: 'Vegetables', value: 'Lettuce' },
   { group: 'Vegetables', value: 'Onion' }
 ];
-var widget2 = new AutoComplete('#example2', groupedFruits);
+var widget2 = new AutoComplete('example2', groupedFruits);
 </pre>
 <div id="example2" class="widget"></div>
 </div>
@@ -77,7 +77,7 @@ var ex3Options = {
     vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
 };
-var widget3 = new AutoComplete('#example3', ex3Options);
+var widget3 = new AutoComplete('example3', ex3Options);
 </pre>
 <div id="example3" class="widget"></div>
 </div>
@@ -96,27 +96,27 @@ var ex4Options = {
       { value: 'Meats', children: 'meats' },
       { value: 'Vegetables', children: 'vegetables' }
     ],
-	
+
     fruits: ['Apple', 'Banana', 'Orange'],
-	
+
     meats: [
 	  { value: 'Beef', children: 'beef' },
 	  'Chicken',
 	  'Pork'
 	],
-	
+
     vegetables: ['Carrot', 'Lettuce', 'Onion'],
-	
+
 	beef: [
 	  'Hamburger',
 	  'Pot Roast',
 	  { value: 'Steak', children: 'steak' }
 	],
-	
+
 	steak: ['NY Strip', 'Ribeye', 'T-Bone']
   }
 };
-var widget4 = new AutoComplete('#example4', ex4Options);
+var widget4 = new AutoComplete('example4', ex4Options);
 </pre>
 <div id="example4" class="widget"></div>
 </div>
@@ -149,7 +149,7 @@ var ex5Options = {
 	}
   }
 };
-var widget5 = new AutoComplete('#example5', ex5Options);
+var widget5 = new AutoComplete('example5', ex5Options);
 </pre>
 <div id="example5" class="widget"></div>
 </div>
@@ -169,9 +169,9 @@ var init = function() {
 // Example 1
 //-------------------------------------------
 (function() {
-	
+
 var fruits = ['Apple', 'Banana', 'Orange'];
-var widget1 = new AutoComplete('#example1', fruits);
+var widget1 = new AutoComplete('example1', fruits);
 
 })();
 
@@ -180,7 +180,7 @@ var widget1 = new AutoComplete('#example1', fruits);
 // Example 2
 //-------------------------------------------
 (function() {
-	
+
 var groupedFruits = [
   { group: 'Fruits', value: 'Apple' },
   { group: 'Fruits', value: 'Banana' },
@@ -192,15 +192,15 @@ var groupedFruits = [
   { group: 'Vegetables', value: 'Lettuce' },
   { group: 'Vegetables', value: 'Onion' }
 ];
-var widget2 = new AutoComplete('#example2', groupedFruits);
-	
+var widget2 = new AutoComplete('example2', groupedFruits);
+
 })();
 
 //-------------------------------------------
 // Example 3
 //-------------------------------------------
 (function() {
-	
+
 var ex3Options = {
   initialList: 'foods',
   lists: {
@@ -214,15 +214,15 @@ var ex3Options = {
     vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
 };
-var widget3 = new AutoComplete('#example3', ex3Options);
-	
+var widget3 = new AutoComplete('example3', ex3Options);
+
 })();
 
 //-------------------------------------------
 // Example 4
 //-------------------------------------------
 (function() {
-	
+
 var ex4Options = {
   initialList: 'foods',
   lists: {
@@ -231,35 +231,35 @@ var ex4Options = {
       { value: 'Meats', children: 'meats' },
       { value: 'Vegetables', children: 'vegetables' }
     ],
-	
+
     fruits: ['Apple', 'Banana', 'Orange'],
-	
+
     meats: [
 	  { value: 'Beef', children: 'beef' },
 	  'Chicken',
 	  'Pork'
 	],
-	
+
     vegetables: ['Carrot', 'Lettuce', 'Onion'],
-	
+
 	beef: [
 	  'Hamburger',
 	  'Pot Roast',
 	  { value: 'Steak', children: 'steak' }
 	],
-	
+
 	steak: ['NY Strip', 'Ribeye', 'T-Bone']
   }
 };
-var widget4 = new AutoComplete('#example4', ex4Options);
-	
+var widget4 = new AutoComplete('example4', ex4Options);
+
 })();
 
 //-------------------------------------------
 // Example 5
 //-------------------------------------------
 (function() {
-	
+
 var ex5Options = {
   initialList: 'meals',
   lists: {
@@ -281,8 +281,8 @@ var ex5Options = {
 	}
   }
 };
-var widget5 = new AutoComplete('#example5', ex5Options);
-	
+var widget5 = new AutoComplete('example5', ex5Options);
+
 })();
 
 // end examples
