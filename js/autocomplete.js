@@ -209,7 +209,7 @@ var buildWidget = function() {
     return html;
 };
 
-var buildOption = function(value) {
+var buildValue = function(value) {
     var html = '<li class="value"' +
 	' data-value="' + encode(JSON.stringify(value.value)) + '"' +
 	' data-name="' + encode(value.name) + '"';
@@ -238,8 +238,8 @@ var buildDropdown = function(values) {
 
 	// build all options without groups first
 	for (i = 0; i < values.length; i++) {
-		if (values[i].group === false) {
-			html += buildOption(values[i]);
+		if (! values[i].group) {
+			html += buildValue(values[i]);
 		}
 	}
 
@@ -250,7 +250,7 @@ var buildDropdown = function(values) {
 
 		for (var j = 0; j < values.length; j++) {
 			if (groups[i] === values[j].group) {
-				html += buildOption(values[j]);
+				html += buildValue(values[j]);
 			}
 		}
 	}
@@ -368,11 +368,8 @@ var startInput = function() {
     });
     inputEl.focus();
 
-    // fill the dropdown with values
-    listEl.html(buildDropdown(list.values));
-
-	// highlight the first element
-	listEl.find('li.value').filter(':first').addClass('highlighted');
+    // open the dropdown with all the values
+    updateDropdown(list.values);
 
     // show the dropdown
     showDropdown();
@@ -382,6 +379,14 @@ var startInput = function() {
 
     // toggle state
     INPUT_HAPPENING = true;
+};
+
+var updateDropdown = function(values) {
+    // fill the dropdown with values
+    listEl.html(buildDropdown(values));
+
+	// highlight the first element
+	listEl.find('li.value').filter(':first').addClass('highlighted');
 };
 
 var stopInput = function() {
@@ -401,20 +406,6 @@ var stopInput = function() {
 
 var clearChunkHighlight = function() {
     piecesEl.find('div.chunk').removeClass('selected');
-};
-
-var filterValues = function(str, values) {
-	var results = [];
-
-	str = str.toLowerCase();
-
-	for (var i = 0; i < values.length; i++) {
-		if (str === values[i].name.toLowerCase().substring(0, str.length)) {
-			results.push(values[i]);
-		}
-	}
-
-	return results;
 };
 
 var highlightLastChunk = function() {
@@ -520,6 +511,52 @@ var addHighlightedValue = function() {
 
 var updatePieces = function() {
     piecesEl.html(buildPieces());
+};
+
+var filterValues = function(str, values) {
+	str = str.toLowerCase();
+    var results = [];
+	for (var i = 0; i < values.length; i++) {
+		if (str === values[i].name.toLowerCase().substring(0, str.length)) {
+			results.push(values[i]);
+		}
+	}
+	return results;
+};
+
+var getCurrentList = function() {
+    var value = getValue();
+    var lastIndex = value.length - 1;
+    if (typeof value[lastIndex] === 'string'
+        && listExists(value[lastIndex]) === true) {
+        return opts.lists[value[lastIndex]];
+    }
+
+    return opts.lists[opts.initialList];
+};
+
+var handleTextInput = function() {
+    var list = getCurrentList();
+    var value = inputEl.val();
+	var filteredValues = filterValues(value, list.values);
+
+    if (filteredValues.length === 0) {
+        if (list.allowFreeform === true) {
+            filteredValues.push({
+                name: value,
+                value: value
+            });
+        }
+        else {
+            filteredValues.push({
+                name: 'No results found.',
+                value: false
+            });
+        }
+    }
+
+	// fill the dropdown with the filtered results
+    updateDropdown(filteredValues);
 };
 
 //--------------------------------------------------------------
@@ -640,6 +677,7 @@ var keydownInputElement = function(e) {
 // keyup on the input elmeent
 var keyupInputElement = function(e) {
 	// do nothing if we have already hidden the input element
+    // NOTE: I think this should never happen
 	if (INPUT_HAPPENING !== true) return;
 
 	// do nothing if they have pressed a control character
@@ -647,10 +685,7 @@ var keyupInputElement = function(e) {
     var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
 	if (inArray(e.which, cntrlChars) !== false) return;
 
-	var filteredValues = filterValues(inputEl.val(), CURRENT_LIST);
-
-	// fill the dropdown
-    listEl.html(buildDropdown(filteredValues));
+    handleTextInput();
 };
 
 // user clicks a dropdown value
