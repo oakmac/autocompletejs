@@ -210,8 +210,11 @@ var buildWidget = function() {
 };
 
 var buildValue = function(value) {
-    var html = '<li class="value"' +
-	' data-value="' + encode(JSON.stringify(value.value)) + '"' +
+    var html = '<li';
+    if (value.hasOwnProperty('clickable') === false || value.clickable !== false) {
+        html += ' class="value"';
+    }
+	html += ' data-value="' + encode(JSON.stringify(value.value)) + '"' +
 	' data-name="' + encode(value.name) + '"';
 
 	if (value.children) {
@@ -549,6 +552,7 @@ var handleTextInput = function() {
         }
         else {
             filteredValues.push({
+                clickable: false,
                 name: 'No results found.',
                 value: false
             });
