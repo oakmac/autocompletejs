@@ -1,25 +1,25 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>AutoComplete Widget</title>
-    <meta name="viewport" content="width=device-width">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AutoComplete Widget</title>
+  <meta name="viewport" content="width=device-width">
 
-    <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
-	<link rel="stylesheet" href="css/shCoreDefault.css" />
-    <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
-    <script src="css/less-1.3.0.min.js"></script>
+  <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
+  <link rel="stylesheet" href="css/shCoreDefault.css" />
+  <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
+  <script src="css/less-1.3.0.min.js"></script>
 
-	<style type="text/css">
-	div.example {
-		padding: 50px 0px;
-		border-bottom: 2px solid #ccc;
-	}
-	div.example-widget {
+  <style type="text/css">
+  div.example {
+      padding: 50px 0px;
+      border-bottom: 2px solid #ccc;
+  }
+  div.example-widget {
 
-	}
-	</style>
+  }
+</style>
 </head>
 <body>
 <div id="body_wrapper" class="container">
@@ -30,7 +30,7 @@ foreach ($examples as $example) {
     echo '<!-- begin Example ' . $example['num'] . ' -->'."\n";
     echo '<div class="example">'."\n";
     echo buildExampleDescription($example['description']);
-    echo '<pre class="brush:js;">'."\n";
+    echo '<pre class="brush:js; toolbar:false;">'."\n";
     echo $example['js']."\n";
     echo '</pre>'."\n";
     echo '<div id="example' . $example['num'] . '" class="example-widget"></div>'."\n";
@@ -51,9 +51,9 @@ var init = function() {
 
 <?php
 foreach ($examples as $example) {
-    //echo '//-------------------------------------------'."\n";
+    echo '//-------------------------------------------'."\n";
     echo '// Example ' . $example['num'] . "\n";
-    //echo '//-------------------------------------------'."\n";
+    echo '//-------------------------------------------'."\n";
     echo '(function() {'."\n\n";
     echo $example['js']."\n\n";
     echo '})();'."\n\n\n";

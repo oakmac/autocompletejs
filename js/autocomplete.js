@@ -13,6 +13,10 @@ widget.clear(); // clear the input of the bar
 widget.reload(opts); // reload with a new options object
 */
 
+// TODO: custom value search and example
+// TODO: AJAX preprocesisng example
+// TODO: AJAX postprocessing example
+
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
 
 //--------------------------------------------------------------
@@ -142,10 +146,17 @@ var expandValue = function(value) {
 };
 
 var expandList = function(list) {
-	// an array is the values
+	// an array is shorthand for values
 	if (Array.isArray(list) === true) {
 		list = {
 			values: list
+		};
+	}
+	
+	// a string is shorthand for the AJAX url
+	if (typeof list === 'string') {
+		list = {
+			url: list
 		};
 	}
 
@@ -168,8 +179,8 @@ var expandList = function(list) {
 };
 
 var initOptions = function() {
-	// an array is a single list option
-	if (Array.isArray(opts) === true) {
+	// if opts is an array or a string, then there is a single list
+	if (Array.isArray(opts) === true || typeof opts === 'string') {
 		opts = {
 			initialList: 'default',
 			lists: {
@@ -563,6 +574,14 @@ var handleTextInput = function() {
     updateDropdown(filteredValues);
 };
 
+var highlightValue = function(valueEl) {
+	// remove highlighted from all values in the list
+	listEl.find('li.value').removeClass('highlighted');
+
+	// add highlight class to the value clicked
+	$(valueEl).addClass('highlighted');
+};
+
 //--------------------------------------------------------------
 // Input Keypresses
 //--------------------------------------------------------------
@@ -694,14 +713,15 @@ var keyupInputElement = function(e) {
 
 // user clicks a dropdown value
 var clickValue = function(e) {
-	// remove highlighted from all values in the list
-	listEl.find('li.value').removeClass('highlighted');
+    // highlight it
+    highlightValue(this);
 
-	// add highlight class to the value clicked
-	$(this).addClass('highlighted');
-
-	// add the piece
+    // add it
 	addHighlightedValue();
+};
+
+var mouseoverValue = function() {
+    highlightValue(this);
 };
 
 // user clicks a chunk
@@ -752,6 +772,7 @@ var addEvents = function() {
     containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
     containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
     containerEl.on('click', 'li.value', clickValue);
+    containerEl.on('mouseover', 'li.value', mouseoverValue);
     containerEl.on('click', 'div.chunk', clickChunk);
 
     // catch all clicks on the page

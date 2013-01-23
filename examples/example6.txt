@@ -1,0 +1,1 @@
+You can source a list from an external URL via AJAX.

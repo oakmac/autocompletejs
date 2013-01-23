@@ -10,20 +10,20 @@ var opts = {
     fruits: ['Apple', 'Banana', 'Orange'],
 
     meats: [
-	  { value: 'Beef', children: 'beef' },
-	  'Chicken',
-	  'Pork'
-	],
+    { value: 'Beef', children: 'beef' },
+    'Chicken',
+    'Pork'
+  ],
 
     vegetables: ['Carrot', 'Lettuce', 'Onion'],
 
-	beef: [
-	  'Hamburger',
-	  'Pot Roast',
-	  { value: 'Steak', children: 'steak' }
-	],
+  beef: [
+    'Hamburger',
+    'Pot Roast',
+    { value: 'Steak', children: 'steak' }
+  ],
 
-	steak: ['NY Strip', 'Ribeye', 'T-Bone']
+  steak: ['NY Strip', 'Ribeye', 'T-Bone']
   }
 };
 var example4 = new AutoComplete('example4', opts);
