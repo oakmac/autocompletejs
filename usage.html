@@ -12,62 +12,193 @@
   <script src="css/less-1.3.0.min.js"></script>
 
   <style type="text/css">
-  div.example {
-      padding: 50px 0px;
-      border-bottom: 2px solid #ccc;
-  }
-  div.example-widget {
 
-  }
-</style>
+  </style>
 </head>
 <body>
 <div id="body_wrapper" class="container">
 
-<h2>Options Object</h2>
-<table class="table">
+<h2 id="options">Options Object</h2>
+<table class="table table-striped syntaxhighlighter">
 <thead>
 	<tr>
 		<th>Property</th>
 		<th>Type</th>
+        <th>Required</th>
 		<th>Default</th>
-		<th>Required</th>
 		<th>Description</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
-		<td>initialList</td>
-		<td>string<br />Should be the property name of a list in the lists property.</td>
-		<td>n/a</td>
+		<td><code class="js plain">initialList</code></td>
+		<td>String</td>
 		<td>yes</td>
+		<td><small>n/a</small></td>
 		<td>
-			The initialList property should be the first list started when the user clicks on the autocomplete component.
+			<p>The <code class="js plain">initialList</code> property should be the first list started when the user clicks on the autocomplete component.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">lists</code></td>
+		<td>Object of lists</td>
+		<td>yes</td>
+		<td><small>n/a</small></td>
+		<td>
+			<p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
+            <p>Please see the <a href="#list_object_header">List Object</a> reference below for more information on List Objects.</p>
 		</td>
 	</tr>
 </tbody>
 </table>
 
-<h2>List Object</h2>
-<table class="table">
+<h2 id="list">List Object</h2>
+<table class="table table-striped syntaxhighlighter">
 <thead>
 	<tr>
 		<th>Property</th>
 		<th>Type</th>
+        <th>Required</th>
 		<th>Default</th>
-		<th>Required</th>
 		<th>Description</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
-		<td>allowFreeform</td>
-		<td>boolean</td>
-		<td>false</td>
+		<td><code class="js plain">allowFreeform</code></td>
+		<td>Boolean</td>
 		<td>no</td>
+        <td><code class="js keyword">false</code></td>
 		<td>
-			<p>If true, allows the user to enter free-form text.  If false, the user must select a value from the list.</p>
-			<p>There can still be list values when allowFreeform is set to true, but the user does not have to select one.</p>
+			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
+            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
+			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">maxResults</code></td>
+		<td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
+		<td>no</td>
+        <td><code class="js keyword">false</code></td>
+		<td>
+			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">noResults</code></td>
+		<td>String<br /><small>or</small><br />Function</td>
+		<td>no</td>
+        <td><code class="js string">'No results found'</code></td>
+		<td>
+			<p>An HTML string to display when <code class="js plain">allowFreeform</code> is <code class="js keyword">false</code> and there are no results to show.</p>
+            <p>If <code class="js plain">noResults</code> is a function, the first argument is the current value of the search bar and the second argument is the text that the user has entered.</p>
+            <p>The function should return an HTML string which will be displayed in the dropdown list (but not be selectable as an option).</p>
+            <p>Note: <code class="js plain">noResults</code> does <strong>not</strong> get HTML escaped when inserted into the DOM.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">postProcess</code></td>
+		<td>Function</td>
+		<td>no</td>
+        <td><small>n/a</small></td>
+		<td>
+			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">preProcess</code></td>
+		<td>Function</td>
+		<td>no</td>
+        <td><small>n/a</small></td>
+		<td>
+			<p><code class="js plain">preProcess</code> is an optional function you can include to process data before it is sent to the server.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">query</code></td>
+		<td>String<br /><small>or</small><br />Function</td>
+		<td>no</td>
+        <td><code class="js plain">'q={value}'</code></td>
+		<td>
+			<p><code class="js plain">query</code> is an optional function you can include to process data before it is sent to the server.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">searching</code></td>
+		<td>String<br /><small>or</small><br />Function</td>
+		<td>no</td>
+        <td><code class="js string">'Searching...'</code></td>
+		<td>
+			<p>An HTML string to display when searching for results.</p>
+            <p>If <code class="js plain">searching</code> is a function, the first argument is the current value of the search bar and the second argument is the text that the user has entered.</p>
+            <p>The function should return an HTML string which will be displayed in the dropdown list (but not be selectable as an option).</p>
+            <p>Note: <code class="js plain">searching</code> does <strong>not</strong> get HTML escaped when inserted into the DOM.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">url</code></td>
+		<td>String</td>
+		<td>no</td>
+        <td><small>n/a</small></td>
+		<td>
+			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
+		</td>
+	</tr>
+</tbody>
+</table>
+
+<h2 id="value">Value Object</h2>
+<table class="table table-striped syntaxhighlighter">
+<thead>
+	<tr>
+		<th>Property</th>
+		<th>Type</th>
+        <th>Required</th>
+		<th>Default</th>
+		<th>Description</th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td><code class="js plain">children</code></td>
+		<td>String</td>
+		<td>no</td>
+        <td></td>
+		<td>
+			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
+            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
+			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+		</td>
+	</tr>
+    <tr>
+		<td><code class="js plain">group</code></td>
+		<td>String</td>
+		<td>no</td>
+        <td></td>
+		<td>
+			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
+            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
+			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">name</code></td>
+		<td>String</td>
+		<td>no</td>
+        <td><code class="js keyword">false</code></td>
+		<td>
+			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
+            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
+			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+		</td>
+	</tr>
+	<tr>
+		<td><code class="js plain">value</code></td>
+		<td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
+		<td>no</td>
+        <td><code class="js keyword">false</code></td>
+		<td>
+			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
 		</td>
 	</tr>
 </tbody>
@@ -81,7 +212,7 @@
 <script>
 var init = function() {
 	// turn on syntax highlighter
-	SyntaxHighlighter.all();
+	//SyntaxHighlighter.all();
 };
 $(document).ready(init);
 </script>

@@ -1,9 +1,11 @@
+
 var opts = {
-  initialList: 'year',
+  initialList: 'states',
   lists: {
-  year: 'api/cars/year.php',
-    make: 'api/cars/make.php',
-  model: 'api/cars/model.php'
+    states: {
+      url: 'api/states.php',
+      preProcess: function
+    }
   }
 };
-var example8 = new AutoComplete('example8', opts);
+var example9 = new AutoComplete('example9', opts);
