@@ -8,6 +8,8 @@ if(!Array.isArray) {
 // TODO: custom value search and example
 // TODO: custom AJAX example using POST or localStorage
 // TODO: AJAX postprocessing example
+// TODO: example using localStorage
+// TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
 
@@ -105,7 +107,7 @@ var checkDeps = function() {
 
     // TODO: make sure jQuery is defined
     // TODO: make sure JSON is defined
-  
+
     return true;
 };
 
@@ -854,6 +856,12 @@ return {
         destroyWidget();
     },
     focus: function() {
+        startInput();
+    },
+    getList: function(listName) {
+
+    },
+    getLists: function() {
 
     },
     reload: function(options) {

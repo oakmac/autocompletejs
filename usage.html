@@ -67,7 +67,7 @@ Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
-      <p>Please see the <a href="#list_object">List Object</a> reference below for more information on List Objects.</p>
+      <p>See the <a href="#list_object">List Object</a> reference for more information on List Objects.</p>
     </td>
   </tr>
 </tbody>
@@ -94,6 +94,16 @@ Methods documentation
 </thead>
 <tbody>
   <tr>
+    <td><code class="js plain">ajaxEnabled</code></td>
+    <td>Boolean</td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p>If <code class="js keyword">true</code>, will send an AJAX request when the user types in the input.</p>
+      <p>Note: You can have local list options as well as requesting results from a server. See this example.</p>
+    </td>
+  </tr>
+  <tr>
     <td><code class="js plain">allowFreeform</code></td>
     <td>Boolean</td>
     <td>no</td>
@@ -114,6 +124,19 @@ Methods documentation
       <p>When any option from this list is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show up in the component.</p>
       <p>Note: If there is a <code class="js plain">children</code> property on the Option Object selected it will supersede this <code class="js plain">children</code> property.
          See the <code class="js plain">children</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">filterOptions</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">filterOptions</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
+      <p>The first argument to the function is the current value of the AutoComplete widget, the second argument is an array of Option Objects for the current list, and the third function is the text the user has entered.</p>
+      <p>The function should return an array of Option Objects.</p>
+      <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
+      <p>Note: You can return an array of any Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
     </td>
   </tr>
   <tr>
@@ -150,15 +173,6 @@ Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">query</code></td>
-    <td>String<br /><small>or</small><br />Function</td>
-    <td>no</td>
-    <td><code class="js string">'q={value}'</code></td>
-    <td>
-      <p><code class="js plain">query</code> is an optional function you can include to process data before it is sent to the server.</p>
-    </td>
-  </tr>
-  <tr>
     <td><code class="js plain">searchingHTML</code></td>
     <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
@@ -171,11 +185,14 @@ Methods documentation
   </tr>
   <tr>
     <td><code class="js plain">url</code></td>
-    <td>String</td>
+    <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">url</code> is the URL to hit.</p>
+      <p><code class="js plain">url</code> is the URL to send an AJAX request to when <code class="js plain">ajaxEnabled</code> is <code class="js keyword">true</code>.</p>
+      <p>The string <code class="js string">'{value}'</code> will be replaced with the text the user has typed.  The text will be escaped using <code class="js plain">encodeURIComponent()</code>.</p>
+      <p>If <code class="js plain">url</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>The function should return a url string.</p>
     </td>
   </tr>
   <tr>
@@ -197,7 +214,7 @@ Methods documentation
   <div class="part-of-speech">Noun</div>
   <div class="definition">A thing that is or may be chosen.</div>
 </div>
-<p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type and contain the names and values of those options.</p>
+<p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type.</p>
 <p>You can define the list workflow using the <code class="js plain">children</code> property on Option Objects.</p>
 <table class="table table-striped syntaxhighlighter">
 <thead>
@@ -233,15 +250,28 @@ Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">name</code></td>
+    <td><code class="js plain">optionHTML</code></td>
     <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
       <p>An HTML string to show inside the dropdown.</p>
-      <p>If there is no <code class="js plain">name</code> property and <code class="js plain">value</code> is a string, then <code class="js plain">value</code> will appear in the dropdown.</p>
-      <p>If <code class="js plain">value</code> is not a string, you must include a <code class="js plain">name</code> property.</p>
-      <p>If <code class="js plain">name</code> is a function, the first argument is the option's <code class="js plain">value</code>.  The function should return an HTML string.</p>
+      <p>If there is no <code class="js plain">optionHTML</code> property and <code class="js plain">value</code> is a string, then <code class="js plain">optionHTML</code> gets an HTML-escaped <code class="js plain">value</code>.</p>
+      <p>If <code class="js plain">value</code> is not a string, you must include a <code class="js plain">optionHTML</code> property.</p>
+      <p>If <code class="js plain">optionHTML</code> is a function, the first argument is the option itself.</p>
+      <p>The function should return an HTML string.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">pieceHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>An HTML string to show inside the search bar.</p>
+      <p>If <code class="js plain">optionHTML</code> is a function, the first argument is the option itself.</p>
+      <p>The function should return an HTML string.</p>
+      <p>If there is no <code class="js plain">pieceHTML</code> property it uses <code class="js plain">optionHTML</code>.</p>
     </td>
   </tr>
   <tr>

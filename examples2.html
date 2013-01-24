@@ -19,7 +19,7 @@
 <div id="body_wrapper" class="container">
 
 <div id="example" class="example-widget"></div>
-<input type="button" id="clear" value="Clear" />
+<input type="button" id="clear" value="I am a button" />
 
 </div><!-- end #body_wrapper -->
 
@@ -32,7 +32,7 @@ var init = function() {
 
 var widget = new AutoComplete('example', ['Apple', 'Banana', 'Orange']);
 
-$('#clear').click(widget.destroy);
+$('#clear').click(widget.focus);
 
 
 
