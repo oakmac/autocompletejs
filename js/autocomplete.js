@@ -5,16 +5,8 @@ if(!Array.isArray) {
   };
 }
 
-/*
-var widget = new AutoComplete(options);
-widget.val();   // get the current value
-widget.focus(); // put focus on the bar
-widget.clear(); // clear the input of the bar
-widget.reload(opts); // reload with a new options object
-*/
-
 // TODO: custom value search and example
-// TODO: AJAX preprocesisng example
+// TODO: custom AJAX example using POST or localStorage
 // TODO: AJAX postprocessing example
 
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
@@ -90,8 +82,31 @@ var arrayUnique = function(arr) {
 // Sanity Checks
 //--------------------------------------------------------------
 
+var validValueObject = function(obj) {
+
+    // TODO: write me
+
+    return true;
+};
+
+var validListObject = function(obj) {
+
+    // TODO: write me
+
+    return true;
+};
+
 var showError = function(code, msg) {
     window.alert('AutoComplete Error ' + code + ': ' + msg);
+};
+
+var checkDeps = function() {
+
+
+    // TODO: make sure jQuery is defined
+    // TODO: make sure JSON is defined
+  
+    return true;
 };
 
 // NOTE: all of the errors have unique codes so that people who search
@@ -109,8 +124,7 @@ var sanityChecks = function() {
         return false;
     }
 
-    // TODO: make sure jQuery is defined
-    // TODO: make sure JSON is defined
+
     // TODO: make sure opts are formatted correctly
     // TODO: allow them to set the initial value of the widget
     // TODO: show an error when a value.children is not a valid list option
@@ -123,7 +137,7 @@ var sanityChecks = function() {
 //--------------------------------------------------------------
 
 // expand a single value object
-var expandValue = function(value) {
+var expandValueObject = function(value) {
     // string becomes the value
     if (typeof value === 'string') {
         value = {
@@ -137,22 +151,22 @@ var expandValue = function(value) {
         value.name = value.value;
     }
 
-	// group is either true or false
-    if (typeof value.group !== 'string') {
+	// group is either a non-empty string or false
+    if (typeof value.group !== 'string' || value.group === '') {
         value.group = false;
     }
 
     return value;
 };
 
-var expandList = function(list) {
+var expandListObject = function(list) {
 	// an array is shorthand for values
 	if (Array.isArray(list) === true) {
 		list = {
 			values: list
 		};
 	}
-	
+
 	// a string is shorthand for the AJAX url
 	if (typeof list === 'string') {
 		list = {
@@ -172,7 +186,7 @@ var expandList = function(list) {
 
 	// expand values
 	for (var i = 0; i < list.values.length; i++) {
-		list.values[i] = expandValue(list.values[i]);
+		list.values[i] = expandValueObject(list.values[i]);
 	}
 
 	return list;
@@ -199,7 +213,7 @@ var initOptions = function() {
 	// expand lists
 	for (var i in opts.lists) {
 		if (opts.lists.hasOwnProperty(i) !== true) continue;
-		opts.lists[i] = expandList(opts.lists[i]);
+		opts.lists[i] = expandListObject(opts.lists[i]);
 	}
 };
 
@@ -318,6 +332,20 @@ var buildPieces = function() {
 //--------------------------------------------------------------
 // Control Flow / DOM Manipulation
 //--------------------------------------------------------------
+
+var removeList = function(listName) {
+    // TODO: write me
+};
+
+var destroyWidget = function() {
+    containerEl.html('');
+    // TODO: unbind event handlers on the container element?
+};
+
+var clearWidget = function() {
+    setValue([]);
+    updatePieces();
+};
 
 var showDropdown = function() {
     // get position and height of input element
@@ -698,6 +726,7 @@ var keydownInputElement = function(e) {
 };
 
 // keyup on the input elmeent
+// TODO: remove this; should do everything on keydown
 var keyupInputElement = function(e) {
 	// do nothing if we have already hidden the input element
     // NOTE: I think this should never happen
@@ -806,6 +835,52 @@ var init = function() {
     addEvents();
 };
 init();
+
+// return a new object
+return {
+    addList: function(name, list) {
+
+    },
+    addValue: function(listName, value) {
+
+    },
+    blur: function() {
+
+    },
+    clear: function() {
+        clearWidget();
+    },
+    destroy: function() {
+        destroyWidget();
+    },
+    focus: function() {
+
+    },
+    reload: function(options) {
+
+    },
+    removeList: function(listName) {
+        // return false if the list does not exist
+        if (listExists(listName) !== true) return false;
+
+        removeList(listName);
+        return true;
+    },
+
+    // TODO: what should the return value of this function be when
+    //       you set a new value?
+    val: function(newValue) {
+        // set a new value
+        if (newValue && validValueObject(newValue) === true) {
+            setValue(newValue);
+            return true;
+        }
+        // else return the current value
+        else {
+            return getValue();
+        }
+    }
+};
 
 // end window.AutoComplete()
 };

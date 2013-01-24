@@ -4,7 +4,7 @@ var opts = {
   lists: {
     states: {
       url: 'api/states.php',
-      preProcess: function
+      preProcess: false
     }
   }
 };

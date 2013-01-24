@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>AutoComplete Widget &rarr; Usage</title>
+  <title>AutoComplete &raquo; Usage</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
@@ -12,195 +12,248 @@
   <script src="css/less-1.3.0.min.js"></script>
 
   <style type="text/css">
-
+  .syntaxhighlighter a {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  }
+  div.etymology {
+    margin: 30px 0px;
+  }
+  div.word {
+    font-size: 26px;
+    margin-bottom: 16px;
+  }
+  div.part-of-speech {
+    color: #878787;
+  }
+  div.definition {
+    font-style: italic;
+  }
   </style>
 </head>
 <body>
 <div id="body_wrapper" class="container">
 
-<h2 id="options">Options Object</h2>
+<!--
+Methods documentation
+-->
+
+<h2 id="config_object">AutoComplete Config Object</h2>
+<p>The Config Object initializes the AutoComplete widget.</p>
 <table class="table table-striped syntaxhighlighter">
 <thead>
-	<tr>
-		<th>Property</th>
-		<th>Type</th>
-        <th>Required</th>
-		<th>Default</th>
-		<th>Description</th>
-	</tr>
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Default</th>
+    <th>Description</th>
+  </tr>
 </thead>
 <tbody>
-	<tr>
-		<td><code class="js plain">initialList</code></td>
-		<td>String</td>
-		<td>yes</td>
-		<td><small>n/a</small></td>
-		<td>
-			<p>The <code class="js plain">initialList</code> property should be the first list started when the user clicks on the autocomplete component.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">lists</code></td>
-		<td>Object of lists</td>
-		<td>yes</td>
-		<td><small>n/a</small></td>
-		<td>
-			<p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
-            <p>Please see the <a href="#list_object_header">List Object</a> reference below for more information on List Objects.</p>
-		</td>
-	</tr>
+  <tr>
+    <td><code class="js plain">initialList</code></td>
+    <td>String</td>
+    <td>yes</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>The <code class="js plain">initialList</code> property is the first list started when the user clicks on the AutoComplete widget.</p>
+      <p>It's value should be the name of a <a href="#list_object">List Object</a>.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">lists</code></td>
+    <td>Object of List Objects</td>
+    <td>yes</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
+      <p>Please see the <a href="#list_object">List Object</a> reference below for more information on List Objects.</p>
+    </td>
+  </tr>
 </tbody>
 </table>
 
-<h2 id="list">List Object</h2>
+<h2 id="list_object">List Object</h2>
+<div class="etymology">
+  <div class="word">list</div>
+  <div class="part-of-speech">Noun</div>
+  <div class="definition">A number of connected items or names written or printed consecutively, typically one below the other.</div>
+</div>
+<p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
+<p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
+<p>You can define the list workflow using the <code class="js plain">children</code> property on List Objects.</p>
 <table class="table table-striped syntaxhighlighter">
 <thead>
-	<tr>
-		<th>Property</th>
-		<th>Type</th>
-        <th>Required</th>
-		<th>Default</th>
-		<th>Description</th>
-	</tr>
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Default</th>
+    <th>Description</th>
+  </tr>
 </thead>
 <tbody>
-	<tr>
-		<td><code class="js plain">allowFreeform</code></td>
-		<td>Boolean</td>
-		<td>no</td>
-        <td><code class="js keyword">false</code></td>
-		<td>
-			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
-            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
-			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">maxResults</code></td>
-		<td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
-		<td>no</td>
-        <td><code class="js keyword">false</code></td>
-		<td>
-			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">noResults</code></td>
-		<td>String<br /><small>or</small><br />Function</td>
-		<td>no</td>
-        <td><code class="js string">'No results found'</code></td>
-		<td>
-			<p>An HTML string to display when <code class="js plain">allowFreeform</code> is <code class="js keyword">false</code> and there are no results to show.</p>
-            <p>If <code class="js plain">noResults</code> is a function, the first argument is the current value of the search bar and the second argument is the text that the user has entered.</p>
-            <p>The function should return an HTML string which will be displayed in the dropdown list (but not be selectable as an option).</p>
-            <p>Note: <code class="js plain">noResults</code> does <strong>not</strong> get HTML escaped when inserted into the DOM.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">postProcess</code></td>
-		<td>Function</td>
-		<td>no</td>
-        <td><small>n/a</small></td>
-		<td>
-			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">preProcess</code></td>
-		<td>Function</td>
-		<td>no</td>
-        <td><small>n/a</small></td>
-		<td>
-			<p><code class="js plain">preProcess</code> is an optional function you can include to process data before it is sent to the server.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">query</code></td>
-		<td>String<br /><small>or</small><br />Function</td>
-		<td>no</td>
-        <td><code class="js plain">'q={value}'</code></td>
-		<td>
-			<p><code class="js plain">query</code> is an optional function you can include to process data before it is sent to the server.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">searching</code></td>
-		<td>String<br /><small>or</small><br />Function</td>
-		<td>no</td>
-        <td><code class="js string">'Searching...'</code></td>
-		<td>
-			<p>An HTML string to display when searching for results.</p>
-            <p>If <code class="js plain">searching</code> is a function, the first argument is the current value of the search bar and the second argument is the text that the user has entered.</p>
-            <p>The function should return an HTML string which will be displayed in the dropdown list (but not be selectable as an option).</p>
-            <p>Note: <code class="js plain">searching</code> does <strong>not</strong> get HTML escaped when inserted into the DOM.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">url</code></td>
-		<td>String</td>
-		<td>no</td>
-        <td><small>n/a</small></td>
-		<td>
-			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
-		</td>
-	</tr>
+  <tr>
+    <td><code class="js plain">allowFreeform</code></td>
+    <td>Boolean</td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
+      <p>If <code class="js keyword">false</code>, the user must select an option from the list.</p>
+      <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">children</code></td>
+    <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p>If specified, <code class="js plain">children</code> should be the name of a List Object.</p>
+      <p>When any option from this list is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show up in the component.</p>
+      <p>Note: If there is a <code class="js plain">children</code> property on the Option Object selected it will supersede this <code class="js plain">children</code> property.
+         See the <code class="js plain">children</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">maxOptions</code></td>
+    <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p><code class="js plain">maxOptions</code> is the maximum number of options to display in a dropdown.</p>
+      <p>Set <code class="js plain">maxOptions</code> to <code class="js keyword">false</code> to show all options available.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">noResultsHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><code class="js string">'No results found.'</code></td>
+    <td>
+      <p>An HTML string to display when there are no options to show.</p>
+      <p>If <code class="js plain">noResultsHTML</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>The function should return an HTML string.</p>
+      <p>Note: <code class="js plain">noResultsHTML</code> will never be shown when <code class="js plain">allowFreeform</code> is <code class="js keyword">true</code>.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">postProcess</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">postProcess</code> is an optional function you can use to process data that is returned from the server.</p>
+      <p>The first argument is the data returned by the server.</p>
+      <p>The function should return an array of <a href="#option_objects">Option Objects</a>.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">query</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><code class="js string">'q={value}'</code></td>
+    <td>
+      <p><code class="js plain">query</code> is an optional function you can include to process data before it is sent to the server.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">searchingHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><code class="js string">'Searching'</code></td>
+    <td>
+      <p>An HTML string to display when searching for options.</p>
+      <p>If <code class="js plain">searchingHTML</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>The function should return an HTML string.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">url</code></td>
+    <td>String</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">url</code> is the URL to hit.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">options</code></td>
+    <td>Array of Option Objects</td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p><code class="js plain">options</code> is an array of Option Objects.</p>
+      <p>See the <a href="#option_object">Option Objects</a> reference for more information.</p>
+    </td>
+  </tr>
 </tbody>
 </table>
 
-<h2 id="value">Value Object</h2>
+<h2 id="option_object">Option Object</h2>
+<div class="etymology">
+  <div class="word">option</div>
+  <div class="part-of-speech">Noun</div>
+  <div class="definition">A thing that is or may be chosen.</div>
+</div>
+<p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type and contain the names and values of those options.</p>
+<p>You can define the list workflow using the <code class="js plain">children</code> property on Option Objects.</p>
 <table class="table table-striped syntaxhighlighter">
 <thead>
-	<tr>
-		<th>Property</th>
-		<th>Type</th>
-        <th>Required</th>
-		<th>Default</th>
-		<th>Description</th>
-	</tr>
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Default</th>
+    <th>Description</th>
+  </tr>
 </thead>
 <tbody>
-	<tr>
-		<td><code class="js plain">children</code></td>
-		<td>String</td>
-		<td>no</td>
-        <td></td>
-		<td>
-			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
-            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
-			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
-		</td>
-	</tr>
+  <tr>
+    <td><code class="js plain">children</code></td>
+    <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
+    <td>no</td>
+    <td><code class="js keyword">false</code></td>
+    <td>
+      <p>If specified, <code class="js plain">children</code> should be the name of a List Object.</p>
+      <p>When the option is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show.</p>
+      <p>Note: This <code class="js plain">children</code> property (the one on the Option Object) will supersede a <code class="js plain">children</code> property on the parent List Object.</p>
+    </td>
+  </tr>
     <tr>
-		<td><code class="js plain">group</code></td>
-		<td>String</td>
-		<td>no</td>
-        <td></td>
-		<td>
-			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
-            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
-			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">name</code></td>
-		<td>String</td>
-		<td>no</td>
-        <td><code class="js keyword">false</code></td>
-		<td>
-			<p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
-            <p>If <code class="js keyword">false</code>, the user must select a value from the list.</p>
-			<p>There can still be list values when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
-		</td>
-	</tr>
-	<tr>
-		<td><code class="js plain">value</code></td>
-		<td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
-		<td>no</td>
-        <td><code class="js keyword">false</code></td>
-		<td>
-			<p><code class="js plain">postProcess</code> is an optional function you can include to process data that is returned from the server.</p>
-		</td>
-	</tr>
+    <td><code class="js plain">group</code></td>
+    <td>String</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>You can group options into sections using the <code class="js plain">group</code> property.</p>
+      <p>Options without groups get displayed first, followed by options with groups.</p>
+      <p>You can control the sort order of groups with the <code class="js plain">groupSort</code> property on the parent List Object.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">name</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>An HTML string to show inside the dropdown.</p>
+      <p>If there is no <code class="js plain">name</code> property and <code class="js plain">value</code> is a string, then <code class="js plain">value</code> will appear in the dropdown.</p>
+      <p>If <code class="js plain">value</code> is not a string, you must include a <code class="js plain">name</code> property.</p>
+      <p>If <code class="js plain">name</code> is a function, the first argument is the option's <code class="js plain">value</code>.  The function should return an HTML string.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">value</code></td>
+    <td>String, Number, Array, or Object</td>
+    <td>yes</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">value</code> is what gets saved when the user selects the option.</p>
+      <p><code class="js plain">value</code> can be anything that is safe to call <code class="js plain">JSON.stringify()</code> on.</p>
+    </td>
+  </tr>
 </tbody>
 </table>
 
@@ -211,8 +264,8 @@
 <script src="js/shBrushJScript.js"></script>
 <script>
 var init = function() {
-	// turn on syntax highlighter
-	//SyntaxHighlighter.all();
+  // turn on syntax highlighter
+  //SyntaxHighlighter.all();
 };
 $(document).ready(init);
 </script>
