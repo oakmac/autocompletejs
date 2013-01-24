@@ -10,6 +10,8 @@ if(!Array.isArray) {
 // TODO: AJAX postprocessing example
 // TODO: example using localStorage
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
+// TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
+//       in their buildHTML functions
 
 window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
 

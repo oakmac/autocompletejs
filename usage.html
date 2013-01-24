@@ -162,6 +162,32 @@ Methods documentation
     </td>
   </tr>
   <tr>
+    <td><code class="js plain">optionHTML</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">optionHTML</code> is an optional function used to build the option HTML in the dropdown for every object in the list.</p>
+      <p>The first argument to the function is the option itself.</p>
+      <p>The function should return an HTML string.</p>
+      <p>Note: If there is a <code class="js plain">optionHTML</code> property on the Option Object selected it will supersede this <code class="js plain">optionHTML</code> property.
+         See the <code class="js plain">optionHTML</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">pieceHTML</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">pieceHTML</code> is an optional function used to build the piece HTML in the search bar for every object in the list.</p>
+      <p>The first argument to the function is the option itself.</p>
+      <p>The function should return an HTML string.</p>
+      <p>Note: If there is a <code class="js plain">pieceHTML</code> property on the Option Object selected it will supersede this <code class="js plain">pieceHTML</code> property.
+         See the <code class="js plain">pieceHTML</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+    </td>
+  </tr>
+  <tr>
     <td><code class="js plain">postProcess</code></td>
     <td>Function</td>
     <td>no</td>
@@ -235,7 +261,7 @@ Methods documentation
     <td>
       <p>If specified, <code class="js plain">children</code> should be the name of a List Object.</p>
       <p>When the option is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show.</p>
-      <p>Note: This <code class="js plain">children</code> property (the one on the Option Object) will supersede a <code class="js plain">children</code> property on the parent List Object.</p>
+      <p>Note: This <code class="js plain">children</code> property will supersede a <code class="js plain">children</code> property on the parent List Object.</p>
     </td>
   </tr>
     <tr>
@@ -260,6 +286,7 @@ Methods documentation
       <p>If <code class="js plain">value</code> is not a string, you must include a <code class="js plain">optionHTML</code> property.</p>
       <p>If <code class="js plain">optionHTML</code> is a function, the first argument is the option itself.</p>
       <p>The function should return an HTML string.</p>
+      <p>Note: This <code class="js plain">optionHTML</code> property will supersede an <code class="js plain">optionHTML</code> property on the parent List Object.</p>
     </td>
   </tr>
   <tr>
@@ -269,9 +296,10 @@ Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p>An HTML string to show inside the search bar.</p>
-      <p>If <code class="js plain">optionHTML</code> is a function, the first argument is the option itself.</p>
+      <p>If <code class="js plain">pieceHTML</code> is a function, the first argument is the option itself.</p>
       <p>The function should return an HTML string.</p>
       <p>If there is no <code class="js plain">pieceHTML</code> property it uses <code class="js plain">optionHTML</code>.</p>
+      <p>Note: This <code class="js plain">pieceHTML</code> property will supersede a <code class="js plain">pieceHTML</code> property on the parent List Object.</p>
     </td>
   </tr>
   <tr>
