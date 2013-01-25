@@ -1,0 +1,1401 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AutoComplete Widget</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
+  <link rel="stylesheet" href="css/shCoreDefault.css" />
+  <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
+  <script src="css/less-1.3.0.min.js"></script>
+
+  <style type="text/css">
+  div.example {
+      padding: 50px 0px;
+      border-bottom: 2px solid #ccc;
+  }
+  div.example-widget {
+
+  }
+</style>
+</head>
+<body>
+<div id="body_wrapper" class="container">
+
+<!-- begin Example 1 -->
+<div class="example">
+<p>At it's most simple, AutoComplete works with an array of values.</p>
+<pre class="brush:js; toolbar:false;">
+var fruits = ['Apple', 'Banana', 'Orange'];
+var example1 = new AutoComplete('example1', fruits);
+</pre>
+<div id="example1" class="example-widget"></div>
+</div>
+<!-- end Example 1 -->
+
+
+<!-- begin Example 2 -->
+<div class="example">
+<p>You can organize values into groups.</p>
+<pre class="brush:js; toolbar:false;">
+var groupedFruits = [
+  { group: 'Fruits', value: 'Apple' },
+  { group: 'Fruits', value: 'Banana' },
+  { group: 'Fruits', value: 'Orange' },
+  { group: 'Meats', value: 'Beef' },
+  { group: 'Meats', value: 'Chicken' },
+  { group: 'Meats', value: 'Pork' },
+  { group: 'Vegetables', value: 'Carrot' },
+  { group: 'Vegetables', value: 'Lettuce' },
+  { group: 'Vegetables', value: 'Onion' }
+];
+var example2 = new AutoComplete('example2', groupedFruits);
+</pre>
+<div id="example2" class="example-widget"></div>
+</div>
+<!-- end Example 2 -->
+
+
+<!-- begin Example 3 -->
+<div class="example">
+<p>You can have nested lists.</p>
+<p>This example works like selecting from a key / value list.</p>
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+
+    fruits: ['Apple', 'Banana', 'Orange'],
+
+    meats: ['Beef', 'Chicken', 'Pork'],
+
+    vegetables: ['Carrot', 'Lettuce', 'Onion']
+  }
+};
+var example3 = new AutoComplete('example3', opts);
+</pre>
+<div id="example3" class="example-widget"></div>
+</div>
+<!-- end Example 3 -->
+
+
+<!-- begin Example 4 -->
+<div class="example">
+<p>Your lists can be arbitrarily nested.</p>
+<p>In this example we have more specific choices for beef and steak than the other foods.</p>
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+
+    fruits: ['Apple', 'Banana', 'Orange'],
+
+    meats: [
+    { value: 'Beef', children: 'beef' },
+    'Chicken',
+    'Pork'
+  ],
+
+    vegetables: ['Carrot', 'Lettuce', 'Onion'],
+
+  beef: [
+    'Hamburger',
+    'Pot Roast',
+    { value: 'Steak', children: 'steak' }
+  ],
+
+  steak: ['NY Strip', 'Ribeye', 'T-Bone']
+  }
+};
+var example4 = new AutoComplete('example4', opts);
+</pre>
+<div id="example4" class="example-widget"></div>
+</div>
+<!-- end Example 4 -->
+
+
+<!-- begin Example 5 -->
+<div class="example">
+<p>You can force the user to pick from a list, allow free-form input, or do a hybrid.</p>
+<p>In this example we have mandatory choices for breakfast, suggestions for lunch (but you can type in anything you want), and anything goes for dinner.</p>
+<p>Allowing the user to enter free-form text is disabled by default.</p>
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'meals',
+  lists: {
+    meals: [
+      { value: 'Breakfast', children: 'breakfast' },
+      { value: 'Lunch', children: 'lunch' },
+      { value: 'Dinner', children: 'dinner' }
+    ],
+
+    breakfast: {
+      allowFreeform: false, // NOTE: this is the default
+      values: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
+    },
+
+    lunch: {
+      allowFreeform: true,
+      values: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
+    },
+
+    dinner: {
+      allowFreeform: true
+    }
+  }
+};
+var example5 = new AutoComplete('example5', opts);
+</pre>
+<div id="example5" class="example-widget"></div>
+</div>
+<!-- end Example 5 -->
+
+
+<!-- begin Example 6 -->
+<div class="example">
+<p>You can source a list from an external URL via AJAX.</p>
+<pre class="brush:js; toolbar:false;">
+var statesUrl = 'api/states.php';
+var example6 = new AutoComplete('example6', statesUrl);
+</pre>
+<div id="example6" class="example-widget"></div>
+</div>
+<!-- end Example 6 -->
+
+
+<!-- begin Example 7 -->
+<div class="example">
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'animals',
+  lists: {
+    animals: [
+    { value: 'Birds', children: 'birds' },
+    { value: 'Mammals', children: 'mammals' },
+    { value: 'Reptiles', children: 'reptiles' }
+  ],
+  birds: 'api/birds.php',
+  mammals: 'api/mammals.php',
+  reptiles: 'api/reptiles.php'
+  }
+};
+var example7 = new AutoComplete('example7', opts);
+</pre>
+<div id="example7" class="example-widget"></div>
+</div>
+<!-- end Example 7 -->
+
+
+<!-- begin Example 8 -->
+<div class="example">
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'year',
+  lists: {
+  year: 'api/cars/year.php',
+    make: 'api/cars/make.php',
+  model: 'api/cars/model.php'
+  }
+};
+var example8 = new AutoComplete('example8', opts);
+</pre>
+<div id="example8" class="example-widget"></div>
+</div>
+<!-- end Example 8 -->
+
+
+<!-- begin Example 9 -->
+<div class="example">
+<pre class="brush:js; toolbar:false;">
+var opts = {
+  initialList: 'states',
+  lists: {
+    states: {
+      url: 'api/states.php',
+      preProcess: false
+    }
+  }
+};
+var example9 = new AutoComplete('example9', opts);
+</pre>
+<div id="example9" class="example-widget"></div>
+</div>
+<!-- end Example 9 -->
+
+
+<div style="height: 400px"></div>
+
+</div><!-- end #body_wrapper -->
+
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/shCore.js"></script>
+<script src="js/shBrushJScript.js"></script>
+<script>
+	
+	
+	// polyfills
+if(!Array.isArray) {
+  Array.isArray = function (vArg) {
+    return Object.prototype.toString.call(vArg) === "[object Array]";
+  };
+}
+
+// TODO: custom value search and example
+// TODO: custom AJAX example using POST or localStorage
+// TODO: AJAX postprocessing example
+// TODO: example using localStorage
+// TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
+// TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
+//       in their buildHTML functions
+
+window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
+
+//--------------------------------------------------------------
+// Module scope variables
+//--------------------------------------------------------------
+
+var KEYS = {
+    BACKSPACE: 8,
+    DELETE: 46,
+    DOWN_ARROW: 40,
+    ENTER: 13,
+    ESCAPE: 27,
+    UP_ARROW: 38,
+    TAB: 9
+};
+
+// hold DOM elements
+var containerEl, piecesEl, inputEl, listEl;
+
+// stateful
+var INPUT_HAPPENING = false;
+
+//--------------------------------------------------------------
+// Util Functions
+//--------------------------------------------------------------
+// simple string replacement
+var tmpl = function(str, obj) {
+    for (var i in obj) {
+        str = str.replace(new RegExp('{' + i + '}', 'g'), obj[i]);
+    }
+    return str;
+};
+
+// html escape
+var encode = function(str) {
+    var entities = [
+        [/&/g, '&amp;'],
+        [/</g, '&lt;'],
+        [/>/g, '&gt;'],
+        [/"/g, '&quot;'],
+        [/'/g, '&#39;'],
+        [/\//g, '&#x2F']
+    ];
+    str = str + '';
+    for (var i = 0; i < entities.length; i++) {
+        str = str.replace(entities[i][0], entities[i][1]);
+    }
+    return str;
+};
+
+var inArray = function(needle, haystack) {
+    for (var i = 0; i < haystack.length; i++) {
+        if (needle === haystack[i]) {
+            return true;
+        }
+    }
+    return false;
+};
+
+var arrayUnique = function(arr) {
+	var arr2 = [];
+	for (var i = 0; i < arr.length; i++) {
+		if (inArray(arr[i], arr2) === false) {
+			arr2.push(arr[i]);
+		}
+	}
+	return arr2;
+};
+
+//--------------------------------------------------------------
+// Sanity Checks
+//--------------------------------------------------------------
+
+var validOptionObject = function(obj) {
+
+    // TODO: write me
+
+    return true;
+};
+
+var validListObject = function(obj) {
+
+    // TODO: write me
+
+    return true;
+};
+
+var showError = function(code, msg) {
+    window.alert('AutoComplete Error ' + code + ': ' + msg);
+};
+
+var checkDeps = function() {
+
+
+    // TODO: make sure jQuery is defined
+    // TODO: make sure JSON is defined
+
+    return true;
+};
+
+// NOTE: all of the errors have unique codes so that people who search
+//       for them can find them easily :)
+var sanityChecks = function() {
+    // container ID must be a string
+    if (typeof containerElId !== 'string' || containerElId === '') {
+        showError(1001, 'Container element id must be a non-empty string');
+        return false;
+    }
+
+    // make sure the container element exists in the DOM
+    if (! document.getElementById(containerElId)) {
+        showError(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
+        return false;
+    }
+
+
+    // TODO: make sure opts are formatted correctly
+    // TODO: allow them to set the initial value of the widget
+    // TODO: show an error when a value.children is not a valid list option
+
+    return true;
+};
+
+//--------------------------------------------------------------
+// Expand Shorthand / Set Default Options
+//--------------------------------------------------------------
+
+// expand a single option object
+var expandOptionObject = function(option) {
+    // string becomes the value
+    if (typeof option === 'string') {
+        option = {
+            value: option
+        };
+    }
+
+    return option;
+};
+
+var expandListObject = function(list) {
+	// an array is shorthand for options
+	if (Array.isArray(list) === true) {
+		list = {
+			options: list
+		};
+	}
+
+	// a string is shorthand for the AJAX url
+	if (typeof list === 'string') {
+		list = {
+            ajaxEnabled: true,
+			url: list
+		};
+	}
+
+	// set an empty array for values if they are not set
+	if (Array.isArray(list.options) !== true) {
+		list.options = [];
+	}
+
+	// default for allowFreeform is false
+	if (list.allowFreeform !== true) {
+		list.allowFreeform = false;
+	}
+
+    // default for maxOptions is false
+    if (typeof list.maxOptions !== 'number' || list.maxOptions < 0) {
+        list.maxOptions = false;
+    }
+
+	// expand options
+	for (var i = 0; i < list.options.length; i++) {
+		list.options[i] = expandOptionObject(list.options[i]);
+	}
+
+	return list;
+};
+
+var initOptions = function() {
+	// if opts is an array or a string, then it is a single list object
+	if (Array.isArray(opts) === true || typeof opts === 'string') {
+		opts = {
+			initialList: 'default',
+			lists: {
+				'default': opts
+			}
+		};
+	}
+
+    // TODO: showClearBtn
+    // TODO: clearBtnHTML
+    // TODO: maxChunks
+
+    // class prefix
+    if (typeof opts.classPrefix !== 'string' || opts.classPrefix === '') {
+        opts.classPrefix = 'autocomplete';
+    }
+
+	// expand lists
+	for (var i in opts.lists) {
+		if (opts.lists.hasOwnProperty(i) !== true) continue;
+		opts.lists[i] = expandListObject(opts.lists[i]);
+	}
+};
+
+//--------------------------------------------------------------
+// Markup Building Functions
+//--------------------------------------------------------------
+
+var buildWidget = function() {
+    var html = '' +
+    '<div class="' + opts.classPrefix + '_internal_container">' +
+      '<div class="pieces_container" data-value="[]"></div>' +
+      '<input type="text" class="input_proxy" style="visibility:hidden" />' +
+	  '<div class="clearfix"></div>' +
+      '<ul class="dropdown" style="display:none"></ul>' +
+    '</div>';
+
+    return html;
+};
+
+var buildOption = function(option, parentList) {
+
+    var html = '<li class="option" ' +
+    'data-value="' + encode(JSON.stringify(option.value)) + '">';
+
+    if (typeof option.optionHTML === 'string') {
+        html += option.optionHTML;
+    }
+    else if (typeof option.optionHTML === 'function') {
+        html += option.optionHTML(option);
+    }
+    else if (typeof parentList.optionHTML === 'function') {
+        html += parentList.optionHTML(option);
+    }
+    else if (typeof option.value === 'string') {
+        html += encode(option.value);
+    }
+    // NOTE: this should never happen, but rather have it here just in case
+    else {
+        html += '<em>unknown option</em>';
+    }
+
+    html += '</li>';
+
+    /*
+    var html = '<li';
+    if (option.hasOwnProperty('clickable') === false || option.clickable !== false) {
+        html += ' class="value"';
+    }
+	html += ' data-value="' + encode(JSON.stringify(option.value)) + '"';
+
+	html += '>' + encode(option.name);
+
+	if (option.children) {
+		html += '<span class="children-indicator">&rarr;</span>';
+	}
+
+	html += '</li>';
+	*/
+
+    return html;
+};
+
+// build dropdown options
+// TODO: allow custom group sort
+var buildDropdown = function(values) {
+    var html = '';
+	var groups = getGroups(values);
+	var i;
+
+	// build all options without groups first
+	for (i = 0; i < values.length; i++) {
+		if (! values[i].group) {
+			html += buildOption(values[i]);
+		}
+	}
+
+	// build the groups
+	for (i = 0; i < groups.length; i++) {
+		html += '<li class="group">' +
+			encode(groups[i]) + '</li>';
+
+		for (var j = 0; j < values.length; j++) {
+			if (groups[i] === values[j].group) {
+				html += buildOption(values[j]);
+			}
+		}
+	}
+
+    return html;
+};
+
+var buildPiece = function(piece) {
+    var html = '<span class="piece">' +
+    encode(piece.name) +
+    '</span>';
+
+    return html;
+};
+
+// TODO: re-write this
+var buildPieces = function() {
+	var value = getValue();
+    var html = '';
+
+	var chunkNum = 0;
+    for (var i = 0; i < value.length; i++) {
+		var piece = value[i];
+
+		if (typeof piece === 'string') {
+			html += '<span class="child-indicator">:</span>' +
+			'</div>'; // end div.chunk
+			continue;
+		}
+
+		// start a new chunk
+		if (i === 0 || piece.chunk !== chunkNum) {
+			chunkNum++;
+			html += '<div class="chunk" data-chunk="' + chunkNum + '">' +
+            '<span class="remove-chunk">&times;</span>';
+		}
+
+        html += buildPiece(piece);
+
+		if (value[i+1] && value[i+1].chunk === chunkNum) {
+			html += '<span class="child-indicator">:</span>';
+		}
+
+		if ((i+1) === value.length || (value[i+1].chunk && value[i+1].chunk !== chunkNum)) {
+			html += '</div>'; // end div.chunk
+		}
+    }
+    return html;
+};
+
+//--------------------------------------------------------------
+// Control Flow / DOM Manipulation
+//--------------------------------------------------------------
+
+var removeList = function(listName) {
+    // TODO: write me
+};
+
+var destroyWidget = function() {
+    containerEl.html('');
+    // TODO: unbind event handlers on the container element?
+};
+
+var clearWidget = function() {
+    setValue([]);
+    updatePieces();
+};
+
+var showDropdown = function() {
+    // get position and height of input element
+    var pos = inputEl.position();
+    var height = parseInt(inputEl.height(), 10);
+
+    // put the dropdown directly beneath the input element
+    listEl.css({
+        display: '',
+        // TODO: work on the CSS here
+        top: height + pos.top + 8,
+        left: pos.left
+    });
+};
+
+// returns the current value of the widget
+var getValue = function() {
+	return JSON.parse(piecesEl.attr('data-value'));
+};
+
+// set the current value of the widget
+var setValue = function(value) {
+	piecesEl.attr('data-value', JSON.stringify(value));
+}
+
+// returns a sorted array of groups from an array of values
+var getGroups = function(values) {
+	var groups = [];
+	for (var i = 0; i < values.length; i++) {
+		if (typeof values[i].group === 'string') {
+			groups.push(values[i].group);
+		}
+	}
+	groups = arrayUnique(groups);
+	return groups.sort();
+};
+
+var listExists = function(list) {
+    if (opts.lists[list]) {
+        return true;
+    }
+    return false;
+};
+
+var startInput = function() {
+	// get the current list
+	var list = opts.lists[opts.initialList];
+	var currentValue = getValue();
+	if (currentValue.length > 0
+		&& typeof currentValue[currentValue.length-1] === 'string') {
+
+        if (listExists(currentValue[currentValue.length-1]) === true) {
+            list = opts.lists[ currentValue[currentValue.length-1] ];
+        }
+	}
+
+    // empty the input element, unhide it, put the focus on it
+    inputEl.val('');
+    inputEl.css({
+        visibility: '',
+        width: '100px'
+    });
+    inputEl.focus();
+
+    // open the dropdown with all the values
+    updateDropdown(list.values);
+
+    // show the dropdown
+    showDropdown();
+
+    // remove highlight from any chunks
+    clearChunkHighlight();
+
+    // toggle state
+    INPUT_HAPPENING = true;
+};
+
+var updateDropdown = function(values) {
+    // fill the dropdown with values
+    listEl.html(buildDropdown(values));
+
+	// highlight the first element
+	listEl.find('li.value').filter(':first').addClass('highlighted');
+};
+
+var stopInput = function() {
+    // hide the input element and make it small so it doesn't wrap
+    inputEl.css({
+        visibility: 'hidden',
+        width: '0px'
+    });
+    inputEl.blur(); // NOTE: I don't think this line is necessary?
+
+    // hide the dropdown list
+    listEl.css('display', 'none').html('');
+
+    // toggle state
+    INPUT_HAPPENING = false;
+};
+
+var clearChunkHighlight = function() {
+    piecesEl.find('div.chunk').removeClass('selected');
+};
+
+var highlightLastChunk = function() {
+    var chunksEl = piecesEl.find('div.chunk');
+    chunksEl.removeClass('selected');
+    chunksEl.filter(':last').addClass('selected');
+};
+
+// returns true if a chunk is highlighted
+// false otherwise
+var isChunkHighlighted = function() {
+    return (piecesEl.find('div.selected').length === 1);
+};
+
+// TODO: I really don't like this kind of code
+//       need to improve the value data structure
+var removeChunk = function(chunk) {
+    var value = getValue();
+
+    var lastIndex = value.length - 1;
+    if (typeof value[lastIndex] === 'string'
+        && value[lastIndex-1] && value[lastIndex-1].chunk === chunk) {
+        value.pop();
+    }
+
+    var value2 = [];
+    for (var i = 0; i < value.length; i++) {
+        if (value[i].chunk !== chunk) {
+            value2.push(value[i]);
+        }
+    }
+
+    setValue(value2);
+};
+
+var removeHighlightedChunk = function() {
+    var highlightedEl = piecesEl.find('div.selected');
+    var chunk = parseInt(highlightedEl.attr('data-chunk'), 10);
+
+    removeChunk(chunk);
+    updatePieces();
+};
+
+var addPieceToValue = function(value, piece) {
+	// TODO: write me
+};
+
+var addHighlightedValue = function() {
+    // get the highlighted value
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // do nothing if no entry is highlighted
+    if (highlightedEl.length !== 1) return;
+
+	// get values from the option
+	var name = highlightedEl.attr('data-name');
+	var value = JSON.parse(highlightedEl.attr('data-value'));
+
+	// get the current widget value
+	var currentValue = getValue();
+	var newPiece = {
+		name: name,
+		value: value,
+		chunk: 1
+	};
+
+	// add to existing chunk
+	var lastIndex = currentValue.length - 1;
+	if (currentValue[lastIndex] && typeof currentValue[lastIndex] === 'string') {
+		currentValue[lastIndex] = newPiece;
+
+		if (currentValue[lastIndex-1]) {
+			currentValue[lastIndex].chunk = currentValue[lastIndex-1].chunk;
+		}
+	}
+	// start a new chunk
+	else {
+		currentValue.push(newPiece);
+
+		if (currentValue[currentValue.length-2]) {
+			currentValue[currentValue.length-1].chunk = currentValue[currentValue.length-2].chunk + 1;
+		}
+	}
+
+	// add the next child to the end of the chunk
+	var children = highlightedEl.attr('data-children');
+	if (typeof children === 'string' && children !== '') {
+		currentValue.push(children);
+	}
+
+	// set the new value
+	setValue(currentValue);
+
+	// update the widget display
+	updatePieces();
+
+	// close current input
+	stopInput();
+
+	// start new input
+	startInput();
+};
+
+var updatePieces = function() {
+    piecesEl.html(buildPieces());
+};
+
+var filterValues = function(str, values) {
+	str = str.toLowerCase();
+    var results = [];
+	for (var i = 0; i < values.length; i++) {
+		if (str === values[i].name.toLowerCase().substring(0, str.length)) {
+			results.push(values[i]);
+		}
+	}
+	return results;
+};
+
+var getCurrentList = function() {
+    var value = getValue();
+    var lastIndex = value.length - 1;
+    if (typeof value[lastIndex] === 'string'
+        && listExists(value[lastIndex]) === true) {
+        return opts.lists[value[lastIndex]];
+    }
+
+    return opts.lists[opts.initialList];
+};
+
+var handleTextInput = function() {
+    var list = getCurrentList();
+    var value = inputEl.val();
+	var filteredValues = filterValues(value, list.values);
+
+    if (filteredValues.length === 0) {
+        if (list.allowFreeform === true) {
+            filteredValues.push({
+                name: value,
+                value: value
+            });
+        }
+        else {
+            filteredValues.push({
+                clickable: false,
+                name: 'No results found.',
+                value: false
+            });
+        }
+    }
+
+	// fill the dropdown with the filtered results
+    updateDropdown(filteredValues);
+};
+
+var highlightValue = function(valueEl) {
+	// remove highlighted from all values in the list
+	listEl.find('li.value').removeClass('highlighted');
+
+	// add highlight class to the value clicked
+	$(valueEl).addClass('highlighted');
+};
+
+//--------------------------------------------------------------
+// Input Keypresses
+//--------------------------------------------------------------
+
+var pressUpArrow = function() {
+    // get the highlighted element
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // no row highlighted, highlight the last list element
+    if (highlightedEl.length === 0) {
+        listEl.find('li.value').last().addClass('highlighted');
+        return;
+    }
+
+    // remove the highlight from the current element
+    highlightedEl.removeClass('highlighted');
+
+    // highlight the previous .value sibling
+    highlightedEl.prevAll('li.value').first().addClass('highlighted');
+};
+
+var pressDownArrow = function() {
+    // get the highlighted element
+    var highlightedEl = listEl.find('li.highlighted');
+
+    // no row highlighted, highlight the first _value list element
+    if (highlightedEl.length === 0) {
+        listEl.find('li.value').first().addClass('highlighted');
+        return;
+    }
+
+    // remove the highlight from the current element
+    highlightedEl.removeClass('highlighted');
+
+    // highlight the next _value sibling
+    highlightedEl.nextAll('li.value').first().addClass('highlighted');
+};
+
+var pressEscapeKey = function() {
+    stopInput();
+    clearChunkHighlight();
+};
+
+var pressBackspaceOnEmptyInput = function() {
+    stopInput();
+    if (isChunkHighlighted() === true) {
+        removeHighlightedChunk();
+    }
+    else {
+        highlightLastChunk();
+    }
+};
+
+var pressEnterOrTab = function() {
+    // TODO: check for freeForm here
+    addHighlightedValue();
+};
+
+//--------------------------------------------------------------
+// Browser Events
+//--------------------------------------------------------------
+
+// click on the container
+var clickContainerElement = function(e) {
+	// prevent any clicks inside the container from bubbling up to the html element
+	e.stopPropagation();
+
+	// start input if it's not already happening
+    if (INPUT_HAPPENING === false) {
+        startInput();
+    }
+    // else just put the focus on the input element
+    else {
+        inputEl.focus();
+    }
+};
+
+// keydown on the input element
+var keydownInputElement = function(e) {
+    var keyCode = e.which;
+
+    // enter or tab
+    if (keyCode === KEYS.ENTER || keyCode === KEYS.TAB) {
+        e.preventDefault();
+		pressEnterOrTab();
+        return;
+    }
+
+    // backspace on an empty field
+    if (keyCode === KEYS.BACKSPACE && inputEl.val() === '') {
+        e.preventDefault();
+        e.stopPropagation();
+        pressBackspaceOnEmptyInput();
+        return;
+    }
+
+    // down arrow
+    if (keyCode === KEYS.DOWN_ARROW) {
+        pressDownArrow();
+        return;
+    }
+
+    // up arrow
+    if (keyCode === KEYS.UP_ARROW) {
+        pressUpArrow();
+        return;
+    }
+
+    // escape
+    if (keyCode === KEYS.ESCAPE) {
+        pressEscapeKey();
+        return;
+    }
+};
+
+// keyup on the input elmeent
+// TODO: remove this; should do everything on keydown
+var keyupInputElement = function(e) {
+	// do nothing if we have already hidden the input element
+    // NOTE: I think this should never happen
+	if (INPUT_HAPPENING !== true) return;
+
+	// do nothing if they have pressed a control character
+    // TODO: code smell? this seems fishy
+    var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
+	if (inArray(e.which, cntrlChars) !== false) return;
+
+    handleTextInput();
+};
+
+// user clicks a dropdown value
+var clickValue = function(e) {
+    // highlight it
+    highlightValue(this);
+
+    // add it
+	addHighlightedValue();
+};
+
+var mouseoverValue = function() {
+    highlightValue(this);
+};
+
+// user clicks a chunk
+var clickChunk = function(e) {
+    // remove highlight from other chunks
+    clearChunkHighlight();
+
+    // highlight this chunk
+    $(this).addClass('selected');
+
+    // stop input
+    // NOTE: is this necessary?
+    stopInput();
+
+    // stop propagation
+    e.stopPropagation();
+};
+
+// TODO this needs to be better; should run up the DOM from the e.target
+//      and check to see if the element is within containerEl
+//      right now this doesn't work with multiple widgets on the same page
+var clickPage = function(e) {
+	// stop input
+	stopInput();
+};
+
+// keydown anywhere on the page
+var keydownWindow = function(e) {
+    var keyCode = e.which;
+
+    // backspace or delete with a highlighted chunk
+    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE)
+        && isChunkHighlighted() === true) {
+        e.preventDefault();
+        removeHighlightedChunk();
+        return;
+    }
+
+    // escape key
+    if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
+        clearChunkHighlight();
+        return;
+    }
+};
+
+var addEvents = function() {
+    containerEl.on('click', clickContainerElement);
+    containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
+    containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
+    containerEl.on('click', 'li.value', clickValue);
+    containerEl.on('mouseover', 'li.value', mouseoverValue);
+    containerEl.on('click', 'div.chunk', clickChunk);
+
+    // catch all clicks on the page
+    $('html').on('click', clickPage);
+
+    // catch global keydown
+    $(window).on('keydown', keydownWindow);
+};
+
+//--------------------------------------------------------------
+// Initialization
+//--------------------------------------------------------------
+
+var initDom = function() {
+    // get the container element
+    containerEl = $('#' + containerElId);
+
+    // build the markup inside the container
+    containerEl.html(buildWidget());
+
+    // grab elements in memory
+    inputEl = containerEl.find('input.input_proxy');
+    listEl = containerEl.find('ul.dropdown');
+    piecesEl = containerEl.find('div.pieces_container');
+};
+
+var init = function() {
+    if (sanityChecks() !== true) return;
+    initOptions();
+    initDom();
+    addEvents();
+};
+init();
+
+// return a new object
+return {
+    addList: function(name, list) {
+
+    },
+    addValue: function(listName, value) {
+
+    },
+    blur: function() {
+
+    },
+    clear: function() {
+        clearWidget();
+    },
+    destroy: function() {
+        destroyWidget();
+    },
+    focus: function() {
+        startInput();
+    },
+    getList: function(listName) {
+
+    },
+    getLists: function() {
+
+    },
+    reload: function(options) {
+
+    },
+    removeList: function(listName) {
+        // return false if the list does not exist
+        if (listExists(listName) !== true) return false;
+
+        removeList(listName);
+        return true;
+    },
+
+    // TODO: what should the return value of this function be when
+    //       you set a new value?
+    val: function(newValue) {
+        // set a new value
+        if (newValue && validOptionObject(newValue) === true) {
+            setValue(newValue);
+            return true;
+        }
+        // else return the current value
+        else {
+            return getValue();
+        }
+    }
+};
+
+// end window.AutoComplete()
+};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+// end autocomplete.js
+	
+	
+	
+	
+	
+	
+var init = function() {
+
+//-------------------------------------------
+// Example 1
+//-------------------------------------------
+(function() {
+
+var fruits = ['Apple', 'Banana', 'Orange'];
+var example1 = new AutoComplete('example1', fruits);
+
+})();
+
+
+//-------------------------------------------
+// Example 2
+//-------------------------------------------
+(function() {
+
+var groupedFruits = [
+  { group: 'Fruits', value: 'Apple' },
+  { group: 'Fruits', value: 'Banana' },
+  { group: 'Fruits', value: 'Orange' },
+  { group: 'Meats', value: 'Beef' },
+  { group: 'Meats', value: 'Chicken' },
+  { group: 'Meats', value: 'Pork' },
+  { group: 'Vegetables', value: 'Carrot' },
+  { group: 'Vegetables', value: 'Lettuce' },
+  { group: 'Vegetables', value: 'Onion' }
+];
+var example2 = new AutoComplete('example2', groupedFruits);
+
+})();
+
+
+//-------------------------------------------
+// Example 3
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+
+    fruits: ['Apple', 'Banana', 'Orange'],
+
+    meats: ['Beef', 'Chicken', 'Pork'],
+
+    vegetables: ['Carrot', 'Lettuce', 'Onion']
+  }
+};
+var example3 = new AutoComplete('example3', opts);
+
+})();
+
+
+//-------------------------------------------
+// Example 4
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'foods',
+  lists: {
+    foods: [
+      { value: 'Fruits', children: 'fruits' },
+      { value: 'Meats', children: 'meats' },
+      { value: 'Vegetables', children: 'vegetables' }
+    ],
+
+    fruits: ['Apple', 'Banana', 'Orange'],
+
+    meats: [
+    { value: 'Beef', children: 'beef' },
+    'Chicken',
+    'Pork'
+  ],
+
+    vegetables: ['Carrot', 'Lettuce', 'Onion'],
+
+  beef: [
+    'Hamburger',
+    'Pot Roast',
+    { value: 'Steak', children: 'steak' }
+  ],
+
+  steak: ['NY Strip', 'Ribeye', 'T-Bone']
+  }
+};
+var example4 = new AutoComplete('example4', opts);
+
+})();
+
+
+//-------------------------------------------
+// Example 5
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'meals',
+  lists: {
+    meals: [
+      { value: 'Breakfast', children: 'breakfast' },
+      { value: 'Lunch', children: 'lunch' },
+      { value: 'Dinner', children: 'dinner' }
+    ],
+
+    breakfast: {
+      allowFreeform: false, // NOTE: this is the default
+      values: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
+    },
+
+    lunch: {
+      allowFreeform: true,
+      values: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
+    },
+
+    dinner: {
+      allowFreeform: true
+    }
+  }
+};
+var example5 = new AutoComplete('example5', opts);
+
+})();
+
+
+//-------------------------------------------
+// Example 6
+//-------------------------------------------
+(function() {
+
+var statesUrl = 'api/states.php';
+var example6 = new AutoComplete('example6', statesUrl);
+
+})();
+
+
+//-------------------------------------------
+// Example 7
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'animals',
+  lists: {
+    animals: [
+    { value: 'Birds', children: 'birds' },
+    { value: 'Mammals', children: 'mammals' },
+    { value: 'Reptiles', children: 'reptiles' }
+  ],
+  birds: 'api/birds.php',
+  mammals: 'api/mammals.php',
+  reptiles: 'api/reptiles.php'
+  }
+};
+var example7 = new AutoComplete('example7', opts);
+
+})();
+
+
+//-------------------------------------------
+// Example 8
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'year',
+  lists: {
+  year: 'api/cars/year.php',
+    make: 'api/cars/make.php',
+  model: 'api/cars/model.php'
+  }
+};
+var example8 = new AutoComplete('example8', opts);
+
+})();
+
+
+//-------------------------------------------
+// Example 9
+//-------------------------------------------
+(function() {
+
+var opts = {
+  initialList: 'states',
+  lists: {
+    states: {
+      url: 'api/states.php',
+      preProcess: false
+    }
+  }
+};
+var example9 = new AutoComplete('example9', opts);
+
+})();
+
+
+// end examples
+
+// turn on syntax highlighter
+SyntaxHighlighter.all();
+
+}; // end init()
+$(document).ready(init);
+</script>
+</body>
+</html>
+

@@ -9,31 +9,46 @@ if(!Array.isArray) {
 // TODO: custom AJAX example using POST or localStorage
 // TODO: AJAX postprocessing example
 // TODO: example using localStorage
+// TODO: showChunkRemove true / false (default is true)
+// TODO: need more control over how the chunks work
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
 
-window.AutoComplete = window.AutoComplete || function(containerElId, opts) {
+window.AutoComplete = window.AutoComplete || function(containerElId, cfg) {
 
 //--------------------------------------------------------------
 // Module scope variables
 //--------------------------------------------------------------
 
+// constants
+var HTML_ENTITIES = [
+  [/&/g, '&amp;'],
+  [/</g, '&lt;'],
+  [/>/g, '&gt;'],
+  [/"/g, '&quot;'],
+  [/'/g, '&#39;'],
+  [/\//g, '&#x2F']
+];
 var KEYS = {
-    BACKSPACE: 8,
-    DELETE: 46,
-    DOWN_ARROW: 40,
-    ENTER: 13,
-    ESCAPE: 27,
-    UP_ARROW: 38,
-    TAB: 9
+  BACKSPACE: 8,
+  DELETE: 46,
+  DOWN_ARROW: 40,
+  ENTER: 13,
+  ESCAPE: 27,
+  UP_ARROW: 38,
+  TAB: 9
 };
 
-// hold DOM elements
+// DOM elements
 var containerEl, piecesEl, inputEl, listEl;
 
 // stateful
+var CHUNKS = [];
+var CURRENT_CHUNK_INDEX = 0;
+var CURRENT_LIST = false;
 var INPUT_HAPPENING = false;
+var OPTIONS = {};
 
 //--------------------------------------------------------------
 // Util Functions
@@ -48,45 +63,63 @@ var tmpl = function(str, obj) {
 
 // html escape
 var encode = function(str) {
-    var entities = [
-        [/&/g, '&amp;'],
-        [/</g, '&lt;'],
-        [/>/g, '&gt;'],
-        [/"/g, '&quot;'],
-        [/'/g, '&#39;'],
-        [/\//g, '&#x2F']
-    ];
     str = str + '';
-    for (var i = 0; i < entities.length; i++) {
-        str = str.replace(entities[i][0], entities[i][1]);
+    for (var i = 0; i < HTML_ENTITIES.length; i++) {
+        str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
     }
     return str;
 };
 
-var inArray = function(needle, haystack) {
-    for (var i = 0; i < haystack.length; i++) {
-        if (needle === haystack[i]) {
-            return true;
-        }
-    }
-    return false;
-};
-
-var arrayUnique = function(arr) {
-	var arr2 = [];
-	for (var i = 0; i < arr.length; i++) {
-		if (inArray(arr[i], arr2) === false) {
-			arr2.push(arr[i]);
+var objectKeysToArray = function(obj) {
+	var arr = [];
+	for (var i in obj) {
+		if (obj.hasOwnProperty(i) === true) {
+			arr.push(i);
 		}
 	}
-	return arr2;
+	return arr;
+};
+
+// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+var createId = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
 };
 
 //--------------------------------------------------------------
 // Sanity Checks
 //--------------------------------------------------------------
 
-var validValueObject = function(obj) {
+var validChunkIndex = function(chunkIndex) {
+    if (typeof chunkIndex !== 'number') {
+        return false;
+    }
+
+    chunkIndex = parseInt(chunkIndex, 10);
+	if (chunkIndex < 0 || chunkIndex >= CHUNKS.length) {
+		return false;
+	}
+
+    return true;
+};
+
+var validValueArray = function(value) {
+    // value must be an array
+    if (Array.isArray(value) !== true) {
+        return false;
+    }
+
+
+    // TODO: should let them pass in strings as shorthand
+    // value = [['Apple']];
+
+
+    return true;
+};
+
+var validOptionObject = function(obj) {
 
     // TODO: write me
 
@@ -129,58 +162,46 @@ var sanityChecks = function() {
     }
 
 
-    // TODO: make sure opts are formatted correctly
-    // TODO: allow them to set the initial value of the widget
+    // TODO: make sure cfg are formatted correctly
+    // TODO: allow them to set the initial value of the widget (chunks object)
     // TODO: show an error when a value.children is not a valid list option
 
     return true;
 };
 
 //--------------------------------------------------------------
-// Expand Input / Set Default Options
+// Expand Shorthand / Set Default Options
 //--------------------------------------------------------------
 
-// expand a single value object
-var expandValueObject = function(value) {
+// expand a single option object
+var expandOptionObject = function(option) {
     // string becomes the value
-    if (typeof value === 'string') {
-        value = {
-            value: value
+    if (typeof option === 'string') {
+        option = {
+			optionHTML: encode(option),
+			pieceHTML: encode(option),
+            value: option
         };
     }
 
-    // if value is a string and no name specified, then name gets value
-    if (typeof value.value === 'string' &&
-        (value.hasOwnProperty('name') === false || typeof value.name !== 'string')) {
-        value.name = value.value;
-    }
-
-	// group is either a non-empty string or false
-    if (typeof value.group !== 'string' || value.group === '') {
-        value.group = false;
-    }
-
-    return value;
+    return option;
 };
 
+// expand a single List Object
 var expandListObject = function(list) {
-	// an array is shorthand for values
+	// an array is shorthand for options
 	if (Array.isArray(list) === true) {
 		list = {
-			values: list
+			options: list
 		};
 	}
 
 	// a string is shorthand for the AJAX url
 	if (typeof list === 'string') {
 		list = {
+            ajaxEnabled: true,
 			url: list
 		};
-	}
-
-	// set an empty array for values if they are not set
-	if (Array.isArray(list.values) !== true) {
-		list.values = [];
 	}
 
 	// default for allowFreeform is false
@@ -188,36 +209,58 @@ var expandListObject = function(list) {
 		list.allowFreeform = false;
 	}
 
-	// expand values
-	for (var i = 0; i < list.values.length; i++) {
-		list.values[i] = expandValueObject(list.values[i]);
+    // default for maxOptions is false
+    if (typeof list.maxOptions !== 'number' || list.maxOptions < 0) {
+        list.maxOptions = false;
+    }
+
+	// noResults default
+	if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
+		list.noResultsHTML = 'No results found.';
+	}
+
+	// searchingHTML default
+	if (typeof list.searchingHTML !== 'string' && typeof list.searchingHTML !== 'function') {
+		list.searchingHTML = 'Searching';
+	}
+
+	// set options to an empty array if it does not exist
+	if (Array.isArray(list.options) !== true) {
+		list.options = [];
+	}
+
+	// expand options
+	for (var i = 0; i < list.options.length; i++) {
+		list.options[i] = expandOptionObject(list.options[i]);
 	}
 
 	return list;
 };
 
-var initOptions = function() {
-	// if opts is an array or a string, then there is a single list
-	if (Array.isArray(opts) === true || typeof opts === 'string') {
-		opts = {
+var initConfig = function() {
+	// if cfg is an array or a string, then it is a single list object
+	if (Array.isArray(cfg) === true || typeof cfg === 'string') {
+		cfg = {
 			initialList: 'default',
 			lists: {
-				'default': opts
+				'default': cfg
 			}
 		};
 	}
 
-	// TODO: make options.lists mandatory and throw error if it's not there?
+    // TODO: showClearBtn
+    // TODO: clearBtnHTML
+    // TODO: maxChunks
 
     // class prefix
-    if (typeof opts.classPrefix !== 'string' || opts.classPrefix === '') {
-        opts.classPrefix = 'autocomplete';
+    if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
+        cfg.classPrefix = 'autocomplete';
     }
 
 	// expand lists
-	for (var i in opts.lists) {
-		if (opts.lists.hasOwnProperty(i) !== true) continue;
-		opts.lists[i] = expandListObject(opts.lists[i]);
+	for (var i in cfg.lists) {
+		if (cfg.lists.hasOwnProperty(i) !== true) continue;
+		cfg.lists[i] = expandListObject(cfg.lists[i]);
 	}
 };
 
@@ -225,10 +268,9 @@ var initOptions = function() {
 // Markup Building Functions
 //--------------------------------------------------------------
 
-// build the markup inside the container
 var buildWidget = function() {
     var html = '' +
-    '<div class="' + opts.classPrefix + '_internal_container">' +
+    '<div class="' + cfg.classPrefix + '_internal_container">' +
       '<div class="pieces_container" data-value="[]"></div>' +
       '<input type="text" class="input_proxy" style="visibility:hidden" />' +
 	  '<div class="clearfix"></div>' +
@@ -238,51 +280,69 @@ var buildWidget = function() {
     return html;
 };
 
-var buildValue = function(value) {
-    var html = '<li';
-    if (value.hasOwnProperty('clickable') === false || value.clickable !== false) {
-        html += ' class="value"';
+var buildOptionHTML = function(option, parentList) {
+    if (typeof option.optionHTML === 'string') {
+		return option.optionHTML;
     }
-	html += ' data-value="' + encode(JSON.stringify(value.value)) + '"' +
-	' data-name="' + encode(value.name) + '"';
 
-	if (value.children) {
-		html += ' data-children="' + encode(value.children) + '"';
-	}
+	if (typeof option.optionHTML === 'function') {
+		return option.optionHTML(option);
+    }
 
-	html += '>' + encode(value.name);
+	if (typeof parentList.optionHTML === 'function') {
+        return parentList.optionHTML(option);
+    }
 
-	if (value.children) {
-		html += '<span class="children-indicator">&rarr;</span>';
-	}
+	if (typeof option.value === 'string') {
+		return encode(option.value);
+    }
 
-	html += '</li>';
+    // NOTE: this should never happen, but rather have it here just in case
+	//       should I throw an error here?
+	return '<em>unknown option</em>';
+};
+
+var buildOption = function(option, parentList) {
+    var optionId = createId();
+    OPTIONS[optionId] = option;
+
+    var html = '<li class="option" ' +
+    'data-option-id="' + encode(optionId) + '">' +
+	buildOptionHTML(option, parentList) +
+	'</li>';
 
     return html;
 };
 
-// build dropdown options
-// TODO: allow custom group sort
-var buildDropdown = function(values) {
+// TODO: this function could be more efficient
+// TODO: there should only be one argument to this function
+var buildOptions = function(options, parentList) {
     var html = '';
-	var groups = getGroups(values);
+	var groups = getGroups(options);
 	var i;
 
+	// sort the groups
+	if (typeof parentList.groupSort === 'function') {
+		groups.sort(parentList.groupSort);
+	}
+	else {
+		groups.sort();
+	}
+
 	// build all options without groups first
-	for (i = 0; i < values.length; i++) {
-		if (! values[i].group) {
-			html += buildValue(values[i]);
+	for (i = 0; i < options.length; i++) {
+		if (typeof options[i].group !== 'string') {
+			html += buildOption(options[i], parentList);
 		}
 	}
 
 	// build the groups
 	for (i = 0; i < groups.length; i++) {
-		html += '<li class="group">' +
-			encode(groups[i]) + '</li>';
+		html += '<li class="group">' + encode(groups[i]) + '</li>';
 
-		for (var j = 0; j < values.length; j++) {
-			if (groups[i] === values[j].group) {
-				html += buildValue(values[j]);
+		for (var j = 0; j < options.length; j++) {
+			if (groups[i] === options[j].group) {
+				html += buildOption(options[j], parentList);
 			}
 		}
 	}
@@ -290,47 +350,51 @@ var buildDropdown = function(values) {
     return html;
 };
 
-var buildPiece = function(piece) {
-    var html = '<span class="piece">' +
-    encode(piece.name) +
-    '</span>';
+var buildPieceHTML = function(option, parentList) {
+	if (typeof option.pieceHTML === 'string') {
+		return option.pieceHTML;
+	}
 
-    return html;
+	if (typeof option.pieceHTML === 'function') {
+		return option.pieceHTML(option);
+	}
+
+	if (typeof parentList.pieceHTML === 'function') {
+		return parentList.pieceHTML(option);
+	}
+
+	// default to optionHTML
+	return buildOptionHTML(option, parentList);
 };
 
-// TODO: re-write this
-var buildPieces = function() {
-	var value = getValue();
-    var html = '';
+var buildPieces = function(chunks, showChildIndicatorAtEnd) {
+	if (showChildIndicatorAtEnd !== true) {
+		showChildIndicatorAtEnd = false;
+	}
 
-	var chunkNum = 0;
-    for (var i = 0; i < value.length; i++) {
-		var piece = value[i];
+	var html = '';
 
-		if (typeof piece === 'string') {
-			html += '<span class="child-indicator">:</span>' +
-			'</div>'; // end div.chunk
-			continue;
+	for (var i = 0; i < chunks.length; i++) {
+		var pieces = chunks[i];
+
+		html += '<div class="chunk" data-chunkIndex="' + i + '">' +
+		'<span class="remove-chunk">&times;</span>';
+
+		for (var j = 0; j < pieces.length; j++) {
+			html += '<span class="piece">' +
+			pieces[j].pieceHTML + '</span>';
+
+			// show child indicator
+			if ((pieces.length !== 1 && j !== (pieces.length-1))
+				|| (i === (chunks.length-1) && j === (pieces.length-1)
+				    && showChildIndicatorAtEnd === true)) {
+				html += '<span class="child-indicator">:</span>';
+			}
 		}
+		html += '</div>'; // end div.chunk
+	}
 
-		// start a new chunk
-		if (i === 0 || piece.chunk !== chunkNum) {
-			chunkNum++;
-			html += '<div class="chunk" data-chunk="' + chunkNum + '">' +
-            '<span class="remove-chunk">&times;</span>';
-		}
-
-        html += buildPiece(piece);
-
-		if (value[i+1] && value[i+1].chunk === chunkNum) {
-			html += '<span class="child-indicator">:</span>';
-		}
-
-		if ((i+1) === value.length || (value[i+1].chunk && value[i+1].chunk !== chunkNum)) {
-			html += '</div>'; // end div.chunk
-		}
-    }
-    return html;
+	return html;
 };
 
 //--------------------------------------------------------------
@@ -351,7 +415,23 @@ var clearWidget = function() {
     updatePieces();
 };
 
-var showDropdown = function() {
+// empty the input element, unhide it, put the focus on it
+var showInputEl = function() {
+    inputEl.val('').css({
+        visibility: '',
+        width: '20px'
+    }).focus();
+};
+
+// hide the input element, empty it, blur focus
+var hideInputEl = function() {
+    inputEl.css({
+        visibility: 'hidden',
+        width: '0px'
+    }).val('').blur();
+};
+
+var showDropdownEl = function() {
     // get position and height of input element
     var pos = inputEl.position();
     var height = parseInt(inputEl.height(), 10);
@@ -365,89 +445,83 @@ var showDropdown = function() {
     });
 };
 
+var hideDropdownEl = function() {
+    listEl.css('display', 'none').html('');
+};
+
 // returns the current value of the widget
 var getValue = function() {
-	return JSON.parse(piecesEl.attr('data-value'));
+    var value = [];
+    for (var i = 0; i < CHUNKS.length; i++) {
+        value[i] = [];
+
+        for (var j = 0; j < CHUNKS[i].length; j++) {
+            value[i].push(CHUNKS[i][j].value);
+        }
+    }
+
+    return value;
 };
 
 // set the current value of the widget
-var setValue = function(value) {
-	piecesEl.attr('data-value', JSON.stringify(value));
+var setValue = function(chunks) {
+    CHUNKS = chunks;
+    CURRENT_CHUNK_INDEX = chunks.length;
+    CURRENT_LIST = cfg.lists[cfg.initialList];
+    updatePieces();
 }
 
-// returns a sorted array of groups from an array of values
-var getGroups = function(values) {
-	var groups = [];
-	for (var i = 0; i < values.length; i++) {
-		if (typeof values[i].group === 'string') {
-			groups.push(values[i].group);
+// returns a unique array of groups from an array of Option Objects
+var getGroups = function(options) {
+	var groups = {};
+	for (var i = 0; i < options.length; i++) {
+		if (typeof options[i].group === 'string') {
+			groups[options[i].group] = 0;
 		}
 	}
-	groups = arrayUnique(groups);
-	return groups.sort();
+	return objectKeysToArray(groups);
 };
 
 var listExists = function(list) {
-    if (opts.lists[list]) {
+    if (cfg.lists[list]) {
         return true;
     }
     return false;
 };
 
 var startInput = function() {
-	// get the current list
-	var list = opts.lists[opts.initialList];
-	var currentValue = getValue();
-	if (currentValue.length > 0
-		&& typeof currentValue[currentValue.length-1] === 'string') {
-
-        if (listExists(currentValue[currentValue.length-1]) === true) {
-            list = opts.lists[ currentValue[currentValue.length-1] ];
-        }
-	}
-
-    // empty the input element, unhide it, put the focus on it
-    inputEl.val('');
-    inputEl.css({
-        visibility: '',
-        width: '100px'
-    });
-    inputEl.focus();
-
-    // open the dropdown with all the values
-    updateDropdown(list.values);
-
-    // show the dropdown
-    showDropdown();
-
-    // remove highlight from any chunks
-    clearChunkHighlight();
-
-    // toggle state
+    // update state
     INPUT_HAPPENING = true;
+    OPTIONS = {};
+    if (! CURRENT_LIST) {
+        CURRENT_LIST = cfg.lists[cfg.initialList];
+    }
+
+    // build the dropdown markup
+    listEl.html(buildOptions(CURRENT_LIST.options, CURRENT_LIST));
+
+    showInputEl();
+    showDropdownEl();
+    highlightFirstOption();
+    clearChunkHighlight();
+};
+
+var stopInput = function() {
+    hideInputEl();
+    hideDropdownEl();
+    INPUT_HAPPENING = false;
+};
+
+var highlightFirstOption = function() {
+    highlightOption(listEl.find('li.option').filter(':first'));
 };
 
 var updateDropdown = function(values) {
     // fill the dropdown with values
-    listEl.html(buildDropdown(values));
+    listEl.html(buildOptions(values));
 
 	// highlight the first element
-	listEl.find('li.value').filter(':first').addClass('highlighted');
-};
-
-var stopInput = function() {
-    // hide the input element and make it small so it doesn't wrap
-    inputEl.css({
-        visibility: 'hidden',
-        width: '0px'
-    });
-    inputEl.blur(); // NOTE: I don't think this line is necessary?
-
-    // hide the dropdown list
-    listEl.css('display', 'none').html('');
-
-    // toggle state
-    INPUT_HAPPENING = false;
+	listEl.find('li.option').filter(':first').addClass('highlighted');
 };
 
 var clearChunkHighlight = function() {
@@ -466,100 +540,101 @@ var isChunkHighlighted = function() {
     return (piecesEl.find('div.selected').length === 1);
 };
 
-// TODO: I really don't like this kind of code
-//       need to improve the value data structure
-var removeChunk = function(chunk) {
-    var value = getValue();
+var removeChunk = function(chunkIndex) {
+	// defensive
+	chunkIndex = parseInt(chunkIndex, 10);
 
-    var lastIndex = value.length - 1;
-    if (typeof value[lastIndex] === 'string'
-        && value[lastIndex-1] && value[lastIndex-1].chunk === chunk) {
-        value.pop();
-    }
+	// if we are removing the last chunk, reset CURRENT_LIST to the initialList
+	if (chunkIndex === (CHUNKS.length-1)) {
+		CURRENT_LIST = cfg.lists[cfg.initialList];
+	}
 
-    var value2 = [];
-    for (var i = 0; i < value.length; i++) {
-        if (value[i].chunk !== chunk) {
-            value2.push(value[i]);
-        }
-    }
+	// remove the chunk
+	CHUNKS.splice(chunkIndex, 1);
+    CURRENT_CHUNK_INDEX--;
 
-    setValue(value2);
-};
-
-var removeHighlightedChunk = function() {
-    var highlightedEl = piecesEl.find('div.selected');
-    var chunk = parseInt(highlightedEl.attr('data-chunk'), 10);
-
-    removeChunk(chunk);
     updatePieces();
 };
 
-var addPieceToValue = function(value, piece) {
-	// TODO: write me
+var removeHighlightedChunk = function() {
+    var chunkIndex = parseInt(piecesEl.find('div.selected').attr('data-chunkIndex'), 10);
+
+    // defensive
+    if (validChunkIndex(chunkIndex) !== true) return;
+
+    removeChunk(chunkIndex);
 };
 
-var addHighlightedValue = function() {
+var createPieceFromOption = function(option, parentList) {
+    var pieceObj = {
+        pieceHTML: buildPieceHTML(option, parentList),
+        value: option.value
+    };
+
+    return pieceObj;
+};
+
+// returns false if the option has no children
+var getChildrenListName = function(option, parentList) {
+    if (typeof option.children === 'string' && listExists(option.children) === true) {
+        return option.children;
+    }
+
+    if (typeof parentList.children === 'string' && listExists(parentList.children) === true) {
+        return parentList.children;
+    }
+
+    return false;
+};
+
+var addHighlightedOption = function() {
     // get the highlighted value
     var highlightedEl = listEl.find('li.highlighted');
 
     // do nothing if no entry is highlighted
     if (highlightedEl.length !== 1) return;
 
-	// get values from the option
-	var name = highlightedEl.attr('data-name');
-	var value = JSON.parse(highlightedEl.attr('data-value'));
+	// get the option object
+    var optionId = highlightedEl.attr('data-option-id');
 
-	// get the current widget value
-	var currentValue = getValue();
-	var newPiece = {
-		name: name,
-		value: value,
-		chunk: 1
-	};
+    // close input if we did not find the object
+    // NOTE: this should never happen, but it's here for a safeguard
+    if (! OPTIONS[optionId]) {
+        stopInput();
+        return;
+    }
 
-	// add to existing chunk
-	var lastIndex = currentValue.length - 1;
-	if (currentValue[lastIndex] && typeof currentValue[lastIndex] === 'string') {
-		currentValue[lastIndex] = newPiece;
+    // get the option and the piece
+    var option = OPTIONS[optionId];
+    var piece = createPieceFromOption(option, CURRENT_LIST);
 
-		if (currentValue[lastIndex-1]) {
-			currentValue[lastIndex].chunk = currentValue[lastIndex-1].chunk;
-		}
-	}
-	// start a new chunk
-	else {
-		currentValue.push(newPiece);
+    // add the piece to the current chunk
+    if (Array.isArray(CHUNKS[CURRENT_CHUNK_INDEX]) !== true) {
+        CHUNKS[CURRENT_CHUNK_INDEX] = [];
+    }
+    CHUNKS[CURRENT_CHUNK_INDEX].push(piece);
 
-		if (currentValue[currentValue.length-2]) {
-			currentValue[currentValue.length-1].chunk = currentValue[currentValue.length-2].chunk + 1;
-		}
-	}
+    var childrenListName = getChildrenListName(option, CURRENT_LIST);
+    // this option has children, move to the next list
+    if (typeof childrenListName === 'string') {
+        CURRENT_LIST = cfg.lists[childrenListName];
+    }
+    // no children, start a new chunk
+    else {
+        CURRENT_LIST = cfg.lists[cfg.initialList];
+        CURRENT_CHUNK_INDEX++;
+    }
 
-	// add the next child to the end of the chunk
-	var children = highlightedEl.attr('data-children');
-	if (typeof children === 'string' && children !== '') {
-		currentValue.push(children);
-	}
-
-	// set the new value
-	setValue(currentValue);
-
-	// update the widget display
-	updatePieces();
-
-	// close current input
-	stopInput();
-
-	// start new input
-	startInput();
+    updatePieces();
+    stopInput();
+    startInput();
 };
 
 var updatePieces = function() {
-    piecesEl.html(buildPieces());
+    piecesEl.html(buildPieces(CHUNKS, false));
 };
 
-var filterValues = function(str, values) {
+var filterOptions = function(str, values) {
 	str = str.toLowerCase();
     var results = [];
 	for (var i = 0; i < values.length; i++) {
@@ -570,21 +645,22 @@ var filterValues = function(str, values) {
 	return results;
 };
 
+/*
 var getCurrentList = function() {
     var value = getValue();
     var lastIndex = value.length - 1;
     if (typeof value[lastIndex] === 'string'
         && listExists(value[lastIndex]) === true) {
-        return opts.lists[value[lastIndex]];
+        return cfg.lists[value[lastIndex]];
     }
 
-    return opts.lists[opts.initialList];
+    return cfg.lists[cfg.initialList];
 };
 
 var handleTextInput = function() {
     var list = getCurrentList();
     var value = inputEl.val();
-	var filteredValues = filterValues(value, list.values);
+	var filteredValues = filterOptions(value, list.values);
 
     if (filteredValues.length === 0) {
         if (list.allowFreeform === true) {
@@ -605,13 +681,14 @@ var handleTextInput = function() {
 	// fill the dropdown with the filtered results
     updateDropdown(filteredValues);
 };
+*/
 
-var highlightValue = function(valueEl) {
+var highlightOption = function(optionEl) {
 	// remove highlighted from all values in the list
-	listEl.find('li.value').removeClass('highlighted');
+	listEl.find('li.option').removeClass('highlighted');
 
 	// add highlight class to the value clicked
-	$(valueEl).addClass('highlighted');
+	$(optionEl).addClass('highlighted');
 };
 
 //--------------------------------------------------------------
@@ -624,7 +701,7 @@ var pressUpArrow = function() {
 
     // no row highlighted, highlight the last list element
     if (highlightedEl.length === 0) {
-        listEl.find('li.value').last().addClass('highlighted');
+        listEl.find('li.option').last().addClass('highlighted');
         return;
     }
 
@@ -632,7 +709,7 @@ var pressUpArrow = function() {
     highlightedEl.removeClass('highlighted');
 
     // highlight the previous .value sibling
-    highlightedEl.prevAll('li.value').first().addClass('highlighted');
+    highlightedEl.prevAll('li.option').first().addClass('highlighted');
 };
 
 var pressDownArrow = function() {
@@ -641,7 +718,7 @@ var pressDownArrow = function() {
 
     // no row highlighted, highlight the first _value list element
     if (highlightedEl.length === 0) {
-        listEl.find('li.value').first().addClass('highlighted');
+        listEl.find('li.option').first().addClass('highlighted');
         return;
     }
 
@@ -649,7 +726,7 @@ var pressDownArrow = function() {
     highlightedEl.removeClass('highlighted');
 
     // highlight the next _value sibling
-    highlightedEl.nextAll('li.value').first().addClass('highlighted');
+    highlightedEl.nextAll('li.option').first().addClass('highlighted');
 };
 
 var pressEscapeKey = function() {
@@ -668,8 +745,7 @@ var pressBackspaceOnEmptyInput = function() {
 };
 
 var pressEnterOrTab = function() {
-    // TODO: check for freeForm here
-    addHighlightedValue();
+    addHighlightedOption();
 };
 
 //--------------------------------------------------------------
@@ -678,6 +754,13 @@ var pressEnterOrTab = function() {
 
 // click on the container
 var clickContainerElement = function(e) {
+
+
+    return;
+
+
+
+
 	// prevent any clicks inside the container from bubbling up to the html element
 	e.stopPropagation();
 
@@ -744,17 +827,17 @@ var keyupInputElement = function(e) {
     handleTextInput();
 };
 
-// user clicks a dropdown value
-var clickValue = function(e) {
+// user clicks a dropdown option
+var clickOption = function(e) {
     // highlight it
-    highlightValue(this);
+    highlightOption(this);
 
     // add it
-	addHighlightedValue();
+	addHighlightedOption();
 };
 
-var mouseoverValue = function() {
-    highlightValue(this);
+var mouseoverOption = function() {
+    highlightOption(this);
 };
 
 // user clicks a chunk
@@ -777,6 +860,11 @@ var clickChunk = function(e) {
 //      and check to see if the element is within containerEl
 //      right now this doesn't work with multiple widgets on the same page
 var clickPage = function(e) {
+
+
+    return;
+
+
 	// stop input
 	stopInput();
 };
@@ -803,9 +891,9 @@ var keydownWindow = function(e) {
 var addEvents = function() {
     containerEl.on('click', clickContainerElement);
     containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
-    containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
-    containerEl.on('click', 'li.value', clickValue);
-    containerEl.on('mouseover', 'li.value', mouseoverValue);
+    //containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
+    containerEl.on('click', 'li.option', clickOption);
+    containerEl.on('mouseover', 'li.option', mouseoverOption);
     containerEl.on('click', 'div.chunk', clickChunk);
 
     // catch all clicks on the page
@@ -834,7 +922,7 @@ var initDom = function() {
 
 var init = function() {
     if (sanityChecks() !== true) return;
-    initOptions();
+    initConfig();
     initDom();
     addEvents();
 };
@@ -845,11 +933,11 @@ return {
     addList: function(name, list) {
 
     },
-    addValue: function(listName, value) {
+    addOption: function(listName, option) {
 
     },
     blur: function() {
-
+        stopInput();
     },
     clear: function() {
         clearWidget();
@@ -866,9 +954,19 @@ return {
     getLists: function() {
 
     },
-    reload: function(options) {
 
+    reload: function(config) {
+        // TODO: write me
     },
+
+    // returns false if the chunkIndex is invalid
+    // returns the new value of the widget otherwise
+    removeChunk: function(chunkIndex) {
+        if (validChunkIndex(chunkIndex) !== true) return false;
+        removeChunk(chunkIndex);
+        return getValue();
+    },
+
     removeList: function(listName) {
         // return false if the list does not exist
         if (listExists(listName) !== true) return false;
@@ -877,11 +975,9 @@ return {
         return true;
     },
 
-    // TODO: what should the return value of this function be when
-    //       you set a new value?
     val: function(newValue) {
         // set a new value
-        if (newValue && validValueObject(newValue) === true) {
+        if (newValue && validValueArray(newValue) === true) {
             setValue(newValue);
             return true;
         }

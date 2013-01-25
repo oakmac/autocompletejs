@@ -19,7 +19,11 @@
 <div id="body_wrapper" class="container">
 
 <div id="example" class="example-widget"></div>
-<input type="button" id="clear" value="I am a button" />
+<input type="button" id="btn1" value="getValue" />
+<input type="button" id="btn2" value="setValue" />
+<input type="button" id="btn3" value="Remove First Chunk" />
+<input type="button" id="btn4" value="Focus" />
+<input type="button" id="btn5" value="Blur" />
 
 </div><!-- end #body_wrapper -->
 
@@ -30,14 +34,63 @@
 <script>
 var init = function() {
 
-var widget = new AutoComplete('example', ['Apple', 'Banana', 'Orange']);
-
-$('#clear').click(widget.focus);
 
 
+var widget = new AutoComplete('example', {
+    initialList: 'foods',
+    lists: {
+        'foods': [
+            { value: 'Fruits', children: 'fruits' },
+            { value: 'Meats', children: 'meats' },
+            { value: 'Vegetables', children: 'vegetables' }
+        ],
+        'fruits': ['Apple', 'Banana', 'Orange'],
+        'meats': ['Beef', 'Chicken', 'Pork'],
+        'vegetables': ['Carrot', 'Lettuce', 'Onion']
+    }
+});
 
-// turn on syntax highlighter
-SyntaxHighlighter.all();
+
+
+
+$('#btn1').click(function() {
+    console.log(widget.val());
+});
+
+var foo = function() {
+    var newValue = [
+        [
+          {
+            pieceHTML: 'Two',
+            value: 'Two'
+          },
+          {
+            pieceHTML: 'Bar',
+            value: 'Bar'
+          }
+        ],
+        [
+          {
+            pieceHTML: 'Apple',
+            value: {id:55}
+          },
+          {
+            pieceHTML: 'Computer',
+            value: 'Computer'
+          }
+        ]
+    ];
+    widget.val(newValue);
+};
+$('#btn2').click(foo);
+
+
+$('#btn3').click(function() {
+    widget.removeChunk(0);
+});
+
+$('#btn4').click(widget.focus);
+$('#btn5').click(widget.blur);
 
 }; // end init()
 $(document).ready(init);
