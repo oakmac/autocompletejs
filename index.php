@@ -29,11 +29,10 @@ $examples = getExamples();
 foreach ($examples as $example) {
     echo '<!-- begin Example ' . $example['num'] . ' -->'."\n";
     echo '<div class="example">'."\n";
-    echo buildExampleDescription($example['description']);
+    echo $example['html']."\n";
     echo '<pre class="brush:js; toolbar:false;">'."\n";
     echo $example['js']."\n";
     echo '</pre>'."\n";
-    echo '<div id="example' . $example['num'] . '" class="example-widget"></div>'."\n";
     echo '</div>'."\n";
     echo '<!-- end Example ' . $example['num'] . ' -->'."\n\n\n";
 }
@@ -81,27 +80,17 @@ function getExamples() {
         $exampleNum = str_replace('examples/example', '', $file);
         $exampleNum = (int) str_replace('.js', '', $exampleNum);
         $jsFileContent = trim(file_get_contents($file));
-        $textFileName = 'examples/example' . $exampleNum . '.txt';
-        $textFileContent = trim(file_get_contents($textFileName));
+        $htmlFileName = 'examples/example' . $exampleNum . '.html';
+        $htmlFileContent = trim(file_get_contents($htmlFileName));
 
         array_push($examples, array(
-            'js' => $jsFileContent,
-            'num' => $exampleNum,
-            'description' => $textFileContent,
+            'html' => $htmlFileContent,
+            'js'   => $jsFileContent,
+            'num'  => $exampleNum,
         ));
     }
 
     return $examples;
-}
-
-function buildExampleDescription($text) {
-    $textArr = explode("\n", $text);
-    $html = '';
-    foreach ($textArr as $line) {
-        if (trim($line) === '') continue;
-        $html .= '<p>' . $line . '</p>'."\n";
-    }
-    return $html;
 }
 
 ?>

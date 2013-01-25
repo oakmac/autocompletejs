@@ -1,29 +1,36 @@
-var opts = {
+var foods = [
+  { value: 'Fruits', children: 'fruits' },
+  { value: 'Meats', children: 'meats' },
+  { value: 'Vegetables', children: 'vegetables' }
+];
+
+var fruits = ['Apple', 'Banana', 'Orange'];
+
+var meats = [
+  { value: 'Beef', children: 'beef' },
+  'Chicken',
+  'Pork'
+];
+
+var vegetables = ['Carrot', 'Lettuce', 'Onion'];
+
+var beef = [
+  'Hamburger',
+  'Pot Roast',
+  { value: 'Steak', children: 'steak' }
+];
+
+var steak = ['NY Strip', 'Ribeye', 'T-Bone'];
+
+var config = {
   initialList: 'foods',
   lists: {
-    foods: [
-      { value: 'Fruits', children: 'fruits' },
-      { value: 'Meats', children: 'meats' },
-      { value: 'Vegetables', children: 'vegetables' }
-    ],
-
-    fruits: ['Apple', 'Banana', 'Orange'],
-
-    meats: [
-    { value: 'Beef', children: 'beef' },
-    'Chicken',
-    'Pork'
-  ],
-
-    vegetables: ['Carrot', 'Lettuce', 'Onion'],
-
-  beef: [
-    'Hamburger',
-    'Pot Roast',
-    { value: 'Steak', children: 'steak' }
-  ],
-
-  steak: ['NY Strip', 'Ribeye', 'T-Bone']
+    foods: foods,
+    fruits: fruits,
+    meats: meats,
+    vegetables: vegetables,
+    beef: beef,
+    steak: steak
   }
 };
-var example4 = new AutoComplete('example4', opts);
+var widget = new AutoComplete('example4', config);

@@ -9,4 +9,4 @@ var groupedFruits = [
   { group: 'Vegetables', value: 'Lettuce' },
   { group: 'Vegetables', value: 'Onion' }
 ];
-var example2 = new AutoComplete('example2', groupedFruits);
+var widget = new AutoComplete('example2', groupedFruits);

@@ -1,5 +1,4 @@
-
-var opts = {
+var config = {
   initialList: 'states',
   lists: {
     states: {
@@ -8,4 +7,4 @@ var opts = {
     }
   }
 };
-var example9 = new AutoComplete('example9', opts);
+var widget = new AutoComplete('example9', config);

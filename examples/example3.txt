@@ -1,2 +1,0 @@
-You can have nested lists.
-This example works like selecting from a key / value list.

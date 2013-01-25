@@ -1,2 +1,2 @@
 var fruits = ['Apple', 'Banana', 'Orange'];
-var example1 = new AutoComplete('example1', fruits);
+var widget = new AutoComplete('example1', fruits);

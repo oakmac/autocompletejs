@@ -1,4 +1,4 @@
-var opts = {
+var config = {
   initialList: 'foods',
   lists: {
     foods: [
@@ -14,4 +14,4 @@ var opts = {
     vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
 };
-var example3 = new AutoComplete('example3', opts);
+var widget = new AutoComplete('example3', config);

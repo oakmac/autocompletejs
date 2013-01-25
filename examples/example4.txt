@@ -1,2 +1,0 @@
-Your lists can be arbitrarily nested.
-In this example we have more specific choices for beef and steak than the other foods.
