@@ -16,9 +16,6 @@
       padding: 50px 0px;
       border-bottom: 2px solid #ccc;
   }
-  div.example-widget {
-
-  }
 </style>
 </head>
 <body>

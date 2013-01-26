@@ -9,12 +9,12 @@ var config = {
 
     breakfast: {
       allowFreeform: false, // NOTE: this is the default
-      values: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
+      options: ['Bacon', 'Eggs', 'Pancake', 'Waffle']
     },
 
     lunch: {
       allowFreeform: true,
-      values: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
+      options: ['Calzone', 'Hot dog', 'Greek Salad', 'Panini', 'Turkey Sandwich']
     },
 
     dinner: {

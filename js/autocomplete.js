@@ -14,8 +14,10 @@ if(!Array.isArray) {
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
+// TODO: filterOptions should take a callback in the args
 
 window.AutoComplete = window.AutoComplete || function(containerElId, cfg) {
+'use strict';
 
 //--------------------------------------------------------------
 // Module scope variables
@@ -30,25 +32,40 @@ var HTML_ENTITIES = [
   [/'/g, '&#39;'],
   [/\//g, '&#x2F']
 ];
+
+/*
+var KEYS = {
+  SPACE: 32,
+  PAGE_UP: 33,
+  PAGE_DOWN: 34,
+  END: 35,
+  HOME: 36,
+  LEFT: 37,
+  RIGHT: 39,
+  COMMA: 188
+};
+*/
+
 var KEYS = {
   BACKSPACE: 8,
-  DELETE: 46,
-  DOWN_ARROW: 40,
+  TAB: 9,
   ENTER: 13,
   ESCAPE: 27,
-  UP_ARROW: 38,
-  TAB: 9
+  UP: 38,
+  DOWN: 40,
+  DELETE: 46,
+  NUMPAD_ENTER: 108
 };
 
 // DOM elements
 var containerEl, piecesEl, inputEl, listEl;
 
 // stateful
+var ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
 var CHUNKS = [];
-var CURRENT_CHUNK_INDEX = 0;
 var CURRENT_LIST = false;
 var INPUT_HAPPENING = false;
-var OPTIONS = {};
+var VISIBLE_OPTIONS = {};
 
 //--------------------------------------------------------------
 // Util Functions
@@ -260,6 +277,7 @@ var initConfig = function() {
 	// expand lists
 	for (var i in cfg.lists) {
 		if (cfg.lists.hasOwnProperty(i) !== true) continue;
+
 		cfg.lists[i] = expandListObject(cfg.lists[i]);
 	}
 };
@@ -304,19 +322,27 @@ var buildOptionHTML = function(option, parentList) {
 
 var buildOption = function(option, parentList) {
     var optionId = createId();
-    OPTIONS[optionId] = option;
+    VISIBLE_OPTIONS[optionId] = option;
+
+    var childrenListName = getChildrenListName(option, parentList);
 
     var html = '<li class="option" ' +
     'data-option-id="' + encode(optionId) + '">' +
-	buildOptionHTML(option, parentList) +
-	'</li>';
+	buildOptionHTML(option, parentList);
+
+    if (typeof childrenListName === 'string') {
+        html += '<span class="children-indicator">&rarr;</span>';
+    }
+
+	html += '</li>';
 
     return html;
 };
 
 // TODO: this function could be more efficient
-// TODO: there should only be one argument to this function
 var buildOptions = function(options, parentList) {
+	VISIBLE_OPTIONS = {};
+	
     var html = '';
 	var groups = getGroups(options);
 	var i;
@@ -397,6 +423,10 @@ var buildPieces = function(chunks, showChildIndicatorAtEnd) {
 	return html;
 };
 
+var buildNoResults = function(html) {
+	return '<li class="no-results">' + html + '</li>';
+};
+
 //--------------------------------------------------------------
 // Control Flow / DOM Manipulation
 //--------------------------------------------------------------
@@ -431,14 +461,13 @@ var hideInputEl = function() {
     }).val('').blur();
 };
 
-var showDropdownEl = function() {
+var positionDropdownEl = function() {
     // get position and height of input element
     var pos = inputEl.position();
     var height = parseInt(inputEl.height(), 10);
 
     // put the dropdown directly beneath the input element
     listEl.css({
-        display: '',
         // TODO: work on the CSS here
         top: height + pos.top + 8,
         left: pos.left
@@ -466,7 +495,7 @@ var getValue = function() {
 // set the current value of the widget
 var setValue = function(chunks) {
     CHUNKS = chunks;
-    CURRENT_CHUNK_INDEX = chunks.length;
+	ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
     CURRENT_LIST = cfg.lists[cfg.initialList];
     updatePieces();
 }
@@ -492,18 +521,14 @@ var listExists = function(list) {
 var startInput = function() {
     // update state
     INPUT_HAPPENING = true;
-    OPTIONS = {};
     if (! CURRENT_LIST) {
         CURRENT_LIST = cfg.lists[cfg.initialList];
     }
-
-    // build the dropdown markup
-    listEl.html(buildOptions(CURRENT_LIST.options, CURRENT_LIST));
-
-    showInputEl();
-    showDropdownEl();
-    highlightFirstOption();
-    clearChunkHighlight();
+	
+	clearChunkHighlight();
+	showInputEl();
+	positionDropdownEl();
+	pressRegularKey();
 };
 
 var stopInput = function() {
@@ -514,14 +539,6 @@ var stopInput = function() {
 
 var highlightFirstOption = function() {
     highlightOption(listEl.find('li.option').filter(':first'));
-};
-
-var updateDropdown = function(values) {
-    // fill the dropdown with values
-    listEl.html(buildOptions(values));
-
-	// highlight the first element
-	listEl.find('li.option').filter(':first').addClass('highlighted');
 };
 
 var clearChunkHighlight = function() {
@@ -544,23 +561,32 @@ var removeChunk = function(chunkIndex) {
 	// defensive
 	chunkIndex = parseInt(chunkIndex, 10);
 
-	// if we are removing the last chunk, reset CURRENT_LIST to the initialList
+	// if we are removing the last chunk, then the next piece will start
+	// a new chunk
 	if (chunkIndex === (CHUNKS.length-1)) {
 		CURRENT_LIST = cfg.lists[cfg.initialList];
+		ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
 	}
 
 	// remove the chunk
 	CHUNKS.splice(chunkIndex, 1);
-    CURRENT_CHUNK_INDEX--;
 
     updatePieces();
+	
+	if (INPUT_HAPPENING === true) {
+		stopInput();
+		startInput();
+	}
 };
 
 var removeHighlightedChunk = function() {
     var chunkIndex = parseInt(piecesEl.find('div.selected').attr('data-chunkIndex'), 10);
 
     // defensive
-    if (validChunkIndex(chunkIndex) !== true) return;
+    if (validChunkIndex(chunkIndex) !== true) {
+		clearChunkHighlight();
+		return;
+	}
 
     removeChunk(chunkIndex);
 };
@@ -599,30 +625,34 @@ var addHighlightedOption = function() {
 
     // close input if we did not find the object
     // NOTE: this should never happen, but it's here for a safeguard
-    if (! OPTIONS[optionId]) {
+    if (! VISIBLE_OPTIONS[optionId]) {
         stopInput();
         return;
     }
 
     // get the option and the piece
-    var option = OPTIONS[optionId];
+    var option = VISIBLE_OPTIONS[optionId];
     var piece = createPieceFromOption(option, CURRENT_LIST);
 
-    // add the piece to the current chunk
-    if (Array.isArray(CHUNKS[CURRENT_CHUNK_INDEX]) !== true) {
-        CHUNKS[CURRENT_CHUNK_INDEX] = [];
-    }
-    CHUNKS[CURRENT_CHUNK_INDEX].push(piece);
+    // start a new chunk
+	if (ADD_NEXT_PIECE_TO_NEW_CHUNK === true) {
+		CHUNKS[CHUNKS.length] = [piece];
+	}
+	// add the piece to the last chunk
+	else {
+		CHUNKS[CHUNKS.length-1].push(piece);
+	}
 
     var childrenListName = getChildrenListName(option, CURRENT_LIST);
     // this option has children, move to the next list
     if (typeof childrenListName === 'string') {
         CURRENT_LIST = cfg.lists[childrenListName];
+		ADD_NEXT_PIECE_TO_NEW_CHUNK = false;
     }
     // no children, start a new chunk
     else {
         CURRENT_LIST = cfg.lists[cfg.initialList];
-        CURRENT_CHUNK_INDEX++;
+        ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
     }
 
     updatePieces();
@@ -634,54 +664,32 @@ var updatePieces = function() {
     piecesEl.html(buildPieces(CHUNKS, false));
 };
 
-var filterOptions = function(str, values) {
-	str = str.toLowerCase();
-    var results = [];
-	for (var i = 0; i < values.length; i++) {
-		if (str === values[i].name.toLowerCase().substring(0, str.length)) {
-			results.push(values[i]);
+var filterOptions = function(options, input) {
+	input = input.toLowerCase();
+	
+	if (input === '') {
+		return options;
+	}
+	
+	var options2 = [];
+	for (var i = 0; i < options.length; i++) {
+		// try to match the optionHTML
+		if (typeof options[i].optionHTML === 'string') {
+			if (input === options[i].optionHTML.toLowerCase().substring(0, input.length)) {
+				options2.push(options[i]);
+				continue;
+			}
+		}
+		
+		// try to match the value
+		if (typeof options[i].value === 'string') {
+			if (input === options[i].value.toLowerCase().substring(0, input.length)) {
+				options2.push(options[i]);
+			}
 		}
 	}
-	return results;
+	return options2;
 };
-
-/*
-var getCurrentList = function() {
-    var value = getValue();
-    var lastIndex = value.length - 1;
-    if (typeof value[lastIndex] === 'string'
-        && listExists(value[lastIndex]) === true) {
-        return cfg.lists[value[lastIndex]];
-    }
-
-    return cfg.lists[cfg.initialList];
-};
-
-var handleTextInput = function() {
-    var list = getCurrentList();
-    var value = inputEl.val();
-	var filteredValues = filterOptions(value, list.values);
-
-    if (filteredValues.length === 0) {
-        if (list.allowFreeform === true) {
-            filteredValues.push({
-                name: value,
-                value: value
-            });
-        }
-        else {
-            filteredValues.push({
-                clickable: false,
-                name: 'No results found.',
-                value: false
-            });
-        }
-    }
-
-	// fill the dropdown with the filtered results
-    updateDropdown(filteredValues);
-};
-*/
 
 var highlightOption = function(optionEl) {
 	// remove highlighted from all values in the list
@@ -735,7 +743,6 @@ var pressEscapeKey = function() {
 };
 
 var pressBackspaceOnEmptyInput = function() {
-    stopInput();
     if (isChunkHighlighted() === true) {
         removeHighlightedChunk();
     }
@@ -748,19 +755,55 @@ var pressEnterOrTab = function() {
     addHighlightedOption();
 };
 
+var pressRegularKey = function() {
+	var inputValue = inputEl.val();
+	
+	var options = [];
+
+	// filter options with their custom function
+	if (typeof CURRENT_LIST.filterOptions === 'function') {
+		options = CURRENT_LIST.filterOptions(getValue(), CURRENT_LIST.options, inputValue);
+	}
+	// else default to mine
+	else {
+		options = filterOptions(CURRENT_LIST.options, inputValue);
+	}
+
+	// no options and input is blank, hide the dropdown list
+	if (inputValue === '' && options.length === 0) {
+		listEl.css('display', 'none');
+		return;
+	}
+	
+	listEl.css('display', '');
+	
+	// allow freeform?
+	if (options.length === 0 && CURRENT_LIST.allowFreeform === true && inputValue !== '') {
+		options.push(expandOptionObject(inputValue));
+	}
+
+	// no options found :(
+	if (options.length === 0) {
+		if (typeof CURRENT_LIST.noResultsHTML === 'string') {
+			listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML));
+		}
+		else if (typeof CURRENT_LIST.noResultsHTML === 'function') {
+			listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML(getValue(), inputValue)));
+		}
+		return;
+	}
+	
+	// show new options
+	listEl.html(buildOptions(options, CURRENT_LIST));
+	highlightFirstOption();
+};
+
 //--------------------------------------------------------------
 // Browser Events
 //--------------------------------------------------------------
 
 // click on the container
 var clickContainerElement = function(e) {
-
-
-    return;
-
-
-
-
 	// prevent any clicks inside the container from bubbling up to the html element
 	e.stopPropagation();
 
@@ -776,17 +819,21 @@ var clickContainerElement = function(e) {
 
 // keydown on the input element
 var keydownInputElement = function(e) {
+	if (INPUT_HAPPENING !== true) return;
+	
     var keyCode = e.which;
-
+	var inputValue = inputEl.val();
+	
     // enter or tab
-    if (keyCode === KEYS.ENTER || keyCode === KEYS.TAB) {
+    if (keyCode === KEYS.ENTER || keyCode === KEYS.NUMPAD_ENTER
+		|| keyCode === KEYS.TAB) {
         e.preventDefault();
 		pressEnterOrTab();
         return;
     }
 
     // backspace on an empty field
-    if (keyCode === KEYS.BACKSPACE && inputEl.val() === '') {
+    if (keyCode === KEYS.BACKSPACE && inputValue === '') {
         e.preventDefault();
         e.stopPropagation();
         pressBackspaceOnEmptyInput();
@@ -794,13 +841,13 @@ var keydownInputElement = function(e) {
     }
 
     // down arrow
-    if (keyCode === KEYS.DOWN_ARROW) {
+    if (keyCode === KEYS.DOWN) {
         pressDownArrow();
         return;
     }
 
     // up arrow
-    if (keyCode === KEYS.UP_ARROW) {
+    if (keyCode === KEYS.UP) {
         pressUpArrow();
         return;
     }
@@ -810,21 +857,26 @@ var keydownInputElement = function(e) {
         pressEscapeKey();
         return;
     }
-};
-
-// keyup on the input elmeent
-// TODO: remove this; should do everything on keydown
-var keyupInputElement = function(e) {
-	// do nothing if we have already hidden the input element
-    // NOTE: I think this should never happen
-	if (INPUT_HAPPENING !== true) return;
-
-	// do nothing if they have pressed a control character
-    // TODO: code smell? this seems fishy
-    var cntrlChars = [KEYS.ENTER, KEYS.TAB, KEYS.ESCAPE, KEYS.UP_ARROW, KEYS.DOWN_ARROW];
-	if (inArray(e.which, cntrlChars) !== false) return;
-
-    handleTextInput();
+	
+	// else it's a regular key press
+	// NOTE: took this from jquery-tokeninput
+	//       you let the keydown event finish so the input element
+	//       gets updated, then you grab the value
+	//       otherwise you're re-writing the logic behind <input type="text"> elements
+	// TODO: revisit this
+	setTimeout(pressRegularKey, 5);
+	
+	/*
+	var letter = String.fromCharCode(keyCode);
+	
+	// do nothing on non-letter keys
+	if (letter === '') return;
+	
+	// shift
+	if (e.shiftKey === false) {
+		letter = letter.toLowerCase();
+	}
+	*/
 };
 
 // user clicks a dropdown option
@@ -840,37 +892,29 @@ var mouseoverOption = function() {
     highlightOption(this);
 };
 
-// user clicks a chunk
 var clickChunk = function(e) {
+    e.stopPropagation();
+
     // remove highlight from other chunks
     clearChunkHighlight();
 
     // highlight this chunk
     $(this).addClass('selected');
 
-    // stop input
-    // NOTE: is this necessary?
     stopInput();
-
-    // stop propagation
-    e.stopPropagation();
 };
 
 // TODO this needs to be better; should run up the DOM from the e.target
 //      and check to see if the element is within containerEl
 //      right now this doesn't work with multiple widgets on the same page
 var clickPage = function(e) {
-
-
-    return;
-
-
-	// stop input
 	stopInput();
 };
 
 // keydown anywhere on the page
 var keydownWindow = function(e) {
+	if (INPUT_HAPPENING === true) return;
+	
     var keyCode = e.which;
 
     // backspace or delete with a highlighted chunk
@@ -891,7 +935,6 @@ var keydownWindow = function(e) {
 var addEvents = function() {
     containerEl.on('click', clickContainerElement);
     containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
-    //containerEl.on('keyup', 'input.input_proxy', keyupInputElement);
     containerEl.on('click', 'li.option', clickOption);
     containerEl.on('mouseover', 'li.option', mouseoverOption);
     containerEl.on('click', 'div.chunk', clickChunk);
