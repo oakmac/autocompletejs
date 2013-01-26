@@ -16,7 +16,7 @@ if(!Array.isArray) {
 //       in their buildHTML functions
 // TODO: filterOptions should take a callback in the args
 
-window.AutoComplete = window.AutoComplete || function(containerElId, cfg) {
+window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
 //--------------------------------------------------------------
@@ -449,7 +449,7 @@ var clearWidget = function() {
 var showInputEl = function() {
     inputEl.val('').css({
         visibility: '',
-        width: '20px'
+        width: '10px'
     }).focus();
 };
 
@@ -755,8 +755,20 @@ var pressEnterOrTab = function() {
     addHighlightedOption();
 };
 
+// TODO: revisit this and make it better for different font sizes, etc
+// http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
+var updateInputWidth = function(text) {
+	var width = (text.length + 1) * 9;
+	inputEl.css('width', width + 'px');
+};
+
 var pressRegularKey = function() {
 	var inputValue = inputEl.val();
+	
+	if (inputValue !== '') {
+		clearChunkHighlight();
+		updateInputWidth(inputValue);
+	}
 	
 	var options = [];
 
