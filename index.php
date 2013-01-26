@@ -73,18 +73,19 @@ $(document).ready(init);
 function getExamples() {
     $examples = array();
     $jsFiles = glob('examples/*.js');
+	$i = 1;
     foreach ($jsFiles as $file) {
-        $exampleNum = str_replace('examples/example', '', $file);
-        $exampleNum = (int) str_replace('.js', '', $exampleNum);
         $jsFileContent = trim(file_get_contents($file));
-        $htmlFileName = 'examples/example' . $exampleNum . '.html';
+		$htmlFileName = str_replace('.js', '.html', $file);
         $htmlFileContent = trim(file_get_contents($htmlFileName));
 
         array_push($examples, array(
             'html' => $htmlFileContent,
             'js'   => $jsFileContent,
-            'num'  => $exampleNum,
+            'num'  => $i,
         ));
+		
+		$i++;
     }
 
     return $examples;
