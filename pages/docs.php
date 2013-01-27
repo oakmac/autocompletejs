@@ -28,7 +28,7 @@ TODO: Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p>The <code class="js plain">initialList</code> property is the first list started when the user clicks on the AutoComplete widget.</p>
-      <p>It's value should be the name of a <a href="#list_object">List Object</a>.</p>
+      <p>It's value should be the name of a <a href="docs#list_object">List Object</a>.</p>
     </td>
   </tr>
   <tr>
@@ -38,7 +38,7 @@ TODO: Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
-      <p>See the <a href="#list_object">List Object</a> reference for more information on List Objects.</p>
+      <p>See the <a href="docs#list_object">List Object</a> reference for more information on List Objects.</p>
     </td>
   </tr>
   <tr>
@@ -124,7 +124,7 @@ TODO: Methods documentation
       <p>If specified, <code class="js plain">children</code> should be the name of a List Object.</p>
       <p>When any option from this list is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show up in the component.</p>
       <p>Note: If there is a <code class="js plain">children</code> property on the Option Object selected it will supersede this <code class="js plain">children</code> property.
-         See the <code class="js plain">children</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+         See the <code class="js plain">children</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
   </tr>
   <tr>
@@ -172,7 +172,7 @@ TODO: Methods documentation
       <p>The first argument to the function is the option itself.</p>
       <p>The function should return an HTML string.</p>
       <p>Note: If there is a <code class="js plain">optionHTML</code> property on the Option Object selected it will supersede this <code class="js plain">optionHTML</code> property.
-         See the <code class="js plain">optionHTML</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+         See the <code class="js plain">optionHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
   </tr>
   <tr>
@@ -185,7 +185,7 @@ TODO: Methods documentation
       <p>The first argument to the function is the option itself.</p>
       <p>The function should return an HTML string.</p>
       <p>Note: If there is a <code class="js plain">pieceHTML</code> property on the Option Object selected it will supersede this <code class="js plain">pieceHTML</code> property.
-         See the <code class="js plain">pieceHTML</code> property in the <a href="#option_object">Option Object</a> reference.</p>
+         See the <code class="js plain">pieceHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
   </tr>
   <tr>
@@ -196,7 +196,7 @@ TODO: Methods documentation
     <td>
       <p><code class="js plain">postProcess</code> is an optional function you can use to process data that is returned from the server.</p>
       <p>The first argument is the data returned by the server.</p>
-      <p>The function should return an array of <a href="#option_objects">Option Objects</a>.</p>
+      <p>The function should return an array of <a href="docs#option_objects">Option Objects</a>.</p>
     </td>
   </tr>
   <tr>
@@ -229,7 +229,7 @@ TODO: Methods documentation
     <td><code class="js plain">[]</code></td>
     <td>
       <p><code class="js plain">options</code> is an array of Option Objects.</p>
-      <p>See the <a href="#option_object">Option Objects</a> reference for more information.</p>
+      <p>See the <a href="docs#option_object">Option Objects</a> reference for more information.</p>
     </td>
   </tr>
 </tbody>

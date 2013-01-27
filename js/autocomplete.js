@@ -87,41 +87,41 @@ var VISIBLE_OPTIONS = {};
 //----------------------------------------------------------
 // simple string replacement
 var tmpl = function(str, obj) {
-    for (var i in obj) {
-        str = str.replace(new RegExp('{' + i + '}', 'g'), obj[i]);
-    }
-    return str;
+  for (var i in obj) {
+    str = str.replace(new RegExp('{' + i + '}', 'g'), obj[i]);
+  }
+  return str;
 };
 
 // html escape
 var encode = function(str) {
-    str = str + '';
-    for (var i = 0; i < HTML_ENTITIES.length; i++) {
-        str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
-    }
-    return str;
+  str = str + '';
+  for (var i = 0; i < HTML_ENTITIES.length; i++) {
+    str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
+  }
+  return str;
 };
 
 var objectKeysToArray = function(obj) {
-	var arr = [];
-	for (var i in obj) {
-		if (obj.hasOwnProperty(i) === true) {
-			arr.push(i);
-		}
-	}
-	return arr;
+  var arr = [];
+  for (var i in obj) {
+    if (obj.hasOwnProperty(i) === true) {
+      arr.push(i);
+    }
+  }
+  return arr;
 };
 
 // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 var createId = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 };
 
 var isObject = function(thing) {
-	return (Object.prototype.toString.call(thing) === '[object Object]');
+  return (Object.prototype.toString.call(thing) === '[object Object]');
 };
 
 //----------------------------------------------------------
@@ -129,98 +129,92 @@ var isObject = function(thing) {
 //----------------------------------------------------------
 
 var validChunkIndex = function(chunkIndex) {
-    if (typeof chunkIndex !== 'number') {
-        return false;
-    }
+  if (typeof chunkIndex !== 'number') {
+    return false;
+  }
 
-    chunkIndex = parseInt(chunkIndex, 10);
-	if (chunkIndex < 0 || chunkIndex >= CHUNKS.length) {
-		return false;
-	}
+  chunkIndex = parseInt(chunkIndex, 10);
+  if (chunkIndex < 0 || chunkIndex >= CHUNKS.length) {
+    return false;
+  }
 
-    return true;
+  return true;
 };
 
 var validChunksArray = function(newValue) {
-    // must be an array
-    if (Array.isArray(newValue) !== true) {
-        return false;
+  // must be an array
+  if (Array.isArray(newValue) !== true) {
+    return false;
+  }
+
+  for (var i = 0; i < newValue.length; i++) {
+    // string is ok
+    if (typeof newValue[i] === 'string') continue;
+
+    // otherwise must be an object with .value and .pieceHTML
+    // and .pieceHTML must be a string
+    if (isObject(newValue[i]) !== true ||
+        newValue[i].hasOwnProperty('pieceHTML') !== true ||
+        typeof newValue[i].pieceHTML !== 'string' ||
+        newValue[i].hasOwnProperty('value') !== true) {
+      return false;
     }
+  }
 
-	for (var i = 0; i < newValue.length; i++) {
-		// string is ok
-		if (typeof newValue[i] === 'string') continue;
-
-		// otherwise must be an object with .value and .pieceHTML
-		// and .pieceHTML must be a string
-		if (isObject(newValue[i]) !== true ||
-			newValue[i].hasOwnProperty('pieceHTML') !== true ||
-			typeof newValue[i].pieceHTML !== 'string' ||
-			newValue[i].hasOwnProperty('value') !== true) {
-			return false;
-		}
-	}
-
-    return true;
+  return true;
 };
 
 var validOptionObject = function(obj) {
-	// option can be just a string
-	if (typeof obj === 'string') {
-		return true;
-	}
+  // option can be just a string
+  if (typeof obj === 'string') {
+    return true;
+  }
 
-	// else it must be an object with a .value property
-	if (isObject(obj) !== true || obj.hasOwnProperty('value') !== true) {
-		return false;
-	}
-
-	// NOTE: do we need to check if it's safe to call JSON.stringify on .value here?
-
+  // else it must be an object with a .value property
+  if (isObject(obj) !== true || obj.hasOwnProperty('value') !== true) {
     return false;
+  }
+
+  // NOTE: do we need to check if it's safe to call JSON.stringify on .value here?
+
+  return false;
 };
 
 var validListObject = function(obj) {
-
-    // TODO: write me
-
-    return true;
+  // TODO: write me
+  return true;
 };
 
 var showError = function(code, msg) {
-    window.alert('AutoComplete Error ' + code + ': ' + msg);
+  window.alert('AutoComplete Error ' + code + ': ' + msg);
 };
 
 var checkDeps = function() {
-
-
-    // TODO: make sure jQuery is defined
-    // TODO: make sure JSON is defined
-
-    return true;
+  // TODO: make sure jQuery is defined
+  // TODO: make sure JSON is defined
+  return true;
 };
 
 // NOTE: all of the errors have unique codes so that people who search
 //       for them can find them easily :)
 var sanityChecks = function() {
-    // container ID must be a string
-    if (typeof containerElId !== 'string' || containerElId === '') {
-        showError(1001, 'Container element id must be a non-empty string');
-        return false;
-    }
+  // container ID must be a string
+  if (typeof containerElId !== 'string' || containerElId === '') {
+    showError(1001, 'Container element id must be a non-empty string');
+    return false;
+  }
 
-    // make sure the container element exists in the DOM
-    if (! document.getElementById(containerElId)) {
-        showError(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
-        return false;
-    }
+  // make sure the container element exists in the DOM
+  if (! document.getElementById(containerElId)) {
+    showError(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
+    return false;
+  }
 
+  // TODO: make sure cfg are formatted correctly
+  // TODO: allow them to set the initial value of the widget (chunks object)
+  // TODO: show an error when a value.children is not a valid list option
 
-    // TODO: make sure cfg are formatted correctly
-    // TODO: allow them to set the initial value of the widget (chunks object)
-    // TODO: show an error when a value.children is not a valid list option
-
-    return true;
+  return true;
 };
 
 //----------------------------------------------------------
@@ -229,102 +223,102 @@ var sanityChecks = function() {
 
 // expand a single option object
 var expandOptionObject = function(option) {
-    // string becomes the value
-    if (typeof option === 'string') {
-        option = {
-            value: option
-        };
-    }
+  // string becomes the value
+  if (typeof option === 'string') {
+    option = {
+      value: option
+    };
+  }
 
-    return option;
+  return option;
 };
 
 // expand a single List Object
 var expandListObject = function(list) {
-	// an array is shorthand for options
-	if (Array.isArray(list) === true) {
-		list = {
-			options: list
-		};
-	}
+  // an array is shorthand for options
+  if (Array.isArray(list) === true) {
+    list = {
+      options: list
+    };
+  }
 
-	// a string is shorthand for the AJAX url
-	if (typeof list === 'string') {
-		list = {
-            ajaxEnabled: true,
-			url: list
-		};
-	}
+  // a string is shorthand for the AJAX url
+  if (typeof list === 'string') {
+    list = {
+      ajaxEnabled: true,
+      url: list
+    };
+  }
 
-	// if they have included a URL, ajax is turned on
-	if (typeof list.url === 'string' || typeof list.url === 'function') {
-		list.ajaxEnabled = true;
-	}
+  // if they have included a URL, ajax is turned on
+  if (typeof list.url === 'string' || typeof list.url === 'function') {
+    list.ajaxEnabled = true;
+  }
 
-	// default for ajaxEnabled is false
-	if (list.ajaxEnabled !== true) {
-		list.ajaxEnabled = false;
-	}
+  // default for ajaxEnabled is false
+  if (list.ajaxEnabled !== true) {
+    list.ajaxEnabled = false;
+  }
 
-	// default for allowFreeform is false
-	if (list.allowFreeform !== true) {
-		list.allowFreeform = false;
-	}
+  // default for allowFreeform is false
+  if (list.allowFreeform !== true) {
+    list.allowFreeform = false;
+  }
 
-    // default for maxOptions is false
-    if (typeof list.maxOptions !== 'number' || list.maxOptions < 0) {
-        list.maxOptions = false;
-    }
+  // default for maxOptions is false
+  if (typeof list.maxOptions !== 'number' || list.maxOptions < 0) {
+    list.maxOptions = false;
+  }
 
-	// noResults default
-	if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
-		list.noResultsHTML = 'No results found.';
-	}
+  // noResults default
+  if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
+    list.noResultsHTML = 'No results found.';
+  }
 
-	// searchingHTML default
-	if (typeof list.searchingHTML !== 'string' && typeof list.searchingHTML !== 'function') {
-		list.searchingHTML = 'Searching';
-	}
+  // searchingHTML default
+  if (typeof list.searchingHTML !== 'string' && typeof list.searchingHTML !== 'function') {
+    list.searchingHTML = 'Searching';
+  }
 
-	// set options to an empty array if it does not exist
-	if (Array.isArray(list.options) !== true) {
-		list.options = [];
-	}
+  // set options to an empty array if it does not exist
+  if (Array.isArray(list.options) !== true) {
+    list.options = [];
+  }
 
-	// expand options
-	for (var i = 0; i < list.options.length; i++) {
-		list.options[i] = expandOptionObject(list.options[i]);
-	}
+  // expand options
+  for (var i = 0; i < list.options.length; i++) {
+    list.options[i] = expandOptionObject(list.options[i]);
+  }
 
-	return list;
+  return list;
 };
 
 var initConfig = function() {
-	// if cfg is an array or a string, then it is a single list object
-	if (Array.isArray(cfg) === true || typeof cfg === 'string') {
-		cfg = {
-			initialList: 'default',
-			lists: {
-				'default': cfg
-			}
-		};
-	}
+  // if cfg is an array or a string, then it is a single list object
+  if (Array.isArray(cfg) === true || typeof cfg === 'string') {
+    cfg = {
+      initialList: 'default',
+      lists: {
+        'default': cfg
+      }
+    };
+  }
 
-    // TODO: showClearBtn
-    // TODO: clearBtnHTML
-    // TODO: maxChunks
+  // TODO: showClearBtn
+  // TODO: clearBtnHTML
+  // TODO: maxChunks
 
-    // class prefix
-    if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
-        cfg.classPrefix = 'autocomplete';
-    }
+  // class prefix
+  if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
+    cfg.classPrefix = 'autocomplete';
+  }
 
-	// expand lists
-	for (var i in cfg.lists) {
-		if (cfg.lists.hasOwnProperty(i) !== true) continue;
+  // expand lists
+  for (var i in cfg.lists) {
+    if (cfg.lists.hasOwnProperty(i) !== true) continue;
 
-		cfg.lists[i] = expandListObject(cfg.lists[i]);
-	}
+    cfg.lists[i] = expandListObject(cfg.lists[i]);
+  }
 };
 
 //----------------------------------------------------------
@@ -332,163 +326,163 @@ var initConfig = function() {
 //----------------------------------------------------------
 
 var buildWidget = function() {
-    var html = '' +
-    '<div class="' + cfg.classPrefix + '_internal_container">' +
-      '<div class="pieces_container" data-value="[]"></div>' +
-      '<input type="text" class="input_proxy" style="visibility:hidden" />' +
-	  '<div class="clearfix"></div>' +
-      '<ul class="dropdown" style="display:none"></ul>' +
-    '</div>';
+  var html = '' +
+  '<div class="' + cfg.classPrefix + '_internal_container">' +
+    '<div class="pieces_container"></div>' +
+    '<input type="text" class="input_proxy" style="visibility:hidden" />' +
+    '<div class="clearfix"></div>' +
+    '<ul class="dropdown" style="display:none"></ul>' +
+  '</div>';
 
-    return html;
+  return html;
 };
 
 var buildOptionHTML = function(option, parentList) {
-    if (typeof option.optionHTML === 'string') {
-		return option.optionHTML;
-    }
+  if (typeof option.optionHTML === 'string') {
+    return option.optionHTML;
+  }
 
-	if (typeof option.optionHTML === 'function') {
-		return option.optionHTML(option);
-    }
+  if (typeof option.optionHTML === 'function') {
+    return option.optionHTML(option);
+  }
 
-	if (typeof parentList.optionHTML === 'function') {
-        return parentList.optionHTML(option);
-    }
+  if (typeof parentList.optionHTML === 'function') {
+    return parentList.optionHTML(option);
+  }
 
-	if (typeof option.value === 'string') {
-		return encode(option.value);
-    }
+  if (typeof option.value === 'string') {
+    return encode(option.value);
+  }
 
-    // NOTE: this should never happen, but rather have it here just in case
-	//       should I throw an error here?
-	return '<em>unknown option</em>';
+  // NOTE: this should never happen, but rather have it here just in case
+  //       should I throw an error here?
+  return '<em>unknown option</em>';
 };
 
 var buildOption = function(option, parentList) {
-    var optionId = createId();
-    VISIBLE_OPTIONS[optionId] = option;
+  var optionId = createId();
+  VISIBLE_OPTIONS[optionId] = option;
 
-    var childrenListName = getChildrenListName(option, parentList);
+  var childrenListName = getChildrenListName(option, parentList);
 
-    var html = '<li class="option" ' +
-    'data-option-id="' + encode(optionId) + '">' +
-	buildOptionHTML(option, parentList);
+  var html = '<li class="option" ' +
+  'data-option-id="' + encode(optionId) + '">' +
+  buildOptionHTML(option, parentList);
 
-    if (typeof childrenListName === 'string') {
-        html += '<span class="children-indicator">&rarr;</span>';
-    }
+  if (typeof childrenListName === 'string') {
+    html += '<span class="children-indicator">&rarr;</span>';
+  }
 
-	html += '</li>';
+  html += '</li>';
 
-    return html;
+  return html;
 };
 
 // TODO: this function could be more efficient
 var buildOptions = function(options, parentList, appendVisibleOptions) {
-	if (appendVisibleOptions !== true) {
-		VISIBLE_OPTIONS = {};
-	}
+  if (appendVisibleOptions !== true) {
+    VISIBLE_OPTIONS = {};
+  }
 
-    var html = '';
-	var groups = getGroups(options);
-	var i;
+  var html = '';
+  var groups = getGroups(options);
+  var i;
 
-	// sort the groups
-	if (typeof parentList.groupSort === 'function') {
-		groups.sort(parentList.groupSort);
-	}
-	else {
-		groups.sort();
-	}
+  // sort the groups
+  if (typeof parentList.groupSort === 'function') {
+    groups.sort(parentList.groupSort);
+  }
+  else {
+    groups.sort();
+  }
 
-	// build all options without groups first
-	for (i = 0; i < options.length; i++) {
-		if (typeof options[i].group !== 'string') {
-			html += buildOption(options[i], parentList);
-		}
-	}
+  // build all options without groups first
+  for (i = 0; i < options.length; i++) {
+    if (typeof options[i].group !== 'string') {
+      html += buildOption(options[i], parentList);
+    }
+  }
 
-	// build the groups
-	for (i = 0; i < groups.length; i++) {
-		html += '<li class="group">' + encode(groups[i]) + '</li>';
+  // build the groups
+  for (i = 0; i < groups.length; i++) {
+    html += '<li class="group">' + encode(groups[i]) + '</li>';
 
-		for (var j = 0; j < options.length; j++) {
-			if (groups[i] === options[j].group) {
-				html += buildOption(options[j], parentList);
-			}
-		}
-	}
+    for (var j = 0; j < options.length; j++) {
+      if (groups[i] === options[j].group) {
+        html += buildOption(options[j], parentList);
+      }
+    }
+  }
 
-    return html;
+  return html;
 };
 
 var buildPieceHTML = function(option, parentList) {
-	if (typeof option.pieceHTML === 'string') {
-		return option.pieceHTML;
-	}
+  if (typeof option.pieceHTML === 'string') {
+    return option.pieceHTML;
+  }
 
-	if (typeof option.pieceHTML === 'function') {
-		return option.pieceHTML(option);
-	}
+  if (typeof option.pieceHTML === 'function') {
+    return option.pieceHTML(option);
+  }
 
-	if (typeof parentList.pieceHTML === 'function') {
-		return parentList.pieceHTML(option);
-	}
+  if (typeof parentList.pieceHTML === 'function') {
+    return parentList.pieceHTML(option);
+  }
 
-	// default to optionHTML
-	return buildOptionHTML(option, parentList);
+  // default to optionHTML
+  return buildOptionHTML(option, parentList);
 };
 
 var buildPieces = function(chunks, showChildIndicatorAtEnd) {
-	if (showChildIndicatorAtEnd !== true) {
-		showChildIndicatorAtEnd = false;
-	}
+  if (showChildIndicatorAtEnd !== true) {
+    showChildIndicatorAtEnd = false;
+  }
 
-	var html = '';
+  var html = '';
 
-	for (var i = 0; i < chunks.length; i++) {
-		var pieces = chunks[i];
+  for (var i = 0; i < chunks.length; i++) {
+    var pieces = chunks[i];
 
-		html += '<div class="chunk" data-chunkIndex="' + i + '">' +
-		'<span class="remove-chunk">&times;</span>';
+    html += '<div class="chunk" data-chunkIndex="' + i + '">' +
+    '<span class="remove-chunk">&times;</span>';
 
-		for (var j = 0; j < pieces.length; j++) {
-			html += '<span class="piece">' +
-			pieces[j].pieceHTML + '</span>';
+    for (var j = 0; j < pieces.length; j++) {
+      html += '<span class="piece">' +
+      pieces[j].pieceHTML + '</span>';
 
-			// show child indicator
-			if ((pieces.length !== 1 && j !== (pieces.length - 1)) ||
-				(i === (chunks.length - 1) && j === (pieces.length - 1) &&
-				showChildIndicatorAtEnd === true)) {
-				html += '<span class="child-indicator">:</span>';
-			}
-		}
-		html += '</div>'; // end div.chunk
-	}
+      // show child indicator
+      if ((pieces.length !== 1 && j !== (pieces.length - 1)) ||
+        (i === (chunks.length - 1) && j === (pieces.length - 1) &&
+        showChildIndicatorAtEnd === true)) {
+        html += '<span class="child-indicator">:</span>';
+      }
+    }
+    html += '</div>'; // end div.chunk
+  }
 
-	return html;
+  return html;
 };
 
 var buildNoResults = function(noResults, inputValue) {
-	var html = '<li class="no-results">';
-	var type = typeof noResults;
-	if (type === 'string') {
-		html += noResults;
-	}
-	if (type === 'function') {
-		html += noResults(getValue(), inputValue);
-	}
-	html += '</li>';
-	return html;
+  var html = '<li class="no-results">';
+  var type = typeof noResults;
+  if (type === 'string') {
+    html += noResults;
+  }
+  if (type === 'function') {
+    html += noResults(getValue(), inputValue);
+  }
+  html += '</li>';
+  return html;
 };
 
 var buildSearching = function(html) {
-	return '<li class="searching">' + html + '</li>';
+  return '<li class="searching">' + html + '</li>';
 };
 
 var buildAjaxError = function() {
-	return '<li class="ajax-error">AJAX Error!</li>';
+  return '<li class="ajax-error">AJAX Error!</li>';
 };
 
 //----------------------------------------------------------
@@ -496,273 +490,275 @@ var buildAjaxError = function() {
 //----------------------------------------------------------
 
 var removeList = function(listName) {
-    // TODO: write me
+  // TODO: write me
 };
 
 var destroyWidget = function() {
-    containerEl.html('');
-    // TODO: unbind event handlers on the container element?
+  containerEl.html('');
+  // TODO: unbind event handlers on the container element?
 };
 
 var clearWidget = function() {
-    setValue([]);
-    updatePieces();
+  setValue([]);
+  updatePieces();
 };
 
 // empty the input element, unhide it, put the focus on it
 var showInputEl = function() {
-    inputEl.val('').css({
-        visibility: '',
-        width: '10px'
-    }).focus();
+  inputEl.val('').css({
+    visibility: '',
+    width: '10px'
+  }).focus();
 };
 
 // hide the input element, empty it, blur focus
 var hideInputEl = function() {
-    inputEl.css({
-        visibility: 'hidden',
-        width: '0px'
-    }).val('').blur();
+  inputEl.css({
+    visibility: 'hidden',
+    width: '0px'
+  }).val('').blur();
 };
 
 var positionDropdownEl = function() {
-    // get position and height of input element
-    var pos = inputEl.position();
-    var height = parseInt(inputEl.height(), 10);
+  // get position and height of input element
+  var pos = inputEl.position();
+  var height = parseInt(inputEl.height(), 10);
 
-    // put the dropdown directly beneath the input element
-    listEl.css({
-        // TODO: work on the CSS here
-        top: height + pos.top + 8,
-        left: pos.left
-    });
+  // put the dropdown directly beneath the input element
+  listEl.css({
+    // TODO: work on the CSS here
+    top: height + pos.top + 8,
+    left: pos.left
+  });
 };
 
 var hideDropdownEl = function() {
-    listEl.css('display', 'none').html('');
+  listEl.css('display', 'none').html('');
 };
 
 // returns the current value of the widget
 var getValue = function() {
-    var value = [];
-    for (var i = 0; i < CHUNKS.length; i++) {
-        value[i] = [];
+  var value = [];
+  for (var i = 0; i < CHUNKS.length; i++) {
+    value[i] = [];
 
-        for (var j = 0; j < CHUNKS[i].length; j++) {
-            value[i].push(CHUNKS[i][j].value);
-        }
+    for (var j = 0; j < CHUNKS[i].length; j++) {
+      value[i].push(CHUNKS[i][j].value);
     }
-    return value;
+  }
+  return value;
 };
 
 // set the current value of the widget
 var setValue = function(chunks) {
-    CHUNKS = chunks;
-	ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
-    CURRENT_LIST = cfg.lists[cfg.initialList];
-    updatePieces();
+  CHUNKS = chunks;
+  ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+  CURRENT_LIST = cfg.lists[cfg.initialList];
+  updatePieces();
 };
 
 // returns a unique array of groups from an array of Option Objects
 var getGroups = function(options) {
-	var groups = {};
-	for (var i = 0; i < options.length; i++) {
-		if (typeof options[i].group === 'string') {
-			groups[options[i].group] = 0;
-		}
-	}
-	return objectKeysToArray(groups);
+  var groups = {};
+  for (var i = 0; i < options.length; i++) {
+    if (typeof options[i].group === 'string') {
+      groups[options[i].group] = 0;
+    }
+  }
+  return objectKeysToArray(groups);
 };
 
 var listExists = function(list) {
-    if (cfg.lists[list]) {
-        return true;
-    }
-    return false;
+  if (cfg.lists[list]) {
+    return true;
+  }
+  return false;
 };
 
 var startInput = function() {
-    // update state
-    INPUT_HAPPENING = true;
-    if (! CURRENT_LIST) {
-        CURRENT_LIST = cfg.lists[cfg.initialList];
-    }
+  // update state
+  INPUT_HAPPENING = true;
+  if (! CURRENT_LIST) {
+    CURRENT_LIST = cfg.lists[cfg.initialList];
+  }
 
-	clearChunkHighlight();
-	showInputEl();
-	positionDropdownEl();
-	pressRegularKey();
+  clearChunkHighlight();
+  showInputEl();
+  positionDropdownEl();
+  pressRegularKey();
 };
 
 var stopInput = function() {
-	if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
-		JQUERY_AJAX_OBJECT.abort();
-	}
-    hideInputEl();
-    hideDropdownEl();
-    INPUT_HAPPENING = false;
+  if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
+    JQUERY_AJAX_OBJECT.abort();
+  }
+  hideInputEl();
+  hideDropdownEl();
+  INPUT_HAPPENING = false;
 };
 
 var highlightFirstOption = function() {
-    highlightOption(listEl.find('li.option').filter(':first'));
+  highlightOption(listEl.find('li.option').filter(':first'));
 };
 
 var clearChunkHighlight = function() {
-    piecesEl.find('div.chunk').removeClass('selected');
+  piecesEl.find('div.chunk').removeClass('selected');
 };
 
 var highlightLastChunk = function() {
-    var chunksEl = piecesEl.find('div.chunk');
-    chunksEl.removeClass('selected');
-    chunksEl.filter(':last').addClass('selected');
+  var chunksEl = piecesEl.find('div.chunk');
+  chunksEl.removeClass('selected');
+  chunksEl.filter(':last').addClass('selected');
 };
 
 // returns true if a chunk is highlighted
 // false otherwise
 var isChunkHighlighted = function() {
-    return (piecesEl.find('div.selected').length === 1);
+  return (piecesEl.find('div.selected').length === 1);
 };
 
 var removeChunk = function(chunkIndex) {
-	// defensive
-	chunkIndex = parseInt(chunkIndex, 10);
+  // defensive
+  chunkIndex = parseInt(chunkIndex, 10);
 
-	// if we are removing the last chunk, then the next piece will start
-	// a new chunk
-	if (chunkIndex === (CHUNKS.length - 1)) {
-		CURRENT_LIST = cfg.lists[cfg.initialList];
-		ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
-	}
+  // if we are removing the last chunk, then the next piece will start
+  // a new chunk
+  if (chunkIndex === (CHUNKS.length - 1)) {
+    CURRENT_LIST = cfg.lists[cfg.initialList];
+    ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+  }
 
-	// remove the chunk
-	CHUNKS.splice(chunkIndex, 1);
+  // remove the chunk
+  CHUNKS.splice(chunkIndex, 1);
 
-    updatePieces();
+  updatePieces();
 
-	if (INPUT_HAPPENING === true) {
-		stopInput();
-		startInput();
-	}
+  if (INPUT_HAPPENING === true) {
+    stopInput();
+    startInput();
+  }
 };
 
 var removeHighlightedChunk = function() {
-    var chunkIndex = parseInt(piecesEl.find('div.selected').attr('data-chunkIndex'), 10);
+  var chunkIndex = parseInt(piecesEl.find('div.selected').attr('data-chunkIndex'), 10);
 
-    // defensive
-    if (validChunkIndex(chunkIndex) !== true) {
-		clearChunkHighlight();
-		return;
-	}
+  // defensive
+  if (validChunkIndex(chunkIndex) !== true) {
+    clearChunkHighlight();
+    return;
+  }
 
-    removeChunk(chunkIndex);
+  removeChunk(chunkIndex);
 };
 
 var createPieceFromOption = function(option, parentList) {
-    var pieceObj = {
-        pieceHTML: buildPieceHTML(option, parentList),
-        value: option.value
-    };
+  var pieceObj = {
+    pieceHTML: buildPieceHTML(option, parentList),
+    value: option.value
+  };
 
-    return pieceObj;
+  return pieceObj;
 };
 
 // returns false if the option has no children
 var getChildrenListName = function(option, parentList) {
-    if (typeof option.children === 'string' && listExists(option.children) === true) {
-        return option.children;
-    }
+  if (typeof option.children === 'string' &&
+      listExists(option.children) === true) {
+    return option.children;
+  }
 
-    if (typeof parentList.children === 'string' && listExists(parentList.children) === true) {
-        return parentList.children;
-    }
+  if (typeof parentList.children === 'string' &&
+      listExists(parentList.children) === true) {
+    return parentList.children;
+  }
 
-    return false;
+  return false;
 };
 
 var addHighlightedOption = function() {
-    // get the highlighted value
-    var highlightedEl = listEl.find('li.highlighted');
+  // get the highlighted value
+  var highlightedEl = listEl.find('li.highlighted');
 
-    // do nothing if no entry is highlighted
-    if (highlightedEl.length !== 1) return;
+  // do nothing if no entry is highlighted
+  if (highlightedEl.length !== 1) return;
 
-	// get the option object
-    var optionId = highlightedEl.attr('data-option-id');
+  // get the option object
+  var optionId = highlightedEl.attr('data-option-id');
 
-    // close input if we did not find the object
-    // NOTE: this should never happen, but it's here for a safeguard
-    if (! VISIBLE_OPTIONS[optionId]) {
-        stopInput();
-        return;
-    }
-
-    // get the option and the piece
-    var option = VISIBLE_OPTIONS[optionId];
-    var piece = createPieceFromOption(option, CURRENT_LIST);
-
-    // start a new chunk
-	if (ADD_NEXT_PIECE_TO_NEW_CHUNK === true) {
-		CHUNKS[CHUNKS.length] = [piece];
-	}
-	// add the piece to the last chunk
-	else {
-		CHUNKS[CHUNKS.length - 1].push(piece);
-	}
-
-    var childrenListName = getChildrenListName(option, CURRENT_LIST);
-    // this option has children, move to the next list
-    if (typeof childrenListName === 'string') {
-        CURRENT_LIST = cfg.lists[childrenListName];
-		ADD_NEXT_PIECE_TO_NEW_CHUNK = false;
-    }
-    // no children, start a new chunk
-    else {
-        CURRENT_LIST = cfg.lists[cfg.initialList];
-        ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
-    }
-
-    updatePieces();
+  // close input if we did not find the object
+  // NOTE: this should never happen, but it's here for a safeguard
+  if (! VISIBLE_OPTIONS[optionId]) {
     stopInput();
-    startInput();
+    return;
+  }
+
+  // get the option and the piece
+  var option = VISIBLE_OPTIONS[optionId];
+  var piece = createPieceFromOption(option, CURRENT_LIST);
+
+  // start a new chunk
+  if (ADD_NEXT_PIECE_TO_NEW_CHUNK === true) {
+    CHUNKS[CHUNKS.length] = [piece];
+  }
+  // add the piece to the last chunk
+  else {
+    CHUNKS[CHUNKS.length - 1].push(piece);
+  }
+
+  var childrenListName = getChildrenListName(option, CURRENT_LIST);
+  // this option has children, move to the next list
+  if (typeof childrenListName === 'string') {
+    CURRENT_LIST = cfg.lists[childrenListName];
+    ADD_NEXT_PIECE_TO_NEW_CHUNK = false;
+  }
+  // no children, start a new chunk
+  else {
+    CURRENT_LIST = cfg.lists[cfg.initialList];
+    ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+  }
+
+  updatePieces();
+  stopInput();
+  startInput();
 };
 
 var updatePieces = function() {
-    piecesEl.html(buildPieces(CHUNKS, false));
+  piecesEl.html(buildPieces(CHUNKS, false));
 };
 
 var filterOptions = function(options, input) {
-	input = input.toLowerCase();
+  input = input.toLowerCase();
 
-	if (input === '') {
-		return options;
-	}
+  if (input === '') {
+    return options;
+  }
 
-	var options2 = [];
-	for (var i = 0; i < options.length; i++) {
-		// try to match the optionHTML
-		if (typeof options[i].optionHTML === 'string') {
-			if (input === options[i].optionHTML.toLowerCase().substring(0, input.length)) {
-				options2.push(options[i]);
-				continue;
-			}
-		}
+  var options2 = [];
+  for (var i = 0; i < options.length; i++) {
+    // try to match the optionHTML
+    if (typeof options[i].optionHTML === 'string') {
+      if (input === options[i].optionHTML.toLowerCase().substring(0, input.length)) {
+        options2.push(options[i]);
+        continue;
+      }
+    }
 
-		// try to match the value
-		if (typeof options[i].value === 'string') {
-			if (input === options[i].value.toLowerCase().substring(0, input.length)) {
-				options2.push(options[i]);
-			}
-		}
-	}
-	return options2;
+    // try to match the value
+    if (typeof options[i].value === 'string') {
+      if (input === options[i].value.toLowerCase().substring(0, input.length)) {
+        options2.push(options[i]);
+      }
+    }
+  }
+  return options2;
 };
 
 var highlightOption = function(optionEl) {
-	// remove highlighted from all values in the list
-	listEl.find('li.option').removeClass('highlighted');
+  // remove highlighted from all values in the list
+  listEl.find('li.option').removeClass('highlighted');
 
-	// add highlight class to the value clicked
-	$(optionEl).addClass('highlighted');
+  // add highlight class to the value clicked
+  $(optionEl).addClass('highlighted');
 };
 
 //----------------------------------------------------------
@@ -770,214 +766,216 @@ var highlightOption = function(optionEl) {
 //----------------------------------------------------------
 
 var pressUpArrow = function() {
-    // get the highlighted element
-    var highlightedEl = listEl.find('li.highlighted');
+  // get the highlighted element
+  var highlightedEl = listEl.find('li.highlighted');
 
-    // no row highlighted, highlight the last list element
-    if (highlightedEl.length === 0) {
-        listEl.find('li.option').last().addClass('highlighted');
-        return;
-    }
+  // no row highlighted, highlight the last list element
+  if (highlightedEl.length === 0) {
+    listEl.find('li.option').last().addClass('highlighted');
+    return;
+  }
 
-    // remove the highlight from the current element
-    highlightedEl.removeClass('highlighted');
+  // remove the highlight from the current element
+  highlightedEl.removeClass('highlighted');
 
-    // highlight the previous .value sibling
-    highlightedEl.prevAll('li.option').first().addClass('highlighted');
+  // highlight the previous .value sibling
+  highlightedEl.prevAll('li.option').first().addClass('highlighted');
 };
 
 var pressDownArrow = function() {
-    // get the highlighted element
-    var highlightedEl = listEl.find('li.highlighted');
+  // get the highlighted element
+  var highlightedEl = listEl.find('li.highlighted');
 
-    // no row highlighted, highlight the first _value list element
-    if (highlightedEl.length === 0) {
-        listEl.find('li.option').first().addClass('highlighted');
-        return;
-    }
+  // no row highlighted, highlight the first _value list element
+  if (highlightedEl.length === 0) {
+    listEl.find('li.option').first().addClass('highlighted');
+    return;
+  }
 
-    // remove the highlight from the current element
-    highlightedEl.removeClass('highlighted');
+  // remove the highlight from the current element
+  highlightedEl.removeClass('highlighted');
 
-    // highlight the next _value sibling
-    highlightedEl.nextAll('li.option').first().addClass('highlighted');
+  // highlight the next _value sibling
+  highlightedEl.nextAll('li.option').first().addClass('highlighted');
 };
 
 var pressEscapeKey = function() {
-    stopInput();
-    clearChunkHighlight();
+  stopInput();
+  clearChunkHighlight();
 };
 
 var pressBackspaceOnEmptyInput = function() {
-    if (isChunkHighlighted() === true) {
-        removeHighlightedChunk();
-    }
-    else {
-        highlightLastChunk();
-    }
+  if (isChunkHighlighted() === true) {
+    removeHighlightedChunk();
+  }
+  else {
+    highlightLastChunk();
+  }
 };
 
 var pressEnterOrTab = function() {
-    addHighlightedOption();
+  addHighlightedOption();
 };
 
 // returns true if there is a valid option showing
 // false otherwise
 var isOptionShowing = function() {
-	return (listEl.find('li.option').length > 0);
+  return (listEl.find('li.option').length > 0);
 };
 
 var isOptionHighlighted = function() {
-    return (listEl.find('li.highlighted').length !== 0);
+  return (listEl.find('li.highlighted').length !== 0);
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
 // http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
 var updateInputWidth = function(text) {
-	var width = (text.length + 1) * 9;
-	inputEl.css('width', width + 'px');
+  var width = (text.length + 1) * 9;
+  inputEl.css('width', width + 'px');
 };
 
 var sendAjaxRequest = function(list, inputValue) {
 
-	// TODO: allow full jQuery ajax config extend here
-	//       just not sure about how to handle scope with the
-	//       internal functions
+  // TODO: allow full jQuery ajax config extend here
+  //       just not sure about how to handle scope with the
+  //       internal functions
 
-	var url;
-	if (typeof list.url === 'string') {
-		url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
-	}
-	if (typeof list.url === 'function') {
-		url = list.url(getValue(), inputValue);
-	}
+  var url;
+  if (typeof list.url === 'string') {
+    url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+  }
+  if (typeof list.url === 'function') {
+    url = list.url(getValue(), inputValue);
+  }
 
-	var ajaxSuccess = function(data, status, xhr) {
-		if (INPUT_HAPPENING !== true) return;
+  var ajaxSuccess = function(data, status, xhr) {
+    if (INPUT_HAPPENING !== true) return;
 
-		// run their custom postProcess function
-		if (typeof list.postProcess === 'function') {
-			data = list.postProcess(getValue(), data);
-		}
+    // run their custom postProcess function
+    if (typeof list.postProcess === 'function') {
+      data = list.postProcess(getValue(), data);
+    }
 
-		// expand the options and make sure they're valid
-		var options = [];
-		if (Array.isArray(data) === true) {
-			for (var i = 0; i < data.length; i++) {
-				// skip any objects that are not valid Options
-				if (validOptionObject(data[i]) !== true) continue;
+    // expand the options and make sure they're valid
+    var options = [];
+    if (Array.isArray(data) === true) {
+      for (var i = 0; i < data.length; i++) {
+        // skip any objects that are not valid Options
+        if (validOptionObject(data[i]) !== true) continue;
 
-				options.push(expandOptionObject(data[i]));
-			}
-		}
+        options.push(expandOptionObject(data[i]));
+      }
+    }
 
-		// no results :(
-		var html = '';
-		if (options.length === 0 && isOptionShowing() === false) {
-			html = buildNoResults(list.noResultsHTML, inputValue);
-		}
+    // no results :(
+    var html = '';
+    if (options.length === 0 && isOptionShowing() === false) {
+      html = buildNoResults(list.noResultsHTML, inputValue);
+    }
 
-		// new options
-		if (options.length > 0) {
-			html = buildOptions(options, list, true);
-		}
+    // new options
+    if (options.length > 0) {
+      html = buildOptions(options, list, true);
+    }
 
-		listEl.find('li.searching').replaceWith(html);
+    listEl.find('li.searching').replaceWith(html);
 
-		// highlight the option if there are no others highlighted
-		if (isOptionHighlighted() === false) {
-			highlightFirstOption();
-		}
-	};
+    // highlight the option if there are no others highlighted
+    if (isOptionHighlighted() === false) {
+      highlightFirstOption();
+    }
+  };
 
-	var ajaxError = function(xhr, errType, exceptionObject) {
-		if (errType === 'abort') {
+  var ajaxError = function(xhr, errType, exceptionObject) {
+    if (errType === 'abort') {
 
-		}
-		if (errType === 'error') {
-			listEl.find('li.searching').replaceWith(buildAjaxError());
-		}
-	};
+    }
+    if (errType === 'error') {
+      listEl.find('li.searching').replaceWith(buildAjaxError());
+    }
+  };
 
-	JQUERY_AJAX_OBJECT = $.ajax({
-		dataType: 'json',
-		error: ajaxError,
-		success: ajaxSuccess,
-		type: 'GET',
-		url: url
-	});
+  JQUERY_AJAX_OBJECT = $.ajax({
+    dataType: 'json',
+    error: ajaxError,
+    success: ajaxSuccess,
+    type: 'GET',
+    url: url
+  });
 };
 
 var pressRegularKey = function() {
-	var inputValue = inputEl.val();
+  var inputValue = inputEl.val();
 
-	if (inputValue !== '') {
-		clearChunkHighlight();
-		updateInputWidth(inputValue);
-	}
+  if (inputValue !== '') {
+    clearChunkHighlight();
+    updateInputWidth(inputValue);
+  }
 
-	var options = [];
+  var options = [];
 
-	// filter options with their custom function
-	if (typeof CURRENT_LIST.filterOptions === 'function') {
-		options = CURRENT_LIST.filterOptions(getValue(), CURRENT_LIST.options, inputValue);
-	}
-	// else default to mine
-	else {
-		options = filterOptions(CURRENT_LIST.options, inputValue);
-	}
+  // filter options with their custom function
+  if (typeof CURRENT_LIST.filterOptions === 'function') {
+    options = CURRENT_LIST.filterOptions(getValue(), CURRENT_LIST.options, inputValue);
+  }
+  // else default to mine
+  else {
+    options = filterOptions(CURRENT_LIST.options, inputValue);
+  }
 
-	// add freeform as an option if that's allowed
-	if (options.length === 0 && inputValue !== '' && CURRENT_LIST.allowFreeform === true) {
-		options.push(expandOptionObject(inputValue));
-	}
+  // add freeform as an option if that's allowed
+  if (options.length === 0 && inputValue !== '' &&
+      CURRENT_LIST.allowFreeform === true) {
+    options.push(expandOptionObject(inputValue));
+  }
 
-	// no input, no options, no freeform, and no ajax
-	// hide the dropdown and exit
-	if (options.length === 0 && inputValue === '' && CURRENT_LIST.ajaxEnabled === false) {
-		listEl.css('display', 'none');
-		return;
-	}
+  // no input, no options, no freeform, and no ajax
+  // hide the dropdown and exit
+  if (options.length === 0 && inputValue === '' &&
+      CURRENT_LIST.ajaxEnabled === false) {
+    listEl.css('display', 'none');
+    return;
+  }
 
-	// else we will show something in the dropdown
-	listEl.css('display', '');
+  // else we will show something in the dropdown
+  listEl.css('display', '');
 
-	// no options found and no AJAX
-	// show "No Results" and exit
-	if (options.length === 0 && CURRENT_LIST.ajaxEnabled === false) {
-		listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML, inputValue));
-		return;
-	}
+  // no options found and no AJAX
+  // show "No Results" and exit
+  if (options.length === 0 && CURRENT_LIST.ajaxEnabled === false) {
+    listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML, inputValue));
+    return;
+  }
 
-	// build the options found
-	var html = buildOptions(options, CURRENT_LIST);
+  // build the options found
+  var html = buildOptions(options, CURRENT_LIST);
 
-	// add AJAX indicator
-	if (CURRENT_LIST.ajaxEnabled === true) {
-		if (typeof CURRENT_LIST.searchingHTML === 'string') {
-			html += buildSearching(CURRENT_LIST.searchingHTML);
-		}
-		if (typeof CURRENT_LIST.searchingHTML === 'function') {
-			html += buildSearching(CURRENT_LIST.searchingHTML(getValue(), inputValue));
-		}
+  // add AJAX indicator
+  if (CURRENT_LIST.ajaxEnabled === true) {
+    if (typeof CURRENT_LIST.searchingHTML === 'string') {
+      html += buildSearching(CURRENT_LIST.searchingHTML);
+    }
+    if (typeof CURRENT_LIST.searchingHTML === 'function') {
+      html += buildSearching(CURRENT_LIST.searchingHTML(getValue(), inputValue));
+    }
 
-		/*
-		// TODO: buffer ajax requests
-		AJAX_BUFFER_TIMEOUT = setTimeout(function() {
+    /*
+    // TODO: buffer ajax requests
+    AJAX_BUFFER_TIMEOUT = setTimeout(function() {
 
-		}, AJAX_BUFFER_LENGTH);
-		*/
+    }, AJAX_BUFFER_LENGTH);
+    */
 
-		// cancel an existing request
-		if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
-			JQUERY_AJAX_OBJECT.abort();
-		}
-		sendAjaxRequest(CURRENT_LIST, inputValue);
-	}
+    // cancel an existing request
+    if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
+      JQUERY_AJAX_OBJECT.abort();
+    }
+    sendAjaxRequest(CURRENT_LIST, inputValue);
+  }
 
-	// show the dropdown
-	listEl.html(html);
-	highlightFirstOption();
+  // show the dropdown
+  listEl.html(html);
+  highlightFirstOption();
 };
 
 //----------------------------------------------------------
@@ -986,89 +984,89 @@ var pressRegularKey = function() {
 
 // click on the container
 var clickContainerElement = function(e) {
-	// prevent any clicks inside the container from bubbling up to the html element
-	e.stopPropagation();
+  // prevent any clicks inside the container from bubbling up to the html element
+  e.stopPropagation();
 
-	// start input if it's not already happening
-    if (INPUT_HAPPENING === false) {
-        startInput();
-    }
-    // else just put the focus on the input element
-    else {
-        inputEl.focus();
-    }
+  // start input if it's not already happening
+  if (INPUT_HAPPENING === false) {
+    startInput();
+  }
+  // else just put the focus on the input element
+  else {
+    inputEl.focus();
+  }
 };
 
 // keydown on the input element
 var keydownInputElement = function(e) {
-	if (INPUT_HAPPENING !== true) return;
+  if (INPUT_HAPPENING !== true) return;
 
-    var keyCode = e.which;
-	var inputValue = inputEl.val();
+  var keyCode = e.which;
+  var inputValue = inputEl.val();
 
-    // enter or tab
-    if (keyCode === KEYS.ENTER ||
-		keyCode === KEYS.NUMPAD_ENTER ||
-		keyCode === KEYS.TAB) {
-        e.preventDefault();
-		pressEnterOrTab();
-        return;
-    }
+  // enter or tab
+  if (keyCode === KEYS.ENTER ||
+      keyCode === KEYS.NUMPAD_ENTER ||
+      keyCode === KEYS.TAB) {
+    e.preventDefault();
+    pressEnterOrTab();
+    return;
+  }
 
-    // backspace on an empty field
-    if (keyCode === KEYS.BACKSPACE && inputValue === '') {
-        e.preventDefault();
-        e.stopPropagation();
-        pressBackspaceOnEmptyInput();
-        return;
-    }
+  // backspace on an empty field
+  if (keyCode === KEYS.BACKSPACE && inputValue === '') {
+    e.preventDefault();
+    e.stopPropagation();
+    pressBackspaceOnEmptyInput();
+    return;
+  }
 
-    // down arrow
-    if (keyCode === KEYS.DOWN) {
-        pressDownArrow();
-        return;
-    }
+  // down arrow
+  if (keyCode === KEYS.DOWN) {
+    pressDownArrow();
+    return;
+  }
 
-    // up arrow
-    if (keyCode === KEYS.UP) {
-        pressUpArrow();
-        return;
-    }
+  // up arrow
+  if (keyCode === KEYS.UP) {
+    pressUpArrow();
+    return;
+  }
 
-    // escape
-    if (keyCode === KEYS.ESCAPE) {
-        pressEscapeKey();
-        return;
-    }
+  // escape
+  if (keyCode === KEYS.ESCAPE) {
+    pressEscapeKey();
+    return;
+  }
 
-	// else it's a regular key press
-	// NOTE: took this from jquery-tokeninput
-	//       you let the keydown event finish so the input element
-	//       gets updated, then you grab the value
-	//       otherwise you're re-writing the logic behind <input type="text"> elements
-	// TODO: revisit this
-	setTimeout(pressRegularKey, 5);
+  // else it's a regular key press
+  // NOTE: took this from jquery-tokeninput
+  //       you let the keydown event finish so the input element
+  //       gets updated, then you grab the value
+  //       otherwise you're re-writing the logic behind <input type="text"> elements
+  // TODO: revisit this
+  setTimeout(pressRegularKey, 5);
 
-	/*
-	var letter = String.fromCharCode(keyCode);
+  /*
+  var letter = String.fromCharCode(keyCode);
 
-	// do nothing on non-letter keys
-	if (letter === '') return;
+  // do nothing on non-letter keys
+  if (letter === '') return;
 
-	// shift
-	if (e.shiftKey === false) {
-		letter = letter.toLowerCase();
-	}
-	*/
+  // shift
+  if (e.shiftKey === false) {
+    letter = letter.toLowerCase();
+  }
+  */
 };
 
 // user clicks a dropdown option
 var clickOption = function(e) {
-    // highlight it
-    highlightOption(this);
+  // highlight it
+  highlightOption(this);
 
-    // add it
-	addHighlightedOption();
+  // add it
+  addHighlightedOption();
 };
 
 var mouseoverOption = function() {
@@ -1076,57 +1074,57 @@ var mouseoverOption = function() {
 };
 
 var clickChunk = function(e) {
-    e.stopPropagation();
+  e.stopPropagation();
 
-    // remove highlight from other chunks
-    clearChunkHighlight();
+  // remove highlight from other chunks
+  clearChunkHighlight();
 
-    // highlight this chunk
-    $(this).addClass('selected');
+  // highlight this chunk
+  $(this).addClass('selected');
 
-    stopInput();
+  stopInput();
 };
 
 // TODO this needs to be better; should run up the DOM from the e.target
 //      and check to see if the element is within containerEl
 //      right now this doesn't work with multiple widgets on the same page
 var clickPage = function(e) {
-	stopInput();
+  stopInput();
 };
 
 // keydown anywhere on the page
 var keydownWindow = function(e) {
-	if (INPUT_HAPPENING === true) return;
+  if (INPUT_HAPPENING === true) return;
 
-    var keyCode = e.which;
+  var keyCode = e.which;
 
-    // backspace or delete with a highlighted chunk
-    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
-        isChunkHighlighted() === true) {
-        e.preventDefault();
-        removeHighlightedChunk();
-        return;
-    }
+  // backspace or delete with a highlighted chunk
+  if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
+    isChunkHighlighted() === true) {
+    e.preventDefault();
+    removeHighlightedChunk();
+    return;
+  }
 
-    // escape key
-    if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
-        clearChunkHighlight();
-        return;
-    }
+  // escape key
+  if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
+    clearChunkHighlight();
+    return;
+  }
 };
 
 var addEvents = function() {
-    containerEl.on('click', clickContainerElement);
-    containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
-    containerEl.on('click', 'li.option', clickOption);
-    containerEl.on('mouseover', 'li.option', mouseoverOption);
-    containerEl.on('click', 'div.chunk', clickChunk);
+  containerEl.on('click', clickContainerElement);
+  containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
+  containerEl.on('click', 'li.option', clickOption);
+  containerEl.on('mouseover', 'li.option', mouseoverOption);
+  containerEl.on('click', 'div.chunk', clickChunk);
 
-    // catch all clicks on the page
-    $('html').on('click', clickPage);
+  // catch all clicks on the page
+  $('html').on('click', clickPage);
 
-    // catch global keydown
-    $(window).on('keydown', keydownWindow);
+  // catch global keydown
+  $(window).on('keydown', keydownWindow);
 };
 
 //----------------------------------------------------------
@@ -1134,84 +1132,84 @@ var addEvents = function() {
 //----------------------------------------------------------
 
 var initDom = function() {
-    // get the container element
-    containerEl = $('#' + containerElId);
+  // get the container element
+  containerEl = $('#' + containerElId);
 
-    // build the markup inside the container
-    containerEl.html(buildWidget());
+  // build the markup inside the container
+  containerEl.html(buildWidget());
 
-    // grab elements in memory
-    inputEl = containerEl.find('input.input_proxy');
-    listEl = containerEl.find('ul.dropdown');
-    piecesEl = containerEl.find('div.pieces_container');
+  // grab elements in memory
+  inputEl = containerEl.find('input.input_proxy');
+  listEl = containerEl.find('ul.dropdown');
+  piecesEl = containerEl.find('div.pieces_container');
 };
 
 var init = function() {
-    if (sanityChecks() !== true) return;
-    initConfig();
-    initDom();
-    addEvents();
+  if (sanityChecks() !== true) return;
+  initConfig();
+  initDom();
+  addEvents();
 };
 init();
 
 // return a new object
 return {
-    addList: function(name, list) {
+  addList: function(name, list) {
 
-    },
-    addOption: function(listName, option) {
+  },
+  addOption: function(listName, option) {
 
-    },
-    blur: function() {
-        stopInput();
-    },
-    clear: function() {
-        clearWidget();
-    },
-    destroy: function() {
-        destroyWidget();
-    },
-    focus: function() {
-        startInput();
-    },
-    getList: function(listName) {
+  },
+  blur: function() {
+    stopInput();
+  },
+  clear: function() {
+    clearWidget();
+  },
+  destroy: function() {
+    destroyWidget();
+  },
+  focus: function() {
+    startInput();
+  },
+  getList: function(listName) {
 
-    },
-    getLists: function() {
+  },
+  getLists: function() {
 
-    },
+  },
 
-    reload: function(config) {
-        // TODO: write me
-    },
+  reload: function(config) {
+    // TODO: write me
+  },
 
-    // returns false if the chunkIndex is invalid
-    // returns the new value of the widget otherwise
-    removeChunk: function(chunkIndex) {
-        if (validChunkIndex(chunkIndex) !== true) return false;
-        removeChunk(chunkIndex);
-        return getValue();
-    },
+  // returns false if the chunkIndex is invalid
+  // returns the new value of the widget otherwise
+  removeChunk: function(chunkIndex) {
+    if (validChunkIndex(chunkIndex) !== true) return false;
+    removeChunk(chunkIndex);
+    return getValue();
+  },
 
-    removeList: function(listName) {
-        // return false if the list does not exist
-        if (listExists(listName) !== true) return false;
+  removeList: function(listName) {
+    // return false if the list does not exist
+    if (listExists(listName) !== true) return false;
 
-        removeList(listName);
-        return true;
-    },
+    removeList(listName);
+    return true;
+  },
 
-    val: function(newValue) {
-        // set a new value
-        if (newValue && validChunksArray(newValue) === true) {
-            setValue(newValue);
-            return true;
-        }
-        // else return the current value
-        else {
-            return getValue();
-        }
+  val: function(newValue) {
+    // set a new value
+    if (newValue && validChunksArray(newValue) === true) {
+      setValue(newValue);
+      return true;
     }
+    // else return the current value
+    else {
+      return getValue();
+    }
+  }
 };
 
 // end window.AutoComplete()
