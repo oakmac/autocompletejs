@@ -1,6 +1,5 @@
 before launch checklist:
-> MIT License file in project
-> MIT header in files
+> MIT header on all files
 > full docs for methods
 > full docs for config options
 > docs for shorthand / expansion
@@ -12,7 +11,6 @@ before launch checklist:
 > add change event
 > have a "cacheOptionsInLocalStorage" option on list config!
 > have a "clearCache" option on the widget config
-> maxChunks
 
 Examples:
 > localStorage

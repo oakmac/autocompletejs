@@ -158,6 +158,7 @@ TODO: Methods documentation
     <td><code class="js keyword">false</code></td>
     <td>
       <p><code class="js plain">maxOptions</code> is the maximum number of options to display in a dropdown.</p>
+      <p>If <code class="js plain">maxOptions</code> is a number it must be an integer greater than 1.</p>
       <p>Set <code class="js plain">maxOptions</code> to <code class="js keyword">false</code> to show all options available.</p>
     </td>
   </tr>

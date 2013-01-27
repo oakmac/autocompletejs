@@ -9,7 +9,6 @@
  * Date: 27 Jan 2013
  */
 
-// TODO: showTokenGroupHTML true / false (default is true)
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
@@ -129,7 +128,7 @@ var validToken = function(token) {
   if (typeof token === 'string') {
     return true;
   }
-  
+
   // else must be an object with .value and .tokenHTML
   // and .tokenHTML must be a string
   if (isObject(token) !== true ||
@@ -138,7 +137,7 @@ var validToken = function(token) {
       typeof token.tokenHTML !== 'string') {
     return false;
   }
-  
+
   return true;
 };
 
@@ -264,8 +263,11 @@ var expandListObject = function(list) {
   }
 
   // default for maxOptions is false
-  if (typeof list.maxOptions !== 'number' || list.maxOptions < 0) {
+  if (typeof list.maxOptions !== 'number' || list.maxOptions < 1) {
     list.maxOptions = false;
+  }
+  if (typeof list.maxOptions === 'number') {
+    list.maxOptions = parseInt(list.maxOptions, 10);
   }
 
   // noResults default
@@ -305,7 +307,14 @@ var initConfig = function() {
   // TODO: errors - check that console.log is a function
   // TODO: showClearBtn
   // TODO: clearBtnHTML
-  // TODO: maxTokenGroups
+
+  // default for maxTokenGroups is false
+  if (typeof cfg.maxTokenGroups !== 'number' || cfg.maxTokenGroups < 0) {
+    cfg.maxTokenGroups = false;
+  }
+  if (typeof cfg.maxTokenGroups === 'number') {
+    cfg.maxTokenGroups = parseInt(cfg.maxTokenGroups, 10);
+  }
 
   // class prefix
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
@@ -567,6 +576,11 @@ var listExists = function(list) {
 };
 
 var startInput = function() {
+  if (typeof cfg.maxTokenGroups === 'number' &&
+      TOKENS.length >= cfg.maxTokenGroups) {
+    return;
+  }
+
   // update state
   INPUT_HAPPENING = true;
   if (! CURRENT_LIST) {
@@ -633,10 +647,10 @@ var removeTokenGroup = function(tokenGroupIndex) {
 var removeHighlightedTokenGroup = function() {
   // do nothing if there are no token groups highlighted
   if (isTokenGroupHighlighted() !== true) return;
-  
+
   var tokenGroupIndex = tokensEl.find('div.selected').attr('data-token-group-index');
   tokenGroupIndex = parseInt(tokenGroupIndex, 10);
-  
+
   // make sure the token group index is valid
   if (validTokenGroupIndex(tokenGroupIndex) !== true) {
     clearTokenGroupHighlight();
@@ -696,7 +710,7 @@ var addHighlightedOption = function() {
   }
   // add the token to the last token group
   else {
-    TOKENS[TOKENS.length-1].push(token);
+    TOKENS[TOKENS.length - 1].push(token);
   }
 
   var childrenListName = getChildrenListName(option, CURRENT_LIST);
@@ -881,9 +895,9 @@ var sendAjaxRequest = function(list, inputValue) {
   };
 
   var ajaxError = function(xhr, errType, exceptionObject) {
-    if (errType === 'abort') {
-      // TODO: write me
-    }
+    //if (errType === 'abort') {
+    // TODO: write me
+    //}
     if (errType === 'error') {
       listEl.find('li.searching').replaceWith(buildAjaxError());
     }
@@ -915,6 +929,16 @@ var pressRegularKey = function() {
   // else default to mine
   else {
     options = filterOptions(CURRENT_LIST.options, inputValue);
+  }
+
+  // cut options down to maxOptions
+  if (typeof CURRENT_LIST.maxOptions === 'number' &&
+      options.length > CURRENT_LIST.maxOptions) {
+    var options2 = [];
+    for (var i = 0; i < CURRENT_LIST.maxOptions; i++) {
+      options2.push(options[i]);
+    }
+    options = options2;
   }
 
   // add freeform as an option if that's allowed
@@ -1070,7 +1094,7 @@ var mouseoverOption = function() {
 var clickTokenGroup = function(e) {
   e.stopPropagation();
   stopInput();
-  
+
   // remove highlight from other token groups
   clearTokenGroupHighlight();
 
@@ -1091,7 +1115,7 @@ var keydownWindow = function(e) {
 
   var keyCode = e.which;
   var tokenGroupHighlighted = isTokenGroupHighlighted();
-  
+
   // backspace or delete with a highlighted token group
   if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
       tokenGroupHighlighted === true) {
@@ -1180,15 +1204,18 @@ return {
   // returns false if the token group index is invalid
   // returns the new value of the widget otherwise
   removeTokenGroup: function(tokenGroupIndex) {
-    if (validTokenGroupIndex(tokenGroupIndex) !== true) return false;
+    if (validTokenGroupIndex(tokenGroupIndex) !== true) {
+      return false;
+    }
     removeTokenGroup(tokenGroupIndex);
     return getValue();
   },
 
   removeList: function(listName) {
     // return false if the list does not exist
-    if (listExists(listName) !== true) return false;
-
+    if (listExists(listName) !== true) {
+      return false;
+    }
     removeList(listName);
     return true;
   },
