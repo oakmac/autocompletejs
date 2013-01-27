@@ -5,4 +5,4 @@ var config = {
     fruits: ["Apple", "Banana", "Orange"]
   }
 };
-var widget = new AutoComplete('maxtokengroups_example', config);
+var widget = new AutoComplete('maxtokengroups1_example', config);

@@ -576,8 +576,10 @@ var listExists = function(list) {
 };
 
 var startInput = function() {
+  // have we hit max token groups?
   if (typeof cfg.maxTokenGroups === 'number' &&
-      TOKENS.length >= cfg.maxTokenGroups) {
+      TOKENS.length >= cfg.maxTokenGroups &&
+      ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
     return;
   }
 
