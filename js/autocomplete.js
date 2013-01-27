@@ -578,6 +578,9 @@ var startInput = function() {
 };
 
 var stopInput = function() {
+	if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
+		JQUERY_AJAX_OBJECT.abort();
+	}
     hideInputEl();
     hideDropdownEl();
     INPUT_HAPPENING = false;
@@ -807,6 +810,10 @@ var isOptionShowing = function() {
 	return (listEl.find('li.option').length > 0);
 };
 
+var isOptionHighlighted = function() {
+    return (listEl.find('li.highlighted').length !== 0);
+};
+
 // TODO: revisit this and make it better for different font sizes, etc
 // http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
 var updateInputWidth = function(text) {
@@ -859,6 +866,11 @@ var sendAjaxRequest = function(list, inputValue) {
 		}
 		
 		listEl.find('li.searching').replaceWith(html);
+		
+		// highlight the option if there are no others highlighted
+		if (isOptionHighlighted() === false) {
+			highlightFirstOption();
+		}
 	};
 	
 	var ajaxError = function(xhr, errType, exceptionObject) {
