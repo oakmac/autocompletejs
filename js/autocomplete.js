@@ -1,7 +1,18 @@
+/*!
+ * AutoCompleteJS JavaScript Widget
+ * http://autocompletejs.com/
+ *
+ * Copyright 2013 Chris Oakman
+ * Released under the MIT license
+ * http://autocompletejs.com/license
+ *
+ * Date: 27 Jan 2013
+ */
+
 // polyfills
-if(!Array.isArray) {
-  Array.isArray = function (vArg) {
-    return Object.prototype.toString.call(vArg) === "[object Array]";
+if (!Array.isArray) {
+  Array.isArray = function(vArg) {
+    return Object.prototype.toString.call(vArg) === '[object Array]';
   };
 }
 
@@ -20,9 +31,9 @@ if(!Array.isArray) {
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Module scope variables
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 // constants
 var HTML_ENTITIES = [
@@ -71,9 +82,9 @@ var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
 var VISIBLE_OPTIONS = {};
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Util Functions
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // simple string replacement
 var tmpl = function(str, obj) {
     for (var i in obj) {
@@ -104,7 +115,7 @@ var objectKeysToArray = function(obj) {
 // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 var createId = function() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 };
@@ -113,9 +124,9 @@ var isObject = function(thing) {
 	return (Object.prototype.toString.call(thing) === '[object Object]');
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Sanity Checks
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 var validChunkIndex = function(chunkIndex) {
     if (typeof chunkIndex !== 'number') {
@@ -139,7 +150,7 @@ var validChunksArray = function(newValue) {
 	for (var i = 0; i < newValue.length; i++) {
 		// string is ok
 		if (typeof newValue[i] === 'string') continue;
-			
+
 		// otherwise must be an object with .value and .pieceHTML
 		// and .pieceHTML must be a string
 		if (isObject(newValue[i]) !== true
@@ -149,7 +160,7 @@ var validChunksArray = function(newValue) {
 			return false;
 		}
 	}
-	
+
     return true;
 };
 
@@ -158,14 +169,14 @@ var validOptionObject = function(obj) {
 	if (typeof obj === 'string') {
 		return true;
 	}
-	
+
 	// else it must be an object with a .value property
 	if (isObject(obj) !== true || obj.hasOwnProperty('value') !== true) {
-		return false
+		return false;
 	}
-	
+
 	// NOTE: do we need to check if it's safe to call JSON.stringify on .value here?
-	
+
     return false;
 };
 
@@ -212,9 +223,9 @@ var sanityChecks = function() {
     return true;
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Expand Shorthand / Set Default Options
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 // expand a single option object
 var expandOptionObject = function(option) {
@@ -244,12 +255,12 @@ var expandListObject = function(list) {
 			url: list
 		};
 	}
-	
+
 	// if they have included a URL, ajax is turned on
 	if (typeof list.url === 'string' || typeof list.url === 'function') {
 		list.ajaxEnabled = true;
 	}
-	
+
 	// default for ajaxEnabled is false
 	if (list.ajaxEnabled !== true) {
 		list.ajaxEnabled = false;
@@ -316,9 +327,9 @@ var initConfig = function() {
 	}
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Markup Building Functions
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 var buildWidget = function() {
     var html = '' +
@@ -447,8 +458,8 @@ var buildPieces = function(chunks, showChildIndicatorAtEnd) {
 			pieces[j].pieceHTML + '</span>';
 
 			// show child indicator
-			if ((pieces.length !== 1 && j !== (pieces.length-1))
-				|| (i === (chunks.length-1) && j === (pieces.length-1)
+			if ((pieces.length !== 1 && j !== (pieces.length - 1))
+				|| (i === (chunks.length - 1) && j === (pieces.length - 1)
 				    && showChildIndicatorAtEnd === true)) {
 				html += '<span class="child-indicator">:</span>';
 			}
@@ -480,9 +491,9 @@ var buildAjaxError = function() {
 	return '<li class="ajax-error">AJAX Error!</li>';
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Control Flow / DOM Manipulation
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 var removeList = function(listName) {
     // TODO: write me
@@ -550,7 +561,7 @@ var setValue = function(chunks) {
 	ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
     CURRENT_LIST = cfg.lists[cfg.initialList];
     updatePieces();
-}
+};
 
 // returns a unique array of groups from an array of Option Objects
 var getGroups = function(options) {
@@ -576,7 +587,7 @@ var startInput = function() {
     if (! CURRENT_LIST) {
         CURRENT_LIST = cfg.lists[cfg.initialList];
     }
-	
+
 	clearChunkHighlight();
 	showInputEl();
 	positionDropdownEl();
@@ -618,7 +629,7 @@ var removeChunk = function(chunkIndex) {
 
 	// if we are removing the last chunk, then the next piece will start
 	// a new chunk
-	if (chunkIndex === (CHUNKS.length-1)) {
+	if (chunkIndex === (CHUNKS.length - 1)) {
 		CURRENT_LIST = cfg.lists[cfg.initialList];
 		ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
 	}
@@ -627,7 +638,7 @@ var removeChunk = function(chunkIndex) {
 	CHUNKS.splice(chunkIndex, 1);
 
     updatePieces();
-	
+
 	if (INPUT_HAPPENING === true) {
 		stopInput();
 		startInput();
@@ -695,7 +706,7 @@ var addHighlightedOption = function() {
 	}
 	// add the piece to the last chunk
 	else {
-		CHUNKS[CHUNKS.length-1].push(piece);
+		CHUNKS[CHUNKS.length - 1].push(piece);
 	}
 
     var childrenListName = getChildrenListName(option, CURRENT_LIST);
@@ -721,11 +732,11 @@ var updatePieces = function() {
 
 var filterOptions = function(options, input) {
 	input = input.toLowerCase();
-	
+
 	if (input === '') {
 		return options;
 	}
-	
+
 	var options2 = [];
 	for (var i = 0; i < options.length; i++) {
 		// try to match the optionHTML
@@ -735,7 +746,7 @@ var filterOptions = function(options, input) {
 				continue;
 			}
 		}
-		
+
 		// try to match the value
 		if (typeof options[i].value === 'string') {
 			if (input === options[i].value.toLowerCase().substring(0, input.length)) {
@@ -754,9 +765,9 @@ var highlightOption = function(optionEl) {
 	$(optionEl).addClass('highlighted');
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Input Keypresses
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 var pressUpArrow = function() {
     // get the highlighted element
@@ -828,11 +839,11 @@ var updateInputWidth = function(text) {
 };
 
 var sendAjaxRequest = function(list, inputValue) {
-	
+
 	// TODO: allow full jQuery ajax config extend here
 	//       just not sure about how to handle scope with the
 	//       internal functions
-	
+
 	var url;
 	if (typeof list.url === 'string') {
 		url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
@@ -840,22 +851,22 @@ var sendAjaxRequest = function(list, inputValue) {
 	if (typeof list.url === 'function') {
 		url = list.url(getValue(), inputValue);
 	}
-	
+
 	var ajaxSuccess = function(data, status, xhr) {
 		if (INPUT_HAPPENING !== true) return;
-		
+
 		// run their custom postProcess function
 		if (typeof list.postProcess === 'function') {
 			data = list.postProcess(getValue(), data);
 		}
-		
+
 		// expand the options and make sure they're valid
 		var options = [];
 		if (Array.isArray(data) === true) {
 			for (var i = 0; i < data.length; i++) {
 				// skip any objects that are not valid Options
 				if (validOptionObject(data[i]) !== true) continue;
-				
+
 				options.push(expandOptionObject(data[i]));
 			}
 		}
@@ -865,29 +876,29 @@ var sendAjaxRequest = function(list, inputValue) {
 		if (options.length === 0 && isOptionShowing() === false) {
 			html = buildNoResults(list.noResultsHTML, inputValue);
 		}
-		
+
 		// new options
 		if (options.length > 0) {
 			html = buildOptions(options, list, true);
 		}
-		
+
 		listEl.find('li.searching').replaceWith(html);
-		
+
 		// highlight the option if there are no others highlighted
 		if (isOptionHighlighted() === false) {
 			highlightFirstOption();
 		}
 	};
-	
+
 	var ajaxError = function(xhr, errType, exceptionObject) {
 		if (errType === 'abort') {
-			
+
 		}
 		if (errType === 'error') {
 			listEl.find('li.searching').replaceWith(buildAjaxError());
 		}
 	};
-	
+
 	JQUERY_AJAX_OBJECT = $.ajax({
 		dataType: 'json',
 		error: ajaxError,
@@ -899,12 +910,12 @@ var sendAjaxRequest = function(list, inputValue) {
 
 var pressRegularKey = function() {
 	var inputValue = inputEl.val();
-	
+
 	if (inputValue !== '') {
 		clearChunkHighlight();
 		updateInputWidth(inputValue);
 	}
-	
+
 	var options = [];
 
 	// filter options with their custom function
@@ -920,27 +931,27 @@ var pressRegularKey = function() {
 	if (options.length === 0 && inputValue !== '' && CURRENT_LIST.allowFreeform === true) {
 		options.push(expandOptionObject(inputValue));
 	}
-	
+
 	// no input, no options, no freeform, and no ajax
 	// hide the dropdown and exit
 	if (options.length === 0 && inputValue === '' && CURRENT_LIST.ajaxEnabled === false) {
 		listEl.css('display', 'none');
 		return;
 	}
-	
+
 	// else we will show something in the dropdown
 	listEl.css('display', '');
-	
+
 	// no options found and no AJAX
 	// show "No Results" and exit
 	if (options.length === 0 && CURRENT_LIST.ajaxEnabled === false) {
 		listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML, inputValue));
 		return;
 	}
-	
+
 	// build the options found
 	var html = buildOptions(options, CURRENT_LIST);
-	
+
 	// add AJAX indicator
 	if (CURRENT_LIST.ajaxEnabled === true) {
 		if (typeof CURRENT_LIST.searchingHTML === 'string') {
@@ -949,29 +960,29 @@ var pressRegularKey = function() {
 		if (typeof CURRENT_LIST.searchingHTML === 'function') {
 			html += buildSearching(CURRENT_LIST.searchingHTML(getValue(), inputValue));
 		}
-		
+
 		/*
 		// TODO: buffer ajax requests
 		AJAX_BUFFER_TIMEOUT = setTimeout(function() {
-			
+
 		}, AJAX_BUFFER_LENGTH);
 		*/
-		
+
 		// cancel an existing request
 		if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
 			JQUERY_AJAX_OBJECT.abort();
 		}
 		sendAjaxRequest(CURRENT_LIST, inputValue);
 	}
-	
+
 	// show the dropdown
 	listEl.html(html);
 	highlightFirstOption();
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Browser Events
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 // click on the container
 var clickContainerElement = function(e) {
@@ -991,10 +1002,10 @@ var clickContainerElement = function(e) {
 // keydown on the input element
 var keydownInputElement = function(e) {
 	if (INPUT_HAPPENING !== true) return;
-	
+
     var keyCode = e.which;
 	var inputValue = inputEl.val();
-	
+
     // enter or tab
     if (keyCode === KEYS.ENTER || keyCode === KEYS.NUMPAD_ENTER
 		|| keyCode === KEYS.TAB) {
@@ -1028,7 +1039,7 @@ var keydownInputElement = function(e) {
         pressEscapeKey();
         return;
     }
-	
+
 	// else it's a regular key press
 	// NOTE: took this from jquery-tokeninput
 	//       you let the keydown event finish so the input element
@@ -1036,13 +1047,13 @@ var keydownInputElement = function(e) {
 	//       otherwise you're re-writing the logic behind <input type="text"> elements
 	// TODO: revisit this
 	setTimeout(pressRegularKey, 5);
-	
+
 	/*
 	var letter = String.fromCharCode(keyCode);
-	
+
 	// do nothing on non-letter keys
 	if (letter === '') return;
-	
+
 	// shift
 	if (e.shiftKey === false) {
 		letter = letter.toLowerCase();
@@ -1085,7 +1096,7 @@ var clickPage = function(e) {
 // keydown anywhere on the page
 var keydownWindow = function(e) {
 	if (INPUT_HAPPENING === true) return;
-	
+
     var keyCode = e.which;
 
     // backspace or delete with a highlighted chunk
@@ -1117,9 +1128,9 @@ var addEvents = function() {
     $(window).on('keydown', keydownWindow);
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------
 // Initialization
-//--------------------------------------------------------------
+//----------------------------------------------------------
 
 var initDom = function() {
     // get the container element

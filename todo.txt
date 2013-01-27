@@ -12,6 +12,7 @@ before launch checklist:
 > add change event
 > have a "cacheOptionsInLocalStorage" option on list config!
 > have a "clearCache" option on the widget config
+> maxChunks
 
 Examples:
 > localStorage

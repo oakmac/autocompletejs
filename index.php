@@ -58,6 +58,12 @@ if ($URI[0] === 'example' && $URI[1] !== '') {
 	
 }
 
+// license
+if ($URI[0] === 'license') {
+	require(APP_PATH . 'pages/license.php');
+	die;
+}
+
 // anything else 404's
 header('HTTP/1.1 404 Not Found');
 require(APP_PATH . 'pages/404.php');
