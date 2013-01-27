@@ -153,10 +153,10 @@ var validChunksArray = function(newValue) {
 
 		// otherwise must be an object with .value and .pieceHTML
 		// and .pieceHTML must be a string
-		if (isObject(newValue[i]) !== true
-			|| newValue[i].hasOwnProperty('pieceHTML') !== true
-			|| typeof newValue[i].pieceHTML !== 'string'
-			|| newValue[i].hasOwnProperty('value') !== true) {
+		if (isObject(newValue[i]) !== true ||
+			newValue[i].hasOwnProperty('pieceHTML') !== true ||
+			typeof newValue[i].pieceHTML !== 'string' ||
+			newValue[i].hasOwnProperty('value') !== true) {
 			return false;
 		}
 	}
@@ -458,9 +458,9 @@ var buildPieces = function(chunks, showChildIndicatorAtEnd) {
 			pieces[j].pieceHTML + '</span>';
 
 			// show child indicator
-			if ((pieces.length !== 1 && j !== (pieces.length - 1))
-				|| (i === (chunks.length - 1) && j === (pieces.length - 1)
-				    && showChildIndicatorAtEnd === true)) {
+			if ((pieces.length !== 1 && j !== (pieces.length - 1)) ||
+				(i === (chunks.length - 1) && j === (pieces.length - 1) &&
+				showChildIndicatorAtEnd === true)) {
 				html += '<span class="child-indicator">:</span>';
 			}
 		}
@@ -1007,8 +1007,9 @@ var keydownInputElement = function(e) {
 	var inputValue = inputEl.val();
 
     // enter or tab
-    if (keyCode === KEYS.ENTER || keyCode === KEYS.NUMPAD_ENTER
-		|| keyCode === KEYS.TAB) {
+    if (keyCode === KEYS.ENTER ||
+		keyCode === KEYS.NUMPAD_ENTER ||
+		keyCode === KEYS.TAB) {
         e.preventDefault();
 		pressEnterOrTab();
         return;
@@ -1100,8 +1101,8 @@ var keydownWindow = function(e) {
     var keyCode = e.which;
 
     // backspace or delete with a highlighted chunk
-    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE)
-        && isChunkHighlighted() === true) {
+    if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
+        isChunkHighlighted() === true) {
         e.preventDefault();
         removeHighlightedChunk();
         return;
