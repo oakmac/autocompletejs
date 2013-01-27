@@ -9,25 +9,17 @@
  * Date: 27 Jan 2013
  */
 
-// polyfills
-if (!Array.isArray) {
-  Array.isArray = function(vArg) {
-    return Object.prototype.toString.call(vArg) === '[object Array]';
-  };
-}
-
-// TODO: showChunkRemove true / false (default is true)
+// TODO: showTokenGroupHTML true / false (default is true)
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
 // TODO: filterOptions should take a callback in the args
-// TODO: change "piece" to "token" ?
-// TODO: change "chunks" to "blocks" ?
 
-// allow events:
+// Events:
 // > preChange
 // > postChange
 
+;(function() {
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
@@ -45,19 +37,6 @@ var HTML_ENTITIES = [
   [/\//g, '&#x2F']
 ];
 
-/*
-var KEYS = {
-  SPACE: 32,
-  PAGE_UP: 33,
-  PAGE_DOWN: 34,
-  END: 35,
-  HOME: 36,
-  LEFT: 37,
-  RIGHT: 39,
-  COMMA: 188
-};
-*/
-
 var KEYS = {
   BACKSPACE: 8,
   TAB: 9,
@@ -70,16 +49,16 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, piecesEl, inputEl, listEl;
+var containerEl, tokensEl, inputEl, listEl;
 
 // stateful
-var ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
 var AJAX_BUFFER_LENGTH = 20;
 var AJAX_BUFFER_TIMEOUT;
-var CHUNKS = [];
 var CURRENT_LIST = false;
 var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
+var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
 //----------------------------------------------------------
@@ -88,6 +67,7 @@ var VISIBLE_OPTIONS = {};
 // simple string replacement
 var tmpl = function(str, obj) {
   for (var i in obj) {
+    if (obj.hasOwnProperty(i) !== true) continue;
     str = str.replace(new RegExp('{' + i + '}', 'g'), obj[i]);
   }
   return str;
@@ -105,9 +85,8 @@ var encode = function(str) {
 var objectKeysToArray = function(obj) {
   var arr = [];
   for (var i in obj) {
-    if (obj.hasOwnProperty(i) === true) {
-      arr.push(i);
-    }
+    if (obj.hasOwnProperty(i) !== true) continue;
+    arr.push(i);
   }
   return arr;
 };
@@ -120,6 +99,10 @@ var createId = function() {
   });
 };
 
+var isArray = Array.isArray || function(vArg) {
+  return Object.prototype.toString.call(vArg) === '[object Array]';
+};
+
 var isObject = function(thing) {
   return (Object.prototype.toString.call(thing) === '[object Object]');
 };
@@ -128,54 +111,69 @@ var isObject = function(thing) {
 // Sanity Checks
 //----------------------------------------------------------
 
-var validChunkIndex = function(chunkIndex) {
-  if (typeof chunkIndex !== 'number') {
+var validTokenGroupIndex = function(index) {
+  if (typeof index !== 'number') {
     return false;
   }
 
-  chunkIndex = parseInt(chunkIndex, 10);
-  if (chunkIndex < 0 || chunkIndex >= CHUNKS.length) {
+  index = parseInt(index, 10);
+  if (index < 0 || index >= TOKENS.length) {
     return false;
   }
 
   return true;
 };
 
-var validChunksArray = function(newValue) {
+var validToken = function(token) {
+  // string is ok
+  if (typeof token === 'string') {
+    return true;
+  }
+  
+  // else must be an object with .value and .tokenHTML
+  // and .tokenHTML must be a string
+  if (isObject(token) !== true ||
+      token.hasOwnProperty('value') !== true ||
+      token.hasOwnProperty('tokenHTML') !== true ||
+      typeof token.tokenHTML !== 'string') {
+    return false;
+  }
+  
+  return true;
+};
+
+var validTokensArray = function(newTokens) {
   // must be an array
-  if (Array.isArray(newValue) !== true) {
+  if (isArray(newTokens) !== true) {
     return false;
   }
 
-  for (var i = 0; i < newValue.length; i++) {
-    // string is ok
-    if (typeof newValue[i] === 'string') continue;
-
-    // otherwise must be an object with .value and .pieceHTML
-    // and .pieceHTML must be a string
-    if (isObject(newValue[i]) !== true ||
-        newValue[i].hasOwnProperty('pieceHTML') !== true ||
-        typeof newValue[i].pieceHTML !== 'string' ||
-        newValue[i].hasOwnProperty('value') !== true) {
+  // must be an array of tokenGroups
+  for (var i = 0; i < newTokens.length; i++) {
+    if (isArray(newTokens[i]) !== true) {
       return false;
+    }
+    for (var j = 0; j < newTokens[i].length; j++) {
+      if (validToken(newTokens[i][j]) !== true) {
+        return false;
+      }
     }
   }
 
   return true;
 };
 
-var validOptionObject = function(obj) {
+var validOption = function(option) {
   // option can be just a string
-  if (typeof obj === 'string') {
+  if (typeof option === 'string') {
     return true;
   }
 
   // else it must be an object with a .value property
-  if (isObject(obj) !== true || obj.hasOwnProperty('value') !== true) {
+  if (isObject(option) !== true ||
+      option.hasOwnProperty('value') !== true) {
     return false;
   }
-
-  // NOTE: do we need to check if it's safe to call JSON.stringify on .value here?
 
   return false;
 };
@@ -211,7 +209,7 @@ var sanityChecks = function() {
   }
 
   // TODO: make sure cfg are formatted correctly
-  // TODO: allow them to set the initial value of the widget (chunks object)
+  // TODO: allow them to set the initial value of the widget (tokens object)
   // TODO: show an error when a value.children is not a valid list option
 
   return true;
@@ -236,7 +234,7 @@ var expandOptionObject = function(option) {
 // expand a single List Object
 var expandListObject = function(list) {
   // an array is shorthand for options
-  if (Array.isArray(list) === true) {
+  if (isArray(list) === true) {
     list = {
       options: list
     };
@@ -281,7 +279,7 @@ var expandListObject = function(list) {
   }
 
   // set options to an empty array if it does not exist
-  if (Array.isArray(list.options) !== true) {
+  if (isArray(list.options) !== true) {
     list.options = [];
   }
 
@@ -295,7 +293,7 @@ var expandListObject = function(list) {
 
 var initConfig = function() {
   // if cfg is an array or a string, then it is a single list object
-  if (Array.isArray(cfg) === true || typeof cfg === 'string') {
+  if (isArray(cfg) === true || typeof cfg === 'string') {
     cfg = {
       initialList: 'default',
       lists: {
@@ -304,9 +302,10 @@ var initConfig = function() {
     };
   }
 
+  // TODO: errors - check that console.log is a function
   // TODO: showClearBtn
   // TODO: clearBtnHTML
-  // TODO: maxChunks
+  // TODO: maxTokenGroups
 
   // class prefix
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
@@ -316,7 +315,6 @@ var initConfig = function() {
   // expand lists
   for (var i in cfg.lists) {
     if (cfg.lists.hasOwnProperty(i) !== true) continue;
-
     cfg.lists[i] = expandListObject(cfg.lists[i]);
   }
 };
@@ -328,8 +326,8 @@ var initConfig = function() {
 var buildWidget = function() {
   var html = '' +
   '<div class="' + cfg.classPrefix + '_internal_container">' +
-    '<div class="pieces_container"></div>' +
-    '<input type="text" class="input_proxy" style="visibility:hidden" />' +
+    '<div class="tokens"></div>' +
+    '<input type="text" class="autocomplete-input" style="visibility:hidden" />' +
     '<div class="clearfix"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
   '</div>';
@@ -417,48 +415,41 @@ var buildOptions = function(options, parentList, appendVisibleOptions) {
   return html;
 };
 
-var buildPieceHTML = function(option, parentList) {
-  if (typeof option.pieceHTML === 'string') {
-    return option.pieceHTML;
+var buildTokenHTML = function(option, parentList) {
+  if (typeof option.tokenHTML === 'string') {
+    return option.tokenHTML;
   }
 
-  if (typeof option.pieceHTML === 'function') {
-    return option.pieceHTML(option);
+  if (typeof option.tokenHTML === 'function') {
+    return option.tokenHTML(option);
   }
 
-  if (typeof parentList.pieceHTML === 'function') {
-    return parentList.pieceHTML(option);
+  if (typeof parentList.tokenHTML === 'function') {
+    return parentList.tokenHTML(option);
   }
 
   // default to optionHTML
   return buildOptionHTML(option, parentList);
 };
 
-var buildPieces = function(chunks, showChildIndicatorAtEnd) {
-  if (showChildIndicatorAtEnd !== true) {
-    showChildIndicatorAtEnd = false;
-  }
-
+var buildTokens = function(tokens) {
   var html = '';
+  for (var i = 0; i < tokens.length; i++) {
+    var tokenGroup = tokens[i];
 
-  for (var i = 0; i < chunks.length; i++) {
-    var pieces = chunks[i];
+    html += '<div class="token-group" data-token-group-index="' + i + '">' +
+    '<span class="remove-token-group">&times;</span>';
 
-    html += '<div class="chunk" data-chunkIndex="' + i + '">' +
-    '<span class="remove-chunk">&times;</span>';
-
-    for (var j = 0; j < pieces.length; j++) {
-      html += '<span class="piece">' +
-      pieces[j].pieceHTML + '</span>';
+    for (var j = 0; j < tokenGroup.length; j++) {
+      html += '<span class="token">' +
+      tokenGroup[j].tokenHTML + '</span>';
 
       // show child indicator
-      if ((pieces.length !== 1 && j !== (pieces.length - 1)) ||
-        (i === (chunks.length - 1) && j === (pieces.length - 1) &&
-        showChildIndicatorAtEnd === true)) {
+      if (j !== tokenGroup.length - 1) {
         html += '<span class="child-indicator">:</span>';
       }
     }
-    html += '</div>'; // end div.chunk
+    html += '</div>'; // end div.token-group
   }
 
   return html;
@@ -500,7 +491,7 @@ var destroyWidget = function() {
 
 var clearWidget = function() {
   setValue([]);
-  updatePieces();
+  updateTokens();
 };
 
 // empty the input element, unhide it, put the focus on it
@@ -539,22 +530,22 @@ var hideDropdownEl = function() {
 // returns the current value of the widget
 var getValue = function() {
   var value = [];
-  for (var i = 0; i < CHUNKS.length; i++) {
+  for (var i = 0; i < TOKENS.length; i++) {
     value[i] = [];
 
-    for (var j = 0; j < CHUNKS[i].length; j++) {
-      value[i].push(CHUNKS[i][j].value);
+    for (var j = 0; j < TOKENS[i].length; j++) {
+      value[i].push(TOKENS[i][j].value);
     }
   }
   return value;
 };
 
 // set the current value of the widget
-var setValue = function(chunks) {
-  CHUNKS = chunks;
-  ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+var setValue = function(tokens) {
+  TOKENS = tokens;
+  ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   CURRENT_LIST = cfg.lists[cfg.initialList];
-  updatePieces();
+  updateTokens();
 };
 
 // returns a unique array of groups from an array of Option Objects
@@ -582,7 +573,7 @@ var startInput = function() {
     CURRENT_LIST = cfg.lists[cfg.initialList];
   }
 
-  clearChunkHighlight();
+  clearTokenGroupHighlight();
   showInputEl();
   positionDropdownEl();
   pressRegularKey();
@@ -601,37 +592,37 @@ var highlightFirstOption = function() {
   highlightOption(listEl.find('li.option').filter(':first'));
 };
 
-var clearChunkHighlight = function() {
-  piecesEl.find('div.chunk').removeClass('selected');
+var clearTokenGroupHighlight = function() {
+  tokensEl.find('div.token-group').removeClass('selected');
 };
 
-var highlightLastChunk = function() {
-  var chunksEl = piecesEl.find('div.chunk');
-  chunksEl.removeClass('selected');
-  chunksEl.filter(':last').addClass('selected');
+var highlightLastTokenGroup = function() {
+  tokensEl.find('div.token-group').
+    removeClass('selected').
+    filter(':last').
+    addClass('selected');
 };
 
-// returns true if a chunk is highlighted
+// returns true if a tokenGroup is highlighted
 // false otherwise
-var isChunkHighlighted = function() {
-  return (piecesEl.find('div.selected').length === 1);
+var isTokenGroupHighlighted = function() {
+  return (tokensEl.find('div.selected').length === 1);
 };
 
-var removeChunk = function(chunkIndex) {
-  // defensive
-  chunkIndex = parseInt(chunkIndex, 10);
+var removeTokenGroup = function(tokenGroupIndex) {
+  tokenGroupIndex = parseInt(tokenGroupIndex, 10);
 
-  // if we are removing the last chunk, then the next piece will start
-  // a new chunk
-  if (chunkIndex === (CHUNKS.length - 1)) {
+  // if we are removing the last token group, then the next token will start
+  // a new token group
+  if (tokenGroupIndex === (TOKENS.length - 1)) {
     CURRENT_LIST = cfg.lists[cfg.initialList];
-    ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+    ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
-  // remove the chunk
-  CHUNKS.splice(chunkIndex, 1);
+  // remove the token group
+  TOKENS.splice(tokenGroupIndex, 1);
 
-  updatePieces();
+  updateTokens();
 
   if (INPUT_HAPPENING === true) {
     stopInput();
@@ -639,25 +630,28 @@ var removeChunk = function(chunkIndex) {
   }
 };
 
-var removeHighlightedChunk = function() {
-  var chunkIndex = parseInt(piecesEl.find('div.selected').attr('data-chunkIndex'), 10);
-
-  // defensive
-  if (validChunkIndex(chunkIndex) !== true) {
-    clearChunkHighlight();
+var removeHighlightedTokenGroup = function() {
+  // do nothing if there are no token groups highlighted
+  if (isTokenGroupHighlighted() !== true) return;
+  
+  var tokenGroupIndex = tokensEl.find('div.selected').attr('data-token-group-index');
+  tokenGroupIndex = parseInt(tokenGroupIndex, 10);
+  
+  // make sure the token group index is valid
+  if (validTokenGroupIndex(tokenGroupIndex) !== true) {
+    clearTokenGroupHighlight();
     return;
   }
 
-  removeChunk(chunkIndex);
+  removeTokenGroup(tokenGroupIndex);
 };
 
-var createPieceFromOption = function(option, parentList) {
-  var pieceObj = {
-    pieceHTML: buildPieceHTML(option, parentList),
+var createTokenFromOption = function(option, parentList) {
+  var token = {
+    tokenHTML: buildTokenHTML(option, parentList),
     value: option.value
   };
-
-  return pieceObj;
+  return token;
 };
 
 // returns false if the option has no children
@@ -692,38 +686,38 @@ var addHighlightedOption = function() {
     return;
   }
 
-  // get the option and the piece
+  // get the option and the token
   var option = VISIBLE_OPTIONS[optionId];
-  var piece = createPieceFromOption(option, CURRENT_LIST);
+  var token = createTokenFromOption(option, CURRENT_LIST);
 
-  // start a new chunk
-  if (ADD_NEXT_PIECE_TO_NEW_CHUNK === true) {
-    CHUNKS[CHUNKS.length] = [piece];
+  // start a new token group
+  if (ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
+    TOKENS.push([token]);
   }
-  // add the piece to the last chunk
+  // add the token to the last token group
   else {
-    CHUNKS[CHUNKS.length - 1].push(piece);
+    TOKENS[TOKENS.length-1].push(token);
   }
 
   var childrenListName = getChildrenListName(option, CURRENT_LIST);
   // this option has children, move to the next list
   if (typeof childrenListName === 'string') {
     CURRENT_LIST = cfg.lists[childrenListName];
-    ADD_NEXT_PIECE_TO_NEW_CHUNK = false;
+    ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = false;
   }
-  // no children, start a new chunk
+  // no children, start a new token group
   else {
     CURRENT_LIST = cfg.lists[cfg.initialList];
-    ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+    ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
-  updatePieces();
+  updateTokens();
   stopInput();
   startInput();
 };
 
-var updatePieces = function() {
-  piecesEl.html(buildPieces(CHUNKS, false));
+var updateTokens = function() {
+  tokensEl.html(buildTokens(TOKENS));
 };
 
 var filterOptions = function(options, input) {
@@ -778,7 +772,7 @@ var pressUpArrow = function() {
   // remove the highlight from the current element
   highlightedEl.removeClass('highlighted');
 
-  // highlight the previous .value sibling
+  // highlight the previous option
   highlightedEl.prevAll('li.option').first().addClass('highlighted');
 };
 
@@ -786,7 +780,7 @@ var pressDownArrow = function() {
   // get the highlighted element
   var highlightedEl = listEl.find('li.highlighted');
 
-  // no row highlighted, highlight the first _value list element
+  // no row highlighted, highlight the first option
   if (highlightedEl.length === 0) {
     listEl.find('li.option').first().addClass('highlighted');
     return;
@@ -795,21 +789,21 @@ var pressDownArrow = function() {
   // remove the highlight from the current element
   highlightedEl.removeClass('highlighted');
 
-  // highlight the next _value sibling
+  // highlight the next option
   highlightedEl.nextAll('li.option').first().addClass('highlighted');
 };
 
 var pressEscapeKey = function() {
   stopInput();
-  clearChunkHighlight();
+  clearTokenGroupHighlight();
 };
 
 var pressBackspaceOnEmptyInput = function() {
-  if (isChunkHighlighted() === true) {
-    removeHighlightedChunk();
+  if (isTokenGroupHighlighted() === true) {
+    removeHighlightedTokenGroup();
   }
   else {
-    highlightLastChunk();
+    highlightLastTokenGroup();
   }
 };
 
@@ -858,10 +852,10 @@ var sendAjaxRequest = function(list, inputValue) {
 
     // expand the options and make sure they're valid
     var options = [];
-    if (Array.isArray(data) === true) {
+    if (isArray(data) === true) {
       for (var i = 0; i < data.length; i++) {
         // skip any objects that are not valid Options
-        if (validOptionObject(data[i]) !== true) continue;
+        if (validOption(data[i]) !== true) continue;
 
         options.push(expandOptionObject(data[i]));
       }
@@ -888,7 +882,7 @@ var sendAjaxRequest = function(list, inputValue) {
 
   var ajaxError = function(xhr, errType, exceptionObject) {
     if (errType === 'abort') {
-
+      // TODO: write me
     }
     if (errType === 'error') {
       listEl.find('li.searching').replaceWith(buildAjaxError());
@@ -908,7 +902,7 @@ var pressRegularKey = function() {
   var inputValue = inputEl.val();
 
   if (inputValue !== '') {
-    clearChunkHighlight();
+    clearTokenGroupHighlight();
     updateInputWidth(inputValue);
   }
 
@@ -1070,19 +1064,18 @@ var clickOption = function(e) {
 };
 
 var mouseoverOption = function() {
-    highlightOption(this);
+  highlightOption(this);
 };
 
-var clickChunk = function(e) {
+var clickTokenGroup = function(e) {
   e.stopPropagation();
-
-  // remove highlight from other chunks
-  clearChunkHighlight();
-
-  // highlight this chunk
-  $(this).addClass('selected');
-
   stopInput();
+  
+  // remove highlight from other token groups
+  clearTokenGroupHighlight();
+
+  // highlight this token group
+  $(this).addClass('selected');
 };
 
 // TODO this needs to be better; should run up the DOM from the e.target
@@ -1097,28 +1090,29 @@ var keydownWindow = function(e) {
   if (INPUT_HAPPENING === true) return;
 
   var keyCode = e.which;
-
-  // backspace or delete with a highlighted chunk
+  var tokenGroupHighlighted = isTokenGroupHighlighted();
+  
+  // backspace or delete with a highlighted token group
   if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
-    isChunkHighlighted() === true) {
+      tokenGroupHighlighted === true) {
     e.preventDefault();
-    removeHighlightedChunk();
+    removeHighlightedTokenGroup();
     return;
   }
 
   // escape key
-  if (keyCode === KEYS.ESCAPE && isChunkHighlighted() === true) {
-    clearChunkHighlight();
+  if (keyCode === KEYS.ESCAPE && tokenGroupHighlighted === true) {
+    clearTokenGroupHighlight();
     return;
   }
 };
 
 var addEvents = function() {
   containerEl.on('click', clickContainerElement);
-  containerEl.on('keydown', 'input.input_proxy', keydownInputElement);
+  containerEl.on('keydown', 'input.autocomplete-input', keydownInputElement);
   containerEl.on('click', 'li.option', clickOption);
   containerEl.on('mouseover', 'li.option', mouseoverOption);
-  containerEl.on('click', 'div.chunk', clickChunk);
+  containerEl.on('click', 'div.token-group', clickTokenGroup);
 
   // catch all clicks on the page
   $('html').on('click', clickPage);
@@ -1139,9 +1133,9 @@ var initDom = function() {
   containerEl.html(buildWidget());
 
   // grab elements in memory
-  inputEl = containerEl.find('input.input_proxy');
+  inputEl = containerEl.find('input.autocomplete-input');
   listEl = containerEl.find('ul.dropdown');
-  piecesEl = containerEl.find('div.pieces_container');
+  tokensEl = containerEl.find('div.tokens');
 };
 
 var init = function() {
@@ -1183,11 +1177,11 @@ return {
     // TODO: write me
   },
 
-  // returns false if the chunkIndex is invalid
+  // returns false if the token group index is invalid
   // returns the new value of the widget otherwise
-  removeChunk: function(chunkIndex) {
-    if (validChunkIndex(chunkIndex) !== true) return false;
-    removeChunk(chunkIndex);
+  removeTokenGroup: function(tokenGroupIndex) {
+    if (validTokenGroupIndex(tokenGroupIndex) !== true) return false;
+    removeTokenGroup(tokenGroupIndex);
     return getValue();
   },
 
@@ -1199,10 +1193,10 @@ return {
     return true;
   },
 
-  val: function(newValue) {
+  val: function(newTokens) {
     // set a new value
-    if (newValue && validChunksArray(newValue) === true) {
-      setValue(newValue);
+    if (newTokens && validTokensArray(newTokens) === true) {
+      setValue(newTokens);
       return true;
     }
     // else return the current value
@@ -1212,5 +1206,5 @@ return {
   }
 };
 
-// end window.AutoComplete()
-};
+}; // end window.AutoComplete
+})(); // end anonymous wrapper

@@ -22,9 +22,9 @@ Examples:
 > simple usage with groups
 > multiple lists
 > example with optionHTML
-> example with pieceHTML
+> example with tokenHTML
 > example with parent / child optionHTML
-> example with parent / child pieceHTML
+> example with parent / child tokenHTML
 > allowFreeform
 > simple AJAX
 > AJAX with multiple lists

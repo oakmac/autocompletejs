@@ -12,21 +12,21 @@
 }
 .rounded-top-left(@radius: @pad1) {
 	-webkit-border-top-left-radius: @radius;
-        -moz-border-radius-topleft: @radius;
+      -moz-border-radius-topleft: @radius;
 	        border-top-left-radius: @radius;
 }
 .rounded-top-right(@radius: @pad1) {
 	-webkit-border-top-right-radius: @radius;
-        -moz-border-radius-topright: @radius;
+      -moz-border-radius-topright: @radius;
 	        border-top-right-radius: @radius;
 }
 .rounded-bottom-left(@radius: @pad1) {
 	-webkit-border-bottom-left-radius: @radius;
-        -moz-border-radius-bottomleft: @radius;
+      -moz-border-radius-bottomleft: @radius;
 	        border-bottom-left-radius: @radius;
 }
 .rounded-bottom-right(@radius: @pad1) {
-    -webkit-border-bottom-right-radius: @radius;
+  -webkit-border-bottom-right-radius: @radius;
 	    -moz-border-radius-bottomright: @radius;
 	        border-bottom-right-radius: @radius;
 }
@@ -35,31 +35,31 @@
 	.rounded-top-right(@radius);
 }
 .rounded-bottom(@radius: @pad1) {
-    .rounded-bottom-left(@radius);
-    .rounded-bottom-right(@radius);
+  .rounded-bottom-left(@radius);
+  .rounded-bottom-right(@radius);
 }
 .rounded-left(@radius: @pad1) {
-    .rounded-top-left(@radius);
-    .rounded-bottom-left(@radius);
+  .rounded-top-left(@radius);
+  .rounded-bottom-left(@radius);
 }
 
 // linear gradient
 .linear-gradient(@start, @end) {
-    background: @end;
-    background: -moz-linear-gradient(top, @start 0%, @end 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@start), color-stop(100%,@end));
-    background: -webkit-linear-gradient(top, @start 0%, @end 100%);
-    background: -o-linear-gradient(top, @start 0%, @end 100%);
-    background: -ms-linear-gradient(top, @start 0%, @end 100%);
-    background: linear-gradient(top, @start 0%, @end 100%);
+	background: @end;
+	background: -moz-linear-gradient(top, @start 0%, @end 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@start), color-stop(100%,@end));
+	background: -webkit-linear-gradient(top, @start 0%, @end 100%);
+	background: -o-linear-gradient(top, @start 0%, @end 100%);
+	background: -ms-linear-gradient(top, @start 0%, @end 100%);
+	background: linear-gradient(top, @start 0%, @end 100%);
 }
 
 // transitions
 .transition(@attribute, @time, @effect) {
-    -webkit-transition: @attribute @time @effect;
-       -moz-transition: @attribute @time @effect;
-         -o-transition: @attribute @time @effect;
-            transition: @attribute @time @effect;
+  -webkit-transition: @attribute @time @effect;
+     -moz-transition: @attribute @time @effect;
+       -o-transition: @attribute @time @effect;
+          transition: @attribute @time @effect;
 }
 
 // end functions
@@ -70,68 +70,68 @@ div.autocomplete_internal_container {
 	height: 100%;
 	width: 100%;
 	position: relative;
-    .rounded-corners(8px);
-    border: 2px solid #ccc;
-    padding: 4px;
+  .rounded-corners(8px);
+  border: 2px solid #ccc;
+  padding: 4px;
 
-    input.input_proxy {
-        -webkit-box-shadow: none;
-        -moz-box-shadow: none;
-        outline: none;
+  input.autocomplete-input {
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+    outline: none;
 		border: 0px;
-        background: transparent;
-        float: left;
+    background: transparent;
+    float: left;
 		font-size: 16px;
 		width: 120px;
-        padding: 0px;
-        padding-top: 8px;
-    }
+    padding: 0px;
+    padding-top: 8px;
+  }
 
-	div.chunk {
+	div.token-group {
 		float: left;
-        margin: 4px;
+    margin: 4px;
 		padding: 4px 6px;
 		background: #eee;
 		.rounded-corners(6px);
 		border: 1px solid #ccc;
 		cursor: pointer;
 
-        span.remove-chunk {
-            margin-right: 2px;
-            font-size: 11px;
-        }
+    span.remove-token-group {
+      margin-right: 2px;
+      font-size: 11px;
+    }
 	}
 
 	div.selected {
 		.linear-gradient(#d2e6fd, #b0d1f9);
 	}
 
-    span.piece {
+  span.token {
 		margin: 0px 2px;
-    }
+  }
 
-    ul.dropdown {
-        border: 1px solid #ccc;
-        min-width: 100px;
+  ul.dropdown {
+    border: 1px solid #ccc;
+    min-width: 100px;
 		z-index: 1;
 		position: absolute;
-        background: #f6f6f6;
+    background: #f6f6f6;
 		padding: 0px;
-        margin: 4px 0px 0px 0px;
+    margin: 4px 0px 0px 0px;
 
-        li {
-            list-style: none;
-            margin: 0px;
-            padding: 3px 4px;
-            font-size: 13px;
-            border-bottom: 1px solid #f0f0f0;
+    li {
+      list-style: none;
+      margin: 0px;
+      padding: 3px 4px;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
 
 			span.children-indicator {
 				float: right;
 			}
-        }
+    }
 
-		li.value {
+		li.option {
 			cursor: pointer;
 		}
 
@@ -140,9 +140,9 @@ div.autocomplete_internal_container {
 			color: #fff;
 		}
 
-        li.highlighted {
-            background: blue;
+    li.highlighted {
+      background: blue;
 			color: white;
-        }
     }
+  }
 }

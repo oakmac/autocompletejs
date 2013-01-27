@@ -22,6 +22,17 @@ TODO: Methods documentation
 </thead>
 <tbody>
   <tr>
+    <td><code class="js plain">errors</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">errors</code> is an optional function you can use to log AutoComplete errors to.</p>
+      <p>Good options include <code class="js plain">console.log</code> and <code class="js plain">window.alert</code>.</p>
+      <p>Read more about <a href="docs/errors">AutoComplete errors</a>.</p>
+    </td>
+  </tr>  
+  <tr>
     <td><code class="js plain">initialList</code></td>
     <td>String</td>
     <td>yes</td>
@@ -42,13 +53,13 @@ TODO: Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">maxChunks</code></td>
+    <td><code class="js plain">maxTokenGroups</code></td>
     <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
     <td><code class="js keyword">false</code></td>
     <td>
-      <p>The maximum number of chunks allowed in the search bar.</p>
-      <p>Set <code class="js plain">maxChunks</code> to <code class="js keyword">false</code> to allow infinite chunks.</p>
+      <p>The maximum number of token groups allowed in the search bar.</p>
+      <p>Set <code class="js plain">maxTokenGroups</code> to <code class="js keyword">false</code> to allow unlimited token groups.</p>
     </td>
   </tr>
   <tr>
@@ -62,13 +73,13 @@ TODO: Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">chunkRemoveHTML</code></td>
+    <td><code class="js plain">removeTokenGroupHTML</code></td>
     <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
     <td><code class="js string">'&lt;span class="clear-btn"&gt;&lt;/span&gt;'</code></td>
     <td>
       <p>An HTML string to clear the contents of the search bar.</p>
-      <p>Set <code class="js plain">chunkRemoveHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
+      <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
   </tr>
 </tbody>
@@ -168,7 +179,7 @@ TODO: Methods documentation
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">optionHTML</code> is an optional function used to build the option HTML in the dropdown for every object in the list.</p>
+      <p><code class="js plain">optionHTML</code> is an optional function used to build the option HTML in the dropdown for every option in the list.</p>
       <p>The first argument to the function is the option itself.</p>
       <p>The function should return an HTML string.</p>
       <p>Note: If there is a <code class="js plain">optionHTML</code> property on the Option Object selected it will supersede this <code class="js plain">optionHTML</code> property.
@@ -176,16 +187,16 @@ TODO: Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">pieceHTML</code></td>
+    <td><code class="js plain">tokenHTML</code></td>
     <td>Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">pieceHTML</code> is an optional function used to build the piece HTML in the search bar for every object in the list.</p>
+      <p><code class="js plain">tokenHTML</code> is an optional function used to build the token HTML in the search bar for every option in the list.</p>
       <p>The first argument to the function is the option itself.</p>
       <p>The function should return an HTML string.</p>
-      <p>Note: If there is a <code class="js plain">pieceHTML</code> property on the Option Object selected it will supersede this <code class="js plain">pieceHTML</code> property.
-         See the <code class="js plain">pieceHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
+      <p>Note: If there is a <code class="js plain">tokenHTML</code> property on the Option Object selected it will supersede this <code class="js plain">tokenHTML</code> property.
+         See the <code class="js plain">tokenHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
   </tr>
   <tr>
@@ -291,16 +302,16 @@ TODO: Methods documentation
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">pieceHTML</code></td>
+    <td><code class="js plain">tokenHTML</code></td>
     <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
       <p>An HTML string to show inside the search bar.</p>
-      <p>If <code class="js plain">pieceHTML</code> is a function, the first argument is the option itself.</p>
+      <p>If <code class="js plain">tokenHTML</code> is a function, the first argument is the option itself.</p>
       <p>The function should return an HTML string.</p>
-      <p>If there is no <code class="js plain">pieceHTML</code> property it uses <code class="js plain">optionHTML</code>.</p>
-      <p>Note: This <code class="js plain">pieceHTML</code> property will supersede a <code class="js plain">pieceHTML</code> property on the parent List Object.</p>
+      <p>If there is no <code class="js plain">tokenHTML</code> property it uses <code class="js plain">optionHTML</code>.</p>
+      <p>Note: This <code class="js plain">tokenHTML</code> property will supersede a <code class="js plain">tokenHTML</code> property on the parent List Object.</p>
     </td>
   </tr>
   <tr>
