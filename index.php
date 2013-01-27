@@ -1,94 +1,64 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>AutoComplete Widget</title>
-  <meta name="viewport" content="width=device-width">
-
-  <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
-  <link rel="stylesheet" href="css/shCoreDefault.css" />
-  <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
-  <script src="css/less-1.3.0.min.js"></script>
-
-  <style type="text/css">
-  div.example {
-      padding: 50px 0px;
-      border-bottom: 2px solid #ccc;
-  }
-</style>
-</head>
-<body>
-<div id="body_wrapper" class="container">
-
 <?php
-$examples = getExamples();
-foreach ($examples as $example) {
-    echo '<!-- begin Example ' . $example['num'] . ' -->'."\n";
-    echo '<div class="example">'."\n";
-    echo $example['html']."\n";
-    echo '<pre class="brush:js; toolbar:false;">'."\n";
-    echo $example['js']."\n";
-    echo '</pre>'."\n";
-    echo '</div>'."\n";
-    echo '<!-- end Example ' . $example['num'] . ' -->'."\n\n\n";
+// neutralize magic quotes
+// http://blogs.sitepoint.com/2005/03/02/magic-quotes-headaches/
+if (get_magic_quotes_gpc()) { $_REQUEST = array_map('stripslashes', $_REQUEST); $_GET = array_map('stripslashes', $_GET); $_POST = array_map('stripslashes', $_POST); $_COOKIE = array_map('stripslashes', $_COOKIE); }
+
+// config
+require('php/config.php');
+
+// load AC functions
+require('php/AC.php');
+
+// poor man's routing :)
+$URI = explode('/', $_SERVER['REQUEST_URI']);
+if ($URI[0] === '') {
+	array_shift($URI);
 }
-?>
-<div style="height: 400px"></div>
-
-</div><!-- end #body_wrapper -->
-
-<script src="js/jquery-1.8.2.min.js"></script>
-<script src="js/shCore.js"></script>
-<script src="js/shBrushJScript.js"></script>
-<script src="js/autocomplete.js"></script>
-<script>
-var init = function() {
-
-<?php
-foreach ($examples as $example) {
-    echo '//-------------------------------------------'."\n";
-    echo '// Example ' . $example['num'] . "\n";
-    echo '//-------------------------------------------'."\n";
-    echo '(function() {'."\n\n";
-    echo $example['js']."\n\n";
-    echo '})();'."\n\n\n";
+if ($URI[0] === 'autocompletejs') {
+	array_shift($URI);
 }
-?>
-// end examples
 
-// turn on syntax highlighter
-SyntaxHighlighter.all();
+// chop off any GET parameters from the last entry in the array
+$URI[count($URI)-1] = preg_replace('/\?.+$/', '', $URI[count($URI)-1]);
 
-}; // end init()
-$(document).ready(init);
-</script>
-</body>
-</html>
-
-<?php
-//-------------------------------------------------
-// Functions
-//-------------------------------------------------
-function getExamples() {
-    $examples = array();
-    $jsFiles = glob('examples/*.js');
-	$i = 1;
-    foreach ($jsFiles as $file) {
-        $jsFileContent = trim(file_get_contents($file));
-		$htmlFileName = str_replace('.js', '.html', $file);
-        $htmlFileContent = trim(file_get_contents($htmlFileName));
-
-        array_push($examples, array(
-            'html' => $htmlFileContent,
-            'js'   => $jsFileContent,
-            'num'  => $i,
-        ));
-		
-		$i++;
-    }
-
-    return $examples;
+// fill in the URI array with blanks so we don't get any array index errors
+for ($i = 0; $i < 20; $i++) {
+	if (isset($URI[$i]) === false) {
+		$URI[$i] = '';
+	}
 }
+
+// homepage
+if ($URI[0] === '') {
+	require('pages/home.php');
+	die;
+}
+
+// docs
+if ($URI[0] === 'about') {
+	require('pages/docs.php');
+	die;
+}
+
+// themes
+if ($URI[0] === 'themes') {
+	require('pages/themes.php');
+	die;
+}
+
+// examples
+if ($URI[0] === 'p' || $URI[0] === 'position') {
+	require('pages/examples.php');
+	die;
+}
+
+// example
+if ($URI[0] === 'example' && $URI[1] !== '') {
+	
+}
+
+// anything else 404's
+require('pages/404.php');
+die;
 
 ?>

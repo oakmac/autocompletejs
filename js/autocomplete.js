@@ -5,10 +5,6 @@ if(!Array.isArray) {
   };
 }
 
-// TODO: custom value search and example
-// TODO: custom AJAX example using POST or localStorage
-// TODO: AJAX postprocessing example
-// TODO: example using localStorage
 // TODO: showChunkRemove true / false (default is true)
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
@@ -134,17 +130,26 @@ var validChunkIndex = function(chunkIndex) {
     return true;
 };
 
-var validChunksArray = function(value) {
-    // value must be an array
-    if (Array.isArray(value) !== true) {
+var validChunksArray = function(newValue) {
+    // must be an array
+    if (Array.isArray(newValue) !== true) {
         return false;
     }
 
-
-    // TODO: should let them pass in strings as shorthand
-    // value = [['Apple']];
-
-
+	for (var i = 0; i < newValue.length; i++) {
+		// string is ok
+		if (typeof newValue[i] === 'string') continue;
+			
+		// otherwise must be an object with .value and .pieceHTML
+		// and .pieceHTML must be a string
+		if (isObject(newValue[i]) !== true
+			|| newValue[i].hasOwnProperty('pieceHTML') !== true
+			|| typeof newValue[i].pieceHTML !== 'string'
+			|| newValue[i].hasOwnProperty('value') !== true) {
+			return false;
+		}
+	}
+	
     return true;
 };
 
@@ -240,6 +245,7 @@ var expandListObject = function(list) {
 		};
 	}
 	
+	// if they have included a URL, ajax is turned on
 	if (typeof list.url === 'string' || typeof list.url === 'function') {
 		list.ajaxEnabled = true;
 	}

@@ -1,0 +1,34 @@
+before launch checklist:
+> MIT License file in project
+> MIT header in files
+> full docs for methods
+> full docs for config options
+> docs for shorthand / expansion
+> example for every method
+> example for every config option
+> markup page for theming
+> themes
+> make sure the code conforms to JSLint or Google Closure style guide
+> add change event
+> have a "cacheOptionsInLocalStorage" option on list config!
+> have a "clearCache" option on the widget config
+
+Examples:
+> localStorage
+> AJAX using POST
+> AJAX with postprocessing function
+> simple usage
+> simple usage with groups
+> multiple lists
+> example with optionHTML
+> example with pieceHTML
+> example with parent / child optionHTML
+> example with parent / child pieceHTML
+> allowFreeform
+> simple AJAX
+> AJAX with multiple lists
+> AJAX with local options
+> local lists mixed with AJAX
+> AJAX using POST
+> localStorage example
+> extending the jq AJAX object
