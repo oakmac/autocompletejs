@@ -1,4 +1,5 @@
 <?php
+$page_title = 'Page Not Found';
 include(APP_PATH . 'pages/header.php');
 ?>
 <h1>Page Not Found</h1>

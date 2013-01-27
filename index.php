@@ -26,29 +26,30 @@ for ($i = 0; $i < 20; $i++) {
 	if (isset($URI[$i]) === false) {
 		$URI[$i] = '';
 	}
+	$URI[$i] = strtolower($URI[$i]);
 }
 
 // homepage
 if ($URI[0] === '') {
-	require('pages/home.php');
+	require(APP_PATH . 'pages/home.php');
 	die;
 }
 
 // docs
-if ($URI[0] === 'about') {
-	require('pages/docs.php');
+if ($URI[0] === 'docs') {
+	require(APP_PATH . 'pages/docs.php');
 	die;
 }
 
 // themes
 if ($URI[0] === 'themes') {
-	require('pages/themes.php');
+	require(APP_PATH . 'pages/themes.php');
 	die;
 }
 
 // examples
-if ($URI[0] === 'p' || $URI[0] === 'position') {
-	require('pages/examples.php');
+if ($URI[0] === 'examples') {
+	require(APP_PATH . 'pages/examples.php');
 	die;
 }
 
@@ -58,7 +59,8 @@ if ($URI[0] === 'example' && $URI[1] !== '') {
 }
 
 // anything else 404's
-require('pages/404.php');
+header('HTTP/1.1 404 Not Found');
+require(APP_PATH . 'pages/404.php');
 die;
 
 ?>

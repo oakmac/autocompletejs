@@ -1,25 +1,7 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>AutoComplete Widget</title>
-  <meta name="viewport" content="width=device-width">
-
-  <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
-  <link rel="stylesheet" href="css/shCoreDefault.css" />
-  <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
-  <script src="css/less-1.3.0.min.js"></script>
-
-  <style type="text/css">
-  div.example {
-      padding: 50px 0px;
-      border-bottom: 2px solid #ccc;
-  }
-</style>
-</head>
-<body>
-<div id="body_wrapper" class="container">
+<?php
+$page_title = 'Examples';
+include(APP_PATH . 'pages/header.php');
+?>
 
 <?php
 $examples = getExamples();

@@ -1,4 +1,5 @@
-<?php
+<?php defined('APP_PATH') or die('No direct script access.');
+
 final class AC {
 
   public static function printHeader() {
@@ -10,4 +11,5 @@ final class AC {
   }
 
 }
+
 ?>
