@@ -10,11 +10,16 @@ if(!Array.isArray) {
 // TODO: AJAX postprocessing example
 // TODO: example using localStorage
 // TODO: showChunkRemove true / false (default is true)
-// TODO: need more control over how the chunks work
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
 // TODO: filterOptions should take a callback in the args
+// TODO: change "piece" to "token" ?
+// TODO: change "chunks" to "blocks" ?
+
+// allow events:
+// > preChange
+// > postChange
 
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
@@ -62,9 +67,12 @@ var containerEl, piecesEl, inputEl, listEl;
 
 // stateful
 var ADD_NEXT_PIECE_TO_NEW_CHUNK = true;
+var AJAX_BUFFER_LENGTH = 20;
+var AJAX_BUFFER_TIMEOUT;
 var CHUNKS = [];
 var CURRENT_LIST = false;
 var INPUT_HAPPENING = false;
+var JQUERY_AJAX_OBJECT = {};
 var VISIBLE_OPTIONS = {};
 
 //--------------------------------------------------------------
@@ -105,6 +113,10 @@ var createId = function() {
     });
 };
 
+var isObject = function(thing) {
+	return (Object.prototype.toString.call(thing) === '[object Object]');
+};
+
 //--------------------------------------------------------------
 // Sanity Checks
 //--------------------------------------------------------------
@@ -122,7 +134,7 @@ var validChunkIndex = function(chunkIndex) {
     return true;
 };
 
-var validValueArray = function(value) {
+var validChunksArray = function(value) {
     // value must be an array
     if (Array.isArray(value) !== true) {
         return false;
@@ -137,10 +149,19 @@ var validValueArray = function(value) {
 };
 
 var validOptionObject = function(obj) {
-
-    // TODO: write me
-
-    return true;
+	// option can be just a string
+	if (typeof obj === 'string') {
+		return true;
+	}
+	
+	// else it must be an object with a .value property
+	if (isObject(obj) !== true || obj.hasOwnProperty('value') !== true) {
+		return false
+	}
+	
+	// NOTE: do we need to check if it's safe to call JSON.stringify on .value here?
+	
+    return false;
 };
 
 var validListObject = function(obj) {
@@ -195,8 +216,6 @@ var expandOptionObject = function(option) {
     // string becomes the value
     if (typeof option === 'string') {
         option = {
-			optionHTML: encode(option),
-			pieceHTML: encode(option),
             value: option
         };
     }
@@ -219,6 +238,15 @@ var expandListObject = function(list) {
             ajaxEnabled: true,
 			url: list
 		};
+	}
+	
+	if (typeof list.url === 'string' || typeof list.url === 'function') {
+		list.ajaxEnabled = true;
+	}
+	
+	// default for ajaxEnabled is false
+	if (list.ajaxEnabled !== true) {
+		list.ajaxEnabled = false;
 	}
 
 	// default for allowFreeform is false
@@ -340,9 +368,11 @@ var buildOption = function(option, parentList) {
 };
 
 // TODO: this function could be more efficient
-var buildOptions = function(options, parentList) {
-	VISIBLE_OPTIONS = {};
-	
+var buildOptions = function(options, parentList, appendVisibleOptions) {
+	if (appendVisibleOptions !== true) {
+		VISIBLE_OPTIONS = {};
+	}
+
     var html = '';
 	var groups = getGroups(options);
 	var i;
@@ -423,8 +453,25 @@ var buildPieces = function(chunks, showChildIndicatorAtEnd) {
 	return html;
 };
 
-var buildNoResults = function(html) {
-	return '<li class="no-results">' + html + '</li>';
+var buildNoResults = function(noResults, inputValue) {
+	var html = '<li class="no-results">';
+	var type = typeof noResults;
+	if (type === 'string') {
+		html += noResults;
+	}
+	if (type === 'function') {
+		html += noResults(getValue(), inputValue);
+	}
+	html += '</li>';
+	return html;
+};
+
+var buildSearching = function(html) {
+	return '<li class="searching">' + html + '</li>';
+};
+
+var buildAjaxError = function() {
+	return '<li class="ajax-error">AJAX Error!</li>';
 };
 
 //--------------------------------------------------------------
@@ -488,7 +535,6 @@ var getValue = function() {
             value[i].push(CHUNKS[i][j].value);
         }
     }
-
     return value;
 };
 
@@ -755,11 +801,82 @@ var pressEnterOrTab = function() {
     addHighlightedOption();
 };
 
+// returns true if there is a valid option showing
+// false otherwise
+var isOptionShowing = function() {
+	return (listEl.find('li.option').length > 0);
+};
+
 // TODO: revisit this and make it better for different font sizes, etc
 // http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
 var updateInputWidth = function(text) {
 	var width = (text.length + 1) * 9;
 	inputEl.css('width', width + 'px');
+};
+
+var sendAjaxRequest = function(list, inputValue) {
+	
+	// TODO: allow full jQuery ajax config extend here
+	//       just not sure about how to handle scope with the
+	//       internal functions
+	
+	var url;
+	if (typeof list.url === 'string') {
+		url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+	}
+	if (typeof list.url === 'function') {
+		url = list.url(getValue(), inputValue);
+	}
+	
+	var ajaxSuccess = function(data, status, xhr) {
+		if (INPUT_HAPPENING !== true) return;
+		
+		// run their custom postProcess function
+		if (typeof list.postProcess === 'function') {
+			data = list.postProcess(getValue(), data);
+		}
+		
+		// expand the options and make sure they're valid
+		var options = [];
+		if (Array.isArray(data) === true) {
+			for (var i = 0; i < data.length; i++) {
+				// skip any objects that are not valid Options
+				if (validOptionObject(data[i]) !== true) continue;
+				
+				options.push(expandOptionObject(data[i]));
+			}
+		}
+
+		// no results :(
+		var html = '';
+		if (options.length === 0 && isOptionShowing() === false) {
+			html = buildNoResults(list.noResultsHTML, inputValue);
+		}
+		
+		// new options
+		if (options.length > 0) {
+			html = buildOptions(options, list, true);
+		}
+		
+		listEl.find('li.searching').replaceWith(html);
+	};
+	
+	var ajaxError = function(xhr, errType, exceptionObject) {
+		if (errType === 'abort') {
+			
+		}
+		if (errType === 'error') {
+			listEl.find('li.searching').replaceWith(buildAjaxError());
+		}
+	};
+	
+	JQUERY_AJAX_OBJECT = $.ajax({
+		dataType: 'json',
+		error: ajaxError,
+		success: ajaxSuccess,
+		type: 'GET',
+		url: url
+	});
 };
 
 var pressRegularKey = function() {
@@ -781,32 +898,56 @@ var pressRegularKey = function() {
 		options = filterOptions(CURRENT_LIST.options, inputValue);
 	}
 
-	// no options and input is blank, hide the dropdown list
-	if (inputValue === '' && options.length === 0) {
+	// add freeform as an option if that's allowed
+	if (options.length === 0 && inputValue !== '' && CURRENT_LIST.allowFreeform === true) {
+		options.push(expandOptionObject(inputValue));
+	}
+	
+	// no input, no options, no freeform, and no ajax
+	// hide the dropdown and exit
+	if (options.length === 0 && inputValue === '' && CURRENT_LIST.ajaxEnabled === false) {
 		listEl.css('display', 'none');
 		return;
 	}
 	
+	// else we will show something in the dropdown
 	listEl.css('display', '');
 	
-	// allow freeform?
-	if (options.length === 0 && CURRENT_LIST.allowFreeform === true && inputValue !== '') {
-		options.push(expandOptionObject(inputValue));
-	}
-
-	// no options found :(
-	if (options.length === 0) {
-		if (typeof CURRENT_LIST.noResultsHTML === 'string') {
-			listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML));
-		}
-		else if (typeof CURRENT_LIST.noResultsHTML === 'function') {
-			listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML(getValue(), inputValue)));
-		}
+	// no options found and no AJAX
+	// show "No Results" and exit
+	if (options.length === 0 && CURRENT_LIST.ajaxEnabled === false) {
+		listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML, inputValue));
 		return;
 	}
 	
-	// show new options
-	listEl.html(buildOptions(options, CURRENT_LIST));
+	// build the options found
+	var html = buildOptions(options, CURRENT_LIST);
+	
+	// add AJAX indicator
+	if (CURRENT_LIST.ajaxEnabled === true) {
+		if (typeof CURRENT_LIST.searchingHTML === 'string') {
+			html += buildSearching(CURRENT_LIST.searchingHTML);
+		}
+		if (typeof CURRENT_LIST.searchingHTML === 'function') {
+			html += buildSearching(CURRENT_LIST.searchingHTML(getValue(), inputValue));
+		}
+		
+		/*
+		// TODO: buffer ajax requests
+		AJAX_BUFFER_TIMEOUT = setTimeout(function() {
+			
+		}, AJAX_BUFFER_LENGTH);
+		*/
+		
+		// cancel an existing request
+		if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
+			JQUERY_AJAX_OBJECT.abort();
+		}
+		sendAjaxRequest(CURRENT_LIST, inputValue);
+	}
+	
+	// show the dropdown
+	listEl.html(html);
 	highlightFirstOption();
 };
 
@@ -1032,7 +1173,7 @@ return {
 
     val: function(newValue) {
         // set a new value
-        if (newValue && validValueArray(newValue) === true) {
+        if (newValue && validChunksArray(newValue) === true) {
             setValue(newValue);
             return true;
         }
