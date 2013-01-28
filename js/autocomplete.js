@@ -581,7 +581,8 @@ var getGroups = function(options) {
 };
 
 var listExists = function(listName) {
-  return (typeof listName === 'string' && cfg.lists[listName]);
+  return (typeof listName === 'string' &&
+          cfg.lists.hasOwnProperty(listName) === true);
 };
 
 var startInput = function() {
