@@ -215,9 +215,12 @@ $(document).ready(function() {
   $('div.autocomplete_internal_container').each(function() {
     var inputEl = $(this).find('input.autocomplete-input');
     var listEl = $(this).find('ul.dropdown');
+
+		var pos = inputEl.position();
+		var height = parseInt(inputEl.height(), 10);
     listEl.css({
-      top: (inputEl.height() + 8),
-      left: inputEl.position().left
+      top: (height + pos.top),
+      left: pos.left
     });
   });
   

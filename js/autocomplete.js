@@ -312,11 +312,11 @@ var initConfig = function() {
   // TODO: errors - check that console.log is a function
   // TODO: showClearBtn
   // TODO: clearBtnHTML
-  
+
   // class prefix
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
     cfg.classPrefix = 'autocomplete';
-  }  
+  }
 
   // default for maxTokenGroups is false
   if (typeof cfg.maxTokenGroups !== 'number' || cfg.maxTokenGroups < 0) {
@@ -325,7 +325,7 @@ var initConfig = function() {
   if (typeof cfg.maxTokenGroups === 'number') {
     cfg.maxTokenGroups = parseInt(cfg.maxTokenGroups, 10);
   }
-  
+
   // TODO: they should be able to pass in onChange in the main config
 
   // expand lists
@@ -539,14 +539,12 @@ var hideInputEl = function() {
 };
 
 var positionDropdownEl = function() {
-  // get position and height of input element
   var pos = inputEl.position();
   var height = parseInt(inputEl.height(), 10);
 
   // put the dropdown directly beneath the input element
   listEl.css({
-    // TODO: work on the CSS here
-    top: height + pos.top + 8,
+    top: (height + pos.top),
     left: pos.left
   });
 };
@@ -574,10 +572,10 @@ var setValue = function(tokens) {
   TOKENS = tokens;
   var newValue = getValue();
   widget.onChange(oldValue, newValue);
-  
+
   ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   CURRENT_LIST_NAME = cfg.initialList;
-  
+
   updateTokens();
 };
 
@@ -662,7 +660,7 @@ var removeTokenGroup = function(tokenGroupIndex) {
   TOKENS.splice(tokenGroupIndex, 1);
   var newValue = getValue();
   widget.onChange(oldValue, newValue);
-  
+
   updateTokens();
 
   if (INPUT_HAPPENING === true) {
@@ -845,12 +843,12 @@ var pressEscapeKey = function() {
 
 var moveTokenHighlightLeft = function() {
   var selectedEl = tokensEl.find('div.selected');
-  
+
   // NOTE: should never happen
   if (selectedEl.length !== 1) {
     return;
   }
-  
+
   var prev = selectedEl.prev('div.token-group');
   selectedEl.removeClass('selected');
   if (prev.length === 1) {
@@ -864,12 +862,12 @@ var moveTokenHighlightLeft = function() {
 
 var moveTokenHighlightRight = function() {
   var selectedEl = tokensEl.find('div.selected');
-  
+
   // NOTE: should never happen
   if (selectedEl.length !== 1) {
     return;
   }
-  
+
   var next = selectedEl.next('div.token-group');
   selectedEl.removeClass('selected');
   if (next.length === 1) {
@@ -1182,13 +1180,13 @@ var keydownWindow = function(e) {
     clearTokenGroupHighlight();
     return;
   }
-  
+
   // left
   if (keyCode === KEYS.LEFT) {
     moveTokenHighlightLeft();
     return;
   }
-  
+
   // right
   if (keyCode === KEYS.RIGHT) {
     moveTokenHighlightRight();
@@ -1221,13 +1219,13 @@ widget.addList = function(name, list) {
     // TODO: throw error here
     return false;
   }
-  
+
   // list must be valid
   if (validListObject(list) !== true) {
     // TODO: throw error here
     return false;
   }
-  
+
   // add the list
   cfg.lists[name] = expandListObject(list);
   return true;
@@ -1281,7 +1279,7 @@ widget.removeTokenGroup = function(tokenGroupIndex) {
     // TODO: throw error here
     return false;
   }
-  
+
   removeTokenGroup(tokenGroupIndex);
   return getValue();
 };
@@ -1292,7 +1290,7 @@ widget.removeList = function(listName) {
     // TODO: error here
     return false;
   }
-  
+
   // they cannot remove the initialList
   if (listName === cfg.initialList) {
     // TODO: error here
@@ -1307,18 +1305,18 @@ widget.val = function(newTokens) {
   if (arguments.length === 0) {
     return getValue();
   }
-  
+
   if (arguments.length === 1) {
     if (validTokensArray(newTokens) !== true) {
       // TODO: throw error: invalid tokens format
       return false;
     }
-    
+
     // update the tokens
     setValue(newTokens);
     return true;
   }
-  
+
   // TODO: throw error here: invalid number of args to val()
   return false;
 };
