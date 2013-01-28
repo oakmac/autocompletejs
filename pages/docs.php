@@ -23,19 +23,22 @@ TODO: Methods documentation
 </thead>
 <tbody>
   <tr>
-    <td><code class="js plain">errors</code></td>
-    <td>Function</td>
+    <td><code class="js plain">showErrors</code></td>
+    <td><code class="js keyword">false</code><br /><small>or</small><br />String<br /><small>or</small><br />Function</td>
     <td>no</td>
-    <td><small>n/a</small></td>
+    <td><code class="js keyword">false</code></td>
     <td>
-      <p><code class="js plain">errors</code> is an optional function you can use to log AutoComplete errors to.</p>
-      <p>Good options include <code class="js plain">console.log</code> and <code class="js plain">window.alert</code>.</p>
-      <p>Read more about <a href="docs/errors">AutoComplete errors</a>.</p>
+      <p><code class="js plain">showErrors</code> is an optional parameter to control how AutoComplete reports errors.</p>
+      <p>Every error in AutoComplete has a unique code to help diagnose and search for problems.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js keyword">false</code> then errors will be ignored.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js string">'console'</code> then errors will be sent to <code class="js plain">console.log()</code>.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js string">'alert'</code> then errors will annoyingly be sent to <code class="js plain">window.alert()</code>.</p>
+      <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
     </td>
     <td>
-      
-    </td>    
-  </tr>  
+
+    </td>
+  </tr>
   <tr>
     <td><code class="js plain">initialList</code></td>
     <td>String</td>
@@ -49,7 +52,7 @@ TODO: Methods documentation
         <p><a href="example/basic_list">Basic List</a></p>
         <p><a href="example/nested_lists1">Nested Lists 1</a></p>
         <p><a href="example/nested_lists2">Nested Lists 2</a></p>
-    </td>    
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">lists</code></td>
@@ -64,7 +67,7 @@ TODO: Methods documentation
         <p><a href="example/basic_list">Basic List</a></p>
         <p><a href="example/nested_lists1">Nested Lists 1</a></p>
         <p><a href="example/nested_lists2">Nested Lists 2</a></p>
-    </td>    
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">maxTokenGroups</code></td>
@@ -91,7 +94,7 @@ TODO: Methods documentation
     </td>
     <td>
 
-    </td>    
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">removeTokenGroupHTML</code></td>
@@ -104,7 +107,7 @@ TODO: Methods documentation
     </td>
     <td>
 
-    </td>    
+    </td>
   </tr>
 </tbody>
 </table>
@@ -140,7 +143,7 @@ TODO: Methods documentation
       <p>Note: You can have local list options as well as requesting results from a server. See this example.</p>
     </td>
     <td>
-      
+
     </td>
   </tr>
   <tr>
@@ -154,7 +157,7 @@ TODO: Methods documentation
       <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
     </td>
     <td>
-      
+
     </td>
   </tr>
   <tr>
@@ -169,7 +172,7 @@ TODO: Methods documentation
          See the <code class="js plain">children</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
     <td>
-      
+
     </td>
   </tr>
   <tr>
@@ -237,7 +240,7 @@ TODO: Methods documentation
     </td>
     <td>
       <p><a href="example/list_optionhtml1">list_optionhtml1</a></p>
-    </td>    
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">tokenHTML</code></td>

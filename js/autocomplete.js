@@ -187,8 +187,35 @@ var validListObject = function(obj) {
   return true;
 };
 
-var showError = function(code, msg) {
-  window.alert('AutoComplete Error ' + code + ': ' + msg);
+var error = function(code, msg, obj) {
+  if (cfg.hasOwnProperty('showErrors') !== true ||
+      cfg.showErrors === false) {
+    return;
+  }
+
+  // NOTE: should we check that window.console.log is defined on
+  //       initial config?
+
+  var errorText = 'AutoComplete Error ' + code + ': ' + msg;
+  if (cfg.showErrors === 'console') {
+    console.log(errorText);
+    if (obj) {
+      console.log(obj);
+    }
+    return;
+  }
+
+  if (cfg.showErrors === 'alert') {
+    if (obj) {
+      errorText += '\n\n' + JSON.stringify(obj);
+    }
+    window.alert(errorText);
+    return;
+  }
+
+  if (typeof cfg.showErrors === 'function') {
+    cfg.showErrors(code, msg, obj);
+  }
 };
 
 var checkDeps = function() {
@@ -202,13 +229,13 @@ var checkDeps = function() {
 var sanityChecks = function() {
   // container ID must be a string
   if (typeof containerElId !== 'string' || containerElId === '') {
-    showError(1001, 'Container element id must be a non-empty string');
+    error(1001, 'Container element id must be a non-empty string.');
     return false;
   }
 
   // make sure the container element exists in the DOM
   if (! document.getElementById(containerElId)) {
-    showError(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
+    error(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
     return false;
   }
 
@@ -369,8 +396,12 @@ var buildOptionHTML = function(option, parentList) {
     return encode(option.value);
   }
 
-  // NOTE: this should never happen, but rather have it here just in case
-  //       should I throw an error here?
+  // I guess I could iterate through the option.values
+  // and just return the first thing that is a String?
+  // Think I'd rather just throw an error.
+
+  // NOTE: this should never happen
+  error(5783, 'Unable to create HTML string for optionHTML.', option);
   return '<em>unknown option</em>';
 };
 
@@ -1217,13 +1248,13 @@ var addEvents = function() {
 widget.addList = function(name, list) {
   // name must be a string
   if (typeof name !== 'string' || name === '') {
-    // TODO: throw error here
+    error(7283, 'The first argument to the addList method must be a non-empty string');
     return false;
   }
 
   // list must be valid
   if (validListObject(list) !== true) {
-    // TODO: throw error here
+    error(2732, 'The list object passed to addList method is not valid.', list);
     return false;
   }
 
@@ -1246,6 +1277,15 @@ widget.clear = function() {
   clearWidget();
 };
 
+widget.config = function(prop, value) {
+  // TODO: write me
+  // no args, return the current config
+
+  // else set the new prop and value
+
+  // what's the difference between this function and reload?
+};
+
 widget.destroy = function() {
   destroyWidget();
 };
@@ -1258,7 +1298,9 @@ widget.focus = function() {
 // returns false if the list does not exist
 widget.getList = function(listName) {
   if (listExists(listName) !== true) {
-    // TODO: throw error here
+    // NOTE: not throwing error here because it's sufficient to return false
+    //       if the list does not exist
+    //       Would it be better to throw an error?
     return false;
   }
   return cfg.lists[listName];
@@ -1277,7 +1319,7 @@ widget.reload = function(config) {
 // returns the new value of the widget otherwise
 widget.removeTokenGroup = function(tokenGroupIndex) {
   if (validTokenGroupIndex(tokenGroupIndex) !== true) {
-    // TODO: throw error here
+    error(4823, 'Error in removeTokenGroup method. Token group index "' + tokenGroupIndex + '" does not exist.');
     return false;
   }
 
@@ -1288,13 +1330,13 @@ widget.removeTokenGroup = function(tokenGroupIndex) {
 widget.removeList = function(listName) {
   // return false if the list does not exist
   if (listExists(listName) !== true) {
-    // TODO: error here
+    error(1328, 'Error in removeList method. List "' + listName + '" does not exist.');
     return false;
   }
 
   // they cannot remove the initialList
   if (listName === cfg.initialList) {
-    // TODO: error here
+    error(1424, 'Error in removeList method. You cannot remove the initialList "' + listName + '"');
     return false;
   }
   removeList(listName);
@@ -1309,7 +1351,7 @@ widget.val = function(newTokens) {
 
   if (arguments.length === 1) {
     if (validTokensArray(newTokens) !== true) {
-      // TODO: throw error: invalid tokens format
+      error(6823, 'Invalid tokens array passed to val method.', newTokens);
       return false;
     }
 
@@ -1318,7 +1360,7 @@ widget.val = function(newTokens) {
     return true;
   }
 
-  // TODO: throw error here: invalid number of args to val()
+  error(9992, 'Wrong number of arguments passed to val method.');
   return false;
 };
 

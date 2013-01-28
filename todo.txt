@@ -2,15 +2,10 @@ before launch checklist:
 > MIT header on all files
 > full docs for methods
 > full docs for config options
-> docs for shorthand / expansion
 > example for every method
 > example for every config option
 > themes
-> make sure the code conforms to JSLint or Google Closure style guide
-> have a "cacheOptionsInLocalStorage" option on list config!
-> have a "clearCache" option on the widget config
 > ability to pick dates
-> add dummy options
 
 Examples:
 > localStorage
