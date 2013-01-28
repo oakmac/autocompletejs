@@ -62,6 +62,12 @@ if ($URI[0] === 'example' && $URI[1] !== '') {
 	}
 }
 
+// markup
+if ($URI[0] === 'markup') {
+	require(APP_PATH.'pages/markup.php');
+	die;
+}
+
 // license
 if ($URI[0] === 'license') {
 	require(APP_PATH.'pages/license.php');
