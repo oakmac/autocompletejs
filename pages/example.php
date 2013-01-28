@@ -6,19 +6,13 @@ $page_title = 'Example';
 include(APP_PATH.'pages/header.php');
 ?>
 
-<div class="single-example">
-  
-<div class="code_container">
+<div class="example">
+<p><a href="examples">&larr; Back to all examples.</a></p>
 <pre class="prettyprint lang-js linenums">
 <?php echo $example['js']; ?>  
 </pre>
-</div>
-
-<div class="markup_container">
 <?php echo $example['html'] . "\n"; ?>
-</div>
-
-</div><!-- end div.single-example -->
+</div><!-- end div.example -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
 <script src="js/prettify.js"></script>

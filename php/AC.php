@@ -2,6 +2,36 @@
 
 final class AC {
 
+  // returns an array of all the examples
+  public static function getExamples() {
+    $examples = array();
+    $jsFiles = glob(APP_PATH.'examples/*.js');
+    $count = 1;
+    foreach ($jsFiles as $jsFileName) {
+      $jsFileContent = trim(file_get_contents($jsFileName));
+      
+      $tmp = array_pop(explode('/', $jsFileName));
+      $slug = str_replace('.js', '', $tmp);
+      
+      // skip empty files
+      if ($jsFileContent === '') continue;
+      
+      $htmlFileName = str_replace('.js', '.html', $jsFileName);
+      $htmlFileContent = trim(file_get_contents($htmlFileName));
+      
+      array_push($examples, array(
+        'html' => $htmlFileContent,
+        'js'   => $jsFileContent,
+        'slug' => $slug,
+        'num'  => $count,
+      ));
+      
+      $count++;
+    }
+    
+    return $examples;
+  }
+
   // get the html and js file for an example
   // returns false if the example does not exist
   public static function getExample($name) {
