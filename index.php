@@ -31,42 +31,46 @@ for ($i = 0; $i < 20; $i++) {
 
 // homepage
 if ($URI[0] === '') {
-	require(APP_PATH . 'pages/home.php');
+	require(APP_PATH.'pages/home.php');
 	die;
 }
 
 // docs
 if ($URI[0] === 'docs') {
-	require(APP_PATH . 'pages/docs.php');
+	require(APP_PATH.'pages/docs.php');
 	die;
 }
 
 // themes
 if ($URI[0] === 'themes') {
-	require(APP_PATH . 'pages/themes.php');
+	require(APP_PATH.'pages/themes.php');
 	die;
 }
 
 // examples
 if ($URI[0] === 'examples') {
-	require(APP_PATH . 'pages/examples.php');
+	require(APP_PATH.'pages/examples.php');
 	die;
 }
 
-// example
+// single example
 if ($URI[0] === 'example' && $URI[1] !== '') {
-	
+	$example = AC::getExample($URI[1]);
+	if ($example !== false) {
+		require(APP_PATH.'pages/example.php');
+		die;
+	}
 }
 
 // license
 if ($URI[0] === 'license') {
-	require(APP_PATH . 'pages/license.php');
+	require(APP_PATH.'pages/license.php');
 	die;
 }
 
 // anything else 404's
 header('HTTP/1.1 404 Not Found');
-require(APP_PATH . 'pages/404.php');
+require(APP_PATH.'pages/404.php');
 die;
 
 ?>

@@ -18,6 +18,7 @@ TODO: Methods documentation
     <th>Required</th>
     <th>Default</th>
     <th>Description</th>
+    <th>Example</th>
   </tr>
 </thead>
 <tbody>
@@ -31,6 +32,10 @@ TODO: Methods documentation
       <p>Good options include <code class="js plain">console.log</code> and <code class="js plain">window.alert</code>.</p>
       <p>Read more about <a href="docs/errors">AutoComplete errors</a>.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">Example 1</a></p>
+        <p><a href="example/maxtokengroups2">Example 2</a></p>
+    </td>    
   </tr>  
   <tr>
     <td><code class="js plain">initialList</code></td>
@@ -41,6 +46,10 @@ TODO: Methods documentation
       <p>The <code class="js plain">initialList</code> property is the first list started when the user clicks on the AutoComplete widget.</p>
       <p>It's value should be the name of a <a href="docs#list_object">List Object</a>.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">Example 1</a></p>
+        <p><a href="example/maxtokengroups2">Example 2</a></p>
+    </td>    
   </tr>
   <tr>
     <td><code class="js plain">lists</code></td>
@@ -51,6 +60,10 @@ TODO: Methods documentation
       <p>The <code class="js plain">lists</code> property contains all of the lists used to power the dropdown options.</p>
       <p>See the <a href="docs#list_object">List Object</a> reference for more information on List Objects.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">Example 1</a></p>
+        <p><a href="example/maxtokengroups2">Example 2</a></p>
+    </td>    
   </tr>
   <tr>
     <td><code class="js plain">maxTokenGroups</code></td>
@@ -61,26 +74,38 @@ TODO: Methods documentation
       <p>The maximum number of token groups allowed in the search bar.</p>
       <p>Set <code class="js plain">maxTokenGroups</code> to <code class="js keyword">false</code> to allow unlimited token groups.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">maxtokengroups1</a></p>
+        <p><a href="example/maxtokengroups2">maxtokengroups2</a></p>
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">clearBtnHTML</code></td>
     <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
-    <td><code class="js string">'&lt;span class="clear-btn"&gt;&lt;/span&gt;'</code></td>
+    <td><code class="js string">'foo'</code></td>
     <td>
       <p>An HTML string to clear the contents of the search bar.</p>
       <p>Set <code class="js plain">clearBtnHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">Example 1</a></p>
+        <p><a href="example/maxtokengroups2">Example 2</a></p>
+    </td>    
   </tr>
   <tr>
     <td><code class="js plain">removeTokenGroupHTML</code></td>
     <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
-    <td><code class="js string">'&lt;span class="clear-btn"&gt;&lt;/span&gt;'</code></td>
+    <td><code class="js string">'foo'</code></td>
     <td>
       <p>An HTML string to clear the contents of the search bar.</p>
       <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
+    <td>
+        <p><a href="example/maxtokengroups1">Example 1</a></p>
+        <p><a href="example/maxtokengroups2">Example 2</a></p>
+    </td>    
   </tr>
 </tbody>
 </table>
@@ -102,6 +127,7 @@ TODO: Methods documentation
     <th>Required</th>
     <th>Default</th>
     <th>Description</th>
+    <th>Example</th>
   </tr>
 </thead>
 <tbody>
@@ -114,6 +140,9 @@ TODO: Methods documentation
       <p>If <code class="js keyword">true</code>, will send an AJAX request when the user types in the input.</p>
       <p>Note: You can have local list options as well as requesting results from a server. See this example.</p>
     </td>
+    <td>
+      
+    </td>
   </tr>
   <tr>
     <td><code class="js plain">allowFreeform</code></td>
@@ -124,6 +153,9 @@ TODO: Methods documentation
       <p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
       <p>If <code class="js keyword">false</code>, the user must select an option from the list.</p>
       <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+    </td>
+    <td>
+      
     </td>
   </tr>
   <tr>
@@ -136,6 +168,9 @@ TODO: Methods documentation
       <p>When any option from this list is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show up in the component.</p>
       <p>Note: If there is a <code class="js plain">children</code> property on the Option Object selected it will supersede this <code class="js plain">children</code> property.
          See the <code class="js plain">children</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
+    </td>
+    <td>
+      
     </td>
   </tr>
   <tr>
@@ -186,6 +221,9 @@ TODO: Methods documentation
       <p>Note: If there is a <code class="js plain">optionHTML</code> property on the Option Object selected it will supersede this <code class="js plain">optionHTML</code> property.
          See the <code class="js plain">optionHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
+    <td>
+      <p><a href="example/list_optionhtml1">list_optionhtml1</a></p>
+    </td>    
   </tr>
   <tr>
     <td><code class="js plain">tokenHTML</code></td>

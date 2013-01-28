@@ -54,7 +54,7 @@ var containerEl, tokensEl, inputEl, listEl;
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
 var AJAX_BUFFER_LENGTH = 20;
 var AJAX_BUFFER_TIMEOUT;
-var CURRENT_LIST = false;
+var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
 var TOKENS = [];
@@ -230,7 +230,7 @@ var expandOptionObject = function(option) {
   return option;
 };
 
-// expand a single List Object
+// expand a List Object
 var expandListObject = function(list) {
   // an array is shorthand for options
   if (isArray(list) === true) {
@@ -477,8 +477,17 @@ var buildNoResults = function(noResults, inputValue) {
   return html;
 };
 
-var buildSearching = function(html) {
-  return '<li class="searching">' + html + '</li>';
+var buildSearching = function(searchingHTML, inputValue) {
+  var html = '<li class="searching">';
+  var type = typeof searchingHTML;
+  if (type === 'string') {
+    html += searchingHTML;
+  }
+  if (type === 'function') {
+    html += searchingHTML(getValue(), inputValue);
+  }
+  html += '</li>';
+  return html;
 };
 
 var buildAjaxError = function() {
@@ -490,7 +499,10 @@ var buildAjaxError = function() {
 //----------------------------------------------------------
 
 var removeList = function(listName) {
-  // TODO: write me
+  delete cfg.lists[listName];
+  if (CURRENT_LIST_NAME === listName) {
+    CURRENT_LIST_NAME = cfg.initialList;
+  }
 };
 
 var destroyWidget = function() {
@@ -553,7 +565,7 @@ var getValue = function() {
 var setValue = function(tokens) {
   TOKENS = tokens;
   ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-  CURRENT_LIST = cfg.lists[cfg.initialList];
+  CURRENT_LIST_NAME = cfg.initialList;
   updateTokens();
 };
 
@@ -568,11 +580,8 @@ var getGroups = function(options) {
   return objectKeysToArray(groups);
 };
 
-var listExists = function(list) {
-  if (cfg.lists[list]) {
-    return true;
-  }
-  return false;
+var listExists = function(listName) {
+  return (typeof listName === 'string' && cfg.lists[listName]);
 };
 
 var startInput = function() {
@@ -585,8 +594,8 @@ var startInput = function() {
 
   // update state
   INPUT_HAPPENING = true;
-  if (! CURRENT_LIST) {
-    CURRENT_LIST = cfg.lists[cfg.initialList];
+  if (listExists(CURRENT_LIST_NAME) !== true) {
+    CURRENT_LIST_NAME = cfg.initialList;
   }
 
   clearTokenGroupHighlight();
@@ -631,7 +640,7 @@ var removeTokenGroup = function(tokenGroupIndex) {
   // if we are removing the last token group, then the next token will start
   // a new token group
   if (tokenGroupIndex === (TOKENS.length - 1)) {
-    CURRENT_LIST = cfg.lists[cfg.initialList];
+    CURRENT_LIST_NAME = cfg.initialList;
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
@@ -702,9 +711,10 @@ var addHighlightedOption = function() {
     return;
   }
 
-  // get the option and the token
+  // get the list, option, and create the token
+  var list = cfg.lists[CURRENT_LIST_NAME];
   var option = VISIBLE_OPTIONS[optionId];
-  var token = createTokenFromOption(option, CURRENT_LIST);
+  var token = createTokenFromOption(option, list);
 
   // start a new token group
   if (ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
@@ -715,15 +725,15 @@ var addHighlightedOption = function() {
     TOKENS[TOKENS.length - 1].push(token);
   }
 
-  var childrenListName = getChildrenListName(option, CURRENT_LIST);
+  var childrenListName = getChildrenListName(option, list);
   // this option has children, move to the next list
   if (typeof childrenListName === 'string') {
-    CURRENT_LIST = cfg.lists[childrenListName];
+    CURRENT_LIST_NAME = childrenListName;
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = false;
   }
   // no children, start a new token group
   else {
-    CURRENT_LIST = cfg.lists[cfg.initialList];
+    CURRENT_LIST_NAME = cfg.initialList;
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
@@ -922,22 +932,23 @@ var pressRegularKey = function() {
     updateInputWidth(inputValue);
   }
 
+  var list = cfg.lists[CURRENT_LIST_NAME];
   var options = [];
 
   // filter options with their custom function
-  if (typeof CURRENT_LIST.filterOptions === 'function') {
-    options = CURRENT_LIST.filterOptions(getValue(), CURRENT_LIST.options, inputValue);
+  if (typeof list.filterOptions === 'function') {
+    options = list.filterOptions(getValue(), list.options, inputValue);
   }
   // else default to mine
   else {
-    options = filterOptions(CURRENT_LIST.options, inputValue);
+    options = filterOptions(list.options, inputValue);
   }
 
   // cut options down to maxOptions
-  if (typeof CURRENT_LIST.maxOptions === 'number' &&
-      options.length > CURRENT_LIST.maxOptions) {
+  if (typeof list.maxOptions === 'number' &&
+      options.length > list.maxOptions) {
     var options2 = [];
-    for (var i = 0; i < CURRENT_LIST.maxOptions; i++) {
+    for (var i = 0; i < list.maxOptions; i++) {
       options2.push(options[i]);
     }
     options = options2;
@@ -945,14 +956,14 @@ var pressRegularKey = function() {
 
   // add freeform as an option if that's allowed
   if (options.length === 0 && inputValue !== '' &&
-      CURRENT_LIST.allowFreeform === true) {
+      list.allowFreeform === true) {
     options.push(expandOptionObject(inputValue));
   }
 
   // no input, no options, no freeform, and no ajax
   // hide the dropdown and exit
   if (options.length === 0 && inputValue === '' &&
-      CURRENT_LIST.ajaxEnabled === false) {
+      list.ajaxEnabled === false) {
     listEl.css('display', 'none');
     return;
   }
@@ -962,22 +973,17 @@ var pressRegularKey = function() {
 
   // no options found and no AJAX
   // show "No Results" and exit
-  if (options.length === 0 && CURRENT_LIST.ajaxEnabled === false) {
-    listEl.html(buildNoResults(CURRENT_LIST.noResultsHTML, inputValue));
+  if (options.length === 0 && list.ajaxEnabled === false) {
+    listEl.html(buildNoResults(list.noResultsHTML, inputValue));
     return;
   }
 
   // build the options found
-  var html = buildOptions(options, CURRENT_LIST);
+  var html = buildOptions(options, list);
 
   // add AJAX indicator
-  if (CURRENT_LIST.ajaxEnabled === true) {
-    if (typeof CURRENT_LIST.searchingHTML === 'string') {
-      html += buildSearching(CURRENT_LIST.searchingHTML);
-    }
-    if (typeof CURRENT_LIST.searchingHTML === 'function') {
-      html += buildSearching(CURRENT_LIST.searchingHTML(getValue(), inputValue));
-    }
+  if (list.ajaxEnabled === true) {
+    html += buildSearching(list.searchingHTML, inputValue);
 
     /*
     // TODO: buffer ajax requests
@@ -986,11 +992,11 @@ var pressRegularKey = function() {
     }, AJAX_BUFFER_LENGTH);
     */
 
-    // cancel an existing request
+    // cancel an existing AJAX request
     if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
       JQUERY_AJAX_OBJECT.abort();
     }
-    sendAjaxRequest(CURRENT_LIST, inputValue);
+    sendAjaxRequest(list, inputValue);
   }
 
   // show the dropdown
@@ -1064,20 +1070,7 @@ var keydownInputElement = function(e) {
   //       you let the keydown event finish so the input element
   //       gets updated, then you grab the value
   //       otherwise you're re-writing the logic behind <input type="text"> elements
-  // TODO: revisit this
   setTimeout(pressRegularKey, 5);
-
-  /*
-  var letter = String.fromCharCode(keyCode);
-
-  // do nothing on non-letter keys
-  if (letter === '') return;
-
-  // shift
-  if (e.shiftKey === false) {
-    letter = letter.toLowerCase();
-  }
-  */
 };
 
 // user clicks a dropdown option
@@ -1174,11 +1167,30 @@ init();
 
 // return a new object
 return {
+  // returns true if adding the list was successful
+  // false otherwise
   addList: function(name, list) {
-
+    // name must be a string
+    if (typeof name !== 'string' || name === '') {
+      // TODO: throw error here
+      return false;
+    }
+    
+    // list must be valid
+    if (validListObject(list) !== true) {
+      // TODO: throw error here
+      return false;
+    }
+    
+    // add the list
+    cfg.lists[name] = expandListObject(list);
+    return true;
   },
+  
+  // returns true if adding the option was successful
+  // false otherwise
   addOption: function(listName, option) {
-
+    // TODO: write me
   },
   blur: function() {
     stopInput();
@@ -1192,11 +1204,20 @@ return {
   focus: function() {
     startInput();
   },
+  
+  // return a list object
+  // returns false if the list does not exist
   getList: function(listName) {
-
+    if (listExists(listName) !== true) {
+      // TODO: throw error here
+      return false;
+    }
+    return cfg.lists[listName];
   },
+  
+  // return all the lists
   getLists: function() {
-
+    return cfg.lists;
   },
 
   reload: function(config) {
@@ -1207,8 +1228,10 @@ return {
   // returns the new value of the widget otherwise
   removeTokenGroup: function(tokenGroupIndex) {
     if (validTokenGroupIndex(tokenGroupIndex) !== true) {
+      // TODO: throw error here
       return false;
     }
+    
     removeTokenGroup(tokenGroupIndex);
     return getValue();
   },
@@ -1216,6 +1239,13 @@ return {
   removeList: function(listName) {
     // return false if the list does not exist
     if (listExists(listName) !== true) {
+      // TODO: error here
+      return false;
+    }
+    
+    // they cannot remove the initialList
+    if (listName === cfg.initialList) {
+      // TODO: error here
       return false;
     }
     removeList(listName);
@@ -1223,15 +1253,24 @@ return {
   },
 
   val: function(newTokens) {
-    // set a new value
-    if (newTokens && validTokensArray(newTokens) === true) {
+    // return the current value
+    if (arguments.length === 0) {
+      return getValue();
+    }
+    
+    if (arguments.length === 1) {
+      if (validTokensArray(newTokens) !== true) {
+        // TODO: throw error: invalid tokens format
+        return false;
+      }
+      
+      // update the tokens
       setValue(newTokens);
       return true;
     }
-    // else return the current value
-    else {
-      return getValue();
-    }
+    
+    // TODO: throw error here: invalid number of args to val()
+    return false;
   }
 };
 
