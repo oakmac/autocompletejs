@@ -7,11 +7,11 @@ include(APP_PATH . 'pages/header.php');
 $examples = getExamples();
 foreach ($examples as $example) {
     echo '<!-- begin Example ' . $example['num'] . ' -->'."\n";
-    echo '<div class="example">'."\n";
-    echo $example['html']."\n";
-    echo '<pre class="brush:js; toolbar:false;">'."\n";
+		echo '<div class="example">'."\n";
+    echo '<pre class="prettyprint lang-js linenums">'."\n";
     echo $example['js']."\n";
     echo '</pre>'."\n";
+    echo $example['html']."\n";
     echo '</div>'."\n";
     echo '<!-- end Example ' . $example['num'] . ' -->'."\n\n\n";
 }
@@ -21,8 +21,7 @@ foreach ($examples as $example) {
 </div><!-- end #body_wrapper -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
-<script src="js/shCore.js"></script>
-<script src="js/shBrushJScript.js"></script>
+<script src="js/prettify.js"></script>
 <script src="js/autocomplete.js"></script>
 <script>
 var init = function() {
@@ -39,8 +38,8 @@ foreach ($examples as $example) {
 ?>
 // end examples
 
-// turn on syntax highlighter
-SyntaxHighlighter.all();
+// syntax highlighting
+prettyPrint();
 
 }; // end init()
 $(document).ready(init);

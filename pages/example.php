@@ -9,7 +9,7 @@ include(APP_PATH.'pages/header.php');
 <div class="single-example">
   
 <div class="code_container">
-<pre class="brush:js; toolbar:false;">
+<pre class="prettyprint lang-js linenums">
 <?php echo $example['js']; ?>  
 </pre>
 </div>
@@ -21,8 +21,7 @@ include(APP_PATH.'pages/header.php');
 </div><!-- end div.single-example -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
-<script src="js/shCore.js"></script>
-<script src="js/shBrushJScript.js"></script>
+<script src="js/prettify.js"></script>
 <script src="js/autocomplete.js"></script>
 <script>
 var init = function() {
@@ -31,8 +30,8 @@ var init = function() {
 <?php echo $example['js'] . "\n"; ?>
 // end example code
 
-// turn on syntax highlighter
-SyntaxHighlighter.all();
+// syntax highlighting
+prettyPrint();
 
 }; // end init()
 $(document).ready(init);

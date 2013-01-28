@@ -10,7 +10,7 @@ TODO: Methods documentation
 
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
-<table class="table table-striped syntaxhighlighter">
+<table class="table table-striped">
 <thead>
   <tr>
     <th>Property</th>
@@ -118,7 +118,7 @@ TODO: Methods documentation
 <p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
 <p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
 <p>You can define the list workflow using the <code class="js plain">children</code> property on List Objects.</p>
-<table class="table table-striped syntaxhighlighter">
+<table class="table table-striped">
 <thead>
   <tr>
     <th>Property</th>
@@ -292,7 +292,7 @@ TODO: Methods documentation
 </div>
 <p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type.</p>
 <p>You can define the list workflow using the <code class="js plain">children</code> property on Option Objects.</p>
-<table class="table table-striped syntaxhighlighter">
+<table class="table table-striped">
 <thead>
   <tr>
     <th>Property</th>
