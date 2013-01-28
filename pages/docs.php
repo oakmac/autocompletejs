@@ -33,8 +33,7 @@ TODO: Methods documentation
       <p>Read more about <a href="docs/errors">AutoComplete errors</a>.</p>
     </td>
     <td>
-        <p><a href="example/maxtokengroups1">Example 1</a></p>
-        <p><a href="example/maxtokengroups2">Example 2</a></p>
+      
     </td>    
   </tr>  
   <tr>
@@ -47,8 +46,9 @@ TODO: Methods documentation
       <p>It's value should be the name of a <a href="docs#list_object">List Object</a>.</p>
     </td>
     <td>
-        <p><a href="example/maxtokengroups1">Example 1</a></p>
-        <p><a href="example/maxtokengroups2">Example 2</a></p>
+        <p><a href="example/basic_list">Basic List</a></p>
+        <p><a href="example/nested_lists1">Nested Lists 1</a></p>
+        <p><a href="example/nested_lists2">Nested Lists 2</a></p>
     </td>    
   </tr>
   <tr>
@@ -61,8 +61,9 @@ TODO: Methods documentation
       <p>See the <a href="docs#list_object">List Object</a> reference for more information on List Objects.</p>
     </td>
     <td>
-        <p><a href="example/maxtokengroups1">Example 1</a></p>
-        <p><a href="example/maxtokengroups2">Example 2</a></p>
+        <p><a href="example/basic_list">Basic List</a></p>
+        <p><a href="example/nested_lists1">Nested Lists 1</a></p>
+        <p><a href="example/nested_lists2">Nested Lists 2</a></p>
     </td>    
   </tr>
   <tr>
@@ -89,8 +90,7 @@ TODO: Methods documentation
       <p>Set <code class="js plain">clearBtnHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
-        <p><a href="example/maxtokengroups1">Example 1</a></p>
-        <p><a href="example/maxtokengroups2">Example 2</a></p>
+
     </td>    
   </tr>
   <tr>
@@ -103,8 +103,7 @@ TODO: Methods documentation
       <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
-        <p><a href="example/maxtokengroups1">Example 1</a></p>
-        <p><a href="example/maxtokengroups2">Example 2</a></p>
+
     </td>    
   </tr>
 </tbody>

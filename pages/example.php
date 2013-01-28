@@ -6,9 +6,19 @@ $page_title = 'Example';
 include(APP_PATH.'pages/header.php');
 ?>
 
-<?php
-echo $example['html'];
-?>
+<div class="single-example">
+  
+<div class="code_container">
+<pre class="brush:js; toolbar:false;">
+<?php echo $example['js']; ?>  
+</pre>
+</div>
+
+<div class="markup_container">
+<?php echo $example['html'] . "\n"; ?>
+</div>
+
+</div><!-- end div.single-example -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
 <script src="js/shCore.js"></script>
@@ -17,9 +27,9 @@ echo $example['html'];
 <script>
 var init = function() {
 
-<?php
-echo $example['js'];
-?>
+// start example code
+<?php echo $example['js'] . "\n"; ?>
+// end example code
 
 // turn on syntax highlighter
 SyntaxHighlighter.all();

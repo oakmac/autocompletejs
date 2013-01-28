@@ -41,7 +41,9 @@ var KEYS = {
   TAB: 9,
   ENTER: 13,
   ESCAPE: 27,
+  LEFT: 37,
   UP: 38,
+  RIGHT: 39,
   DOWN: 40,
   DELETE: 46,
   NUMPAD_ENTER: 108
@@ -825,6 +827,44 @@ var pressEscapeKey = function() {
   clearTokenGroupHighlight();
 };
 
+var moveTokenHighlightLeft = function() {
+  var selectedEl = tokensEl.find('div.selected');
+  
+  // NOTE: should never happen
+  if (selectedEl.length !== 1) {
+    return;
+  }
+  
+  var prev = selectedEl.prev('div.token-group');
+  selectedEl.removeClass('selected');
+  if (prev.length === 1) {
+    prev.addClass('selected');
+  }
+  else {
+    tokensEl.find('div.token-group').filter(':last')
+      .addClass('selected');
+  }
+};
+
+var moveTokenHighlightRight = function() {
+  var selectedEl = tokensEl.find('div.selected');
+  
+  // NOTE: should never happen
+  if (selectedEl.length !== 1) {
+    return;
+  }
+  
+  var next = selectedEl.next('div.token-group');
+  selectedEl.removeClass('selected');
+  if (next.length === 1) {
+    next.addClass('selected');
+  }
+  else {
+    tokensEl.find('div.token-group').filter(':first')
+      .addClass('selected');
+  }
+};
+
 var pressBackspaceOnEmptyInput = function() {
   if (isTokenGroupHighlighted() === true) {
     removeHighlightedTokenGroup();
@@ -1107,23 +1147,35 @@ var clickPage = function(e) {
 
 // keydown anywhere on the page
 var keydownWindow = function(e) {
-  if (INPUT_HAPPENING === true) return;
+  if (INPUT_HAPPENING === true ||
+      isTokenGroupHighlighted() !== true) {
+    return;
+  }
 
   var keyCode = e.which;
-  var tokenGroupHighlighted = isTokenGroupHighlighted();
 
   // backspace or delete with a highlighted token group
-  if ((keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) &&
-      tokenGroupHighlighted === true) {
+  if (keyCode === KEYS.BACKSPACE || keyCode === KEYS.DELETE) {
     e.preventDefault();
     removeHighlightedTokenGroup();
     return;
   }
 
   // escape key
-  if (keyCode === KEYS.ESCAPE && tokenGroupHighlighted === true) {
+  if (keyCode === KEYS.ESCAPE) {
     clearTokenGroupHighlight();
     return;
+  }
+  
+  // left
+  if (keyCode === KEYS.LEFT) {
+    moveTokenHighlightLeft();
+    return;
+  }
+  
+  // right
+  if (keyCode === KEYS.RIGHT) {
+    moveTokenHighlightRight();
   }
 };
 

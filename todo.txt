@@ -5,12 +5,12 @@ before launch checklist:
 > docs for shorthand / expansion
 > example for every method
 > example for every config option
-> markup page for theming
 > themes
 > make sure the code conforms to JSLint or Google Closure style guide
 > add change event
 > have a "cacheOptionsInLocalStorage" option on list config!
 > have a "clearCache" option on the widget config
+> ability to pick dates
 
 Examples:
 > localStorage
