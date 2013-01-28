@@ -62,6 +62,9 @@ var JQUERY_AJAX_OBJECT = {};
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
+// constructor return object
+var widget = {};
+
 //----------------------------------------------------------
 // Util Functions
 //----------------------------------------------------------
@@ -309,6 +312,11 @@ var initConfig = function() {
   // TODO: errors - check that console.log is a function
   // TODO: showClearBtn
   // TODO: clearBtnHTML
+  
+  // class prefix
+  if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
+    cfg.classPrefix = 'autocomplete';
+  }  
 
   // default for maxTokenGroups is false
   if (typeof cfg.maxTokenGroups !== 'number' || cfg.maxTokenGroups < 0) {
@@ -317,11 +325,8 @@ var initConfig = function() {
   if (typeof cfg.maxTokenGroups === 'number') {
     cfg.maxTokenGroups = parseInt(cfg.maxTokenGroups, 10);
   }
-
-  // class prefix
-  if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
-    cfg.classPrefix = 'autocomplete';
-  }
+  
+  // TODO: they should be able to pass in onChange in the main config
 
   // expand lists
   for (var i in cfg.lists) {
@@ -565,9 +570,14 @@ var getValue = function() {
 
 // set the current value of the widget
 var setValue = function(tokens) {
+  var oldValue = getValue();
   TOKENS = tokens;
+  var newValue = getValue();
+  widget.onChange(oldValue, newValue);
+  
   ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   CURRENT_LIST_NAME = cfg.initialList;
+  
   updateTokens();
 };
 
@@ -648,8 +658,11 @@ var removeTokenGroup = function(tokenGroupIndex) {
   }
 
   // remove the token group
+  var oldValue = getValue();
   TOKENS.splice(tokenGroupIndex, 1);
-
+  var newValue = getValue();
+  widget.onChange(oldValue, newValue);
+  
   updateTokens();
 
   if (INPUT_HAPPENING === true) {
@@ -720,6 +733,7 @@ var addHighlightedOption = function() {
   var token = createTokenFromOption(option, list);
 
   // start a new token group
+  var previousValue = getValue();
   if (ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
     TOKENS.push([token]);
   }
@@ -727,6 +741,8 @@ var addHighlightedOption = function() {
   else {
     TOKENS[TOKENS.length - 1].push(token);
   }
+  var newValue = getValue();
+  widget.onChange(previousValue, newValue);
 
   var childrenListName = getChildrenListName(option, list);
   // this option has children, move to the next list
@@ -1194,6 +1210,129 @@ var addEvents = function() {
 };
 
 //----------------------------------------------------------
+// Public Methods
+//----------------------------------------------------------
+
+// returns true if adding the list was successful
+// false otherwise
+widget.addList = function(name, list) {
+  // name must be a string
+  if (typeof name !== 'string' || name === '') {
+    // TODO: throw error here
+    return false;
+  }
+  
+  // list must be valid
+  if (validListObject(list) !== true) {
+    // TODO: throw error here
+    return false;
+  }
+  
+  // add the list
+  cfg.lists[name] = expandListObject(list);
+  return true;
+};
+
+// returns true if adding the option was successful
+// false otherwise
+widget.addOption = function(listName, option) {
+  // TODO: write me
+};
+
+widget.blur = function() {
+  stopInput();
+};
+
+widget.clear = function() {
+  clearWidget();
+};
+
+widget.destroy = function() {
+  destroyWidget();
+};
+
+widget.focus = function() {
+  startInput();
+};
+
+// return a list object
+// returns false if the list does not exist
+widget.getList = function(listName) {
+  if (listExists(listName) !== true) {
+    // TODO: throw error here
+    return false;
+  }
+  return cfg.lists[listName];
+};
+
+// return all the lists
+widget.getLists = function() {
+  return cfg.lists;
+};
+
+widget.reload = function(config) {
+  // TODO: write me
+};
+
+// returns false if the token group index is invalid
+// returns the new value of the widget otherwise
+widget.removeTokenGroup = function(tokenGroupIndex) {
+  if (validTokenGroupIndex(tokenGroupIndex) !== true) {
+    // TODO: throw error here
+    return false;
+  }
+  
+  removeTokenGroup(tokenGroupIndex);
+  return getValue();
+};
+
+widget.removeList = function(listName) {
+  // return false if the list does not exist
+  if (listExists(listName) !== true) {
+    // TODO: error here
+    return false;
+  }
+  
+  // they cannot remove the initialList
+  if (listName === cfg.initialList) {
+    // TODO: error here
+    return false;
+  }
+  removeList(listName);
+  return true;
+};
+
+widget.val = function(newTokens) {
+  // return the current value
+  if (arguments.length === 0) {
+    return getValue();
+  }
+  
+  if (arguments.length === 1) {
+    if (validTokensArray(newTokens) !== true) {
+      // TODO: throw error: invalid tokens format
+      return false;
+    }
+    
+    // update the tokens
+    setValue(newTokens);
+    return true;
+  }
+  
+  // TODO: throw error here: invalid number of args to val()
+  return false;
+};
+
+//----------------------------------------------------------
+// Events
+//----------------------------------------------------------
+
+// TODO: require them to assign event functions through the config
+//       and validate that they're adding a function?
+//       ie: widget.config('onChange', function() {});
+widget.onChange = function(oldValue, newValue) {};
+
+//----------------------------------------------------------
 // Initialization
 //----------------------------------------------------------
 
@@ -1218,114 +1357,8 @@ var init = function() {
 };
 init();
 
-// return a new object
-return {
-  // returns true if adding the list was successful
-  // false otherwise
-  addList: function(name, list) {
-    // name must be a string
-    if (typeof name !== 'string' || name === '') {
-      // TODO: throw error here
-      return false;
-    }
-    
-    // list must be valid
-    if (validListObject(list) !== true) {
-      // TODO: throw error here
-      return false;
-    }
-    
-    // add the list
-    cfg.lists[name] = expandListObject(list);
-    return true;
-  },
-  
-  // returns true if adding the option was successful
-  // false otherwise
-  addOption: function(listName, option) {
-    // TODO: write me
-  },
-  blur: function() {
-    stopInput();
-  },
-  clear: function() {
-    clearWidget();
-  },
-  destroy: function() {
-    destroyWidget();
-  },
-  focus: function() {
-    startInput();
-  },
-  
-  // return a list object
-  // returns false if the list does not exist
-  getList: function(listName) {
-    if (listExists(listName) !== true) {
-      // TODO: throw error here
-      return false;
-    }
-    return cfg.lists[listName];
-  },
-  
-  // return all the lists
-  getLists: function() {
-    return cfg.lists;
-  },
-
-  reload: function(config) {
-    // TODO: write me
-  },
-
-  // returns false if the token group index is invalid
-  // returns the new value of the widget otherwise
-  removeTokenGroup: function(tokenGroupIndex) {
-    if (validTokenGroupIndex(tokenGroupIndex) !== true) {
-      // TODO: throw error here
-      return false;
-    }
-    
-    removeTokenGroup(tokenGroupIndex);
-    return getValue();
-  },
-
-  removeList: function(listName) {
-    // return false if the list does not exist
-    if (listExists(listName) !== true) {
-      // TODO: error here
-      return false;
-    }
-    
-    // they cannot remove the initialList
-    if (listName === cfg.initialList) {
-      // TODO: error here
-      return false;
-    }
-    removeList(listName);
-    return true;
-  },
-
-  val: function(newTokens) {
-    // return the current value
-    if (arguments.length === 0) {
-      return getValue();
-    }
-    
-    if (arguments.length === 1) {
-      if (validTokensArray(newTokens) !== true) {
-        // TODO: throw error: invalid tokens format
-        return false;
-      }
-      
-      // update the tokens
-      setValue(newTokens);
-      return true;
-    }
-    
-    // TODO: throw error here: invalid number of args to val()
-    return false;
-  }
-};
+// return the widget
+return widget;
 
 }; // end window.AutoComplete
 })(); // end anonymous wrapper
