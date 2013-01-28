@@ -33,4 +33,4 @@ var config = {
     steak: steak
   }
 };
-var widget = new AutoComplete('example4', config);
+var widget = new AutoComplete('nested_lists2_example', config);

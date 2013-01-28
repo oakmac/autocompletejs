@@ -14,4 +14,4 @@ var config = {
     vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
 };
-var widget = new AutoComplete('example3', config);
+var widget = new AutoComplete('nested_lists_example', config);
