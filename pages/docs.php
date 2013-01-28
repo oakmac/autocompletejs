@@ -179,12 +179,27 @@ TODO: Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p><code class="js plain">filterOptions</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
-      <p>The first argument to the function is the current value of the AutoComplete widget, the second argument is an array of Option Objects for the current list, and the third function is the text the user has entered.</p>
+      <p>The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an array of Option Objects.</p>
       <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
       <p>Note: You can return an array of any Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
     </td>
   </tr>
+  <!--
+  <tr>
+    <td><code class="js plain">filterOptionsProps</code></td>
+    <td>String<br /></td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p><code class="js plain">filterOptionsProps</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
+      <p>The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.</p>
+      <p>The function should return an array of Option Objects.</p>
+      <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
+      <p>Note: You can return an array of any Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
+    </td>
+  </tr>
+  -->
   <tr>
     <td><code class="js plain">maxOptions</code></td>
     <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
@@ -203,7 +218,7 @@ TODO: Methods documentation
     <td><code class="js string">'No results found.'</code></td>
     <td>
       <p>An HTML string to display when there are no options to show.</p>
-      <p>If <code class="js plain">noResultsHTML</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>If <code class="js plain">noResultsHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an HTML string.</p>
       <p>Note: <code class="js plain">noResultsHTML</code> will never be shown when <code class="js plain">allowFreeform</code> is <code class="js keyword">true</code>.</p>
     </td>
@@ -255,7 +270,7 @@ TODO: Methods documentation
     <td><code class="js string">'Searching'</code></td>
     <td>
       <p>An HTML string to display when searching for options.</p>
-      <p>If <code class="js plain">searchingHTML</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>If <code class="js plain">searchingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an HTML string.</p>
     </td>
   </tr>
@@ -267,7 +282,7 @@ TODO: Methods documentation
     <td>
       <p><code class="js plain">url</code> is the URL to send an AJAX request to when <code class="js plain">ajaxEnabled</code> is <code class="js keyword">true</code>.</p>
       <p>The string <code class="js string">'{value}'</code> will be replaced with the text the user has typed.  The text will be escaped using <code class="js plain">encodeURIComponent()</code>.</p>
-      <p>If <code class="js plain">url</code> is a function, the first argument is the current value of the AutoComplete widget and the second argument is the text that the user has entered.</p>
+      <p>If <code class="js plain">url</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
       <p>The function should return a url string.</p>
     </td>
   </tr>

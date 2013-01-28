@@ -6,7 +6,7 @@
  * Released under the MIT license
  * http://autocompletejs.com/license
  *
- * Date: 27 Jan 2013
+ * Date: 25 Jan 2013
  */
 
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
@@ -309,7 +309,6 @@ var initConfig = function() {
     };
   }
 
-  // TODO: errors - check that console.log is a function
   // TODO: showClearBtn
   // TODO: clearBtnHTML
 
@@ -351,6 +350,8 @@ var buildWidget = function() {
   return html;
 };
 
+// TODO: need to add a check here that the return value of optionHTML()
+//       and tokenHTML are strings
 var buildOptionHTML = function(option, parentList) {
   if (typeof option.optionHTML === 'string') {
     return option.optionHTML;
