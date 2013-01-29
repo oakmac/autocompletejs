@@ -50,7 +50,7 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, tokensEl, inputEl, listEl;
+var containerEl, dropdownEl, inputEl, tokensEl;
 
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
@@ -59,6 +59,7 @@ var AJAX_BUFFER_TIMEOUT;
 var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
+var LOCAL_STORAGE_AVAILABLE = false;
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
@@ -110,6 +111,19 @@ var isArray = Array.isArray || function(vArg) {
 var isObject = function(thing) {
   return (Object.prototype.toString.call(thing) === '[object Object]');
 };
+
+// copied from modernizr
+var hasLocalStorage = function() {
+  var str = 'test';
+  try {
+    localStorage.setItem(str, str);
+    localStorage.removeItem(str);
+    return true;
+  } catch(e) {
+    return false;
+  }  
+};
+LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
 
 //----------------------------------------------------------
 // Sanity Checks
@@ -293,6 +307,11 @@ var expandListObject = function(list) {
   if (list.allowFreeform !== true) {
     list.allowFreeform = false;
   }
+  
+  // default for cacheAjax is true
+  if (typeof list.cacheAjax !== false) {
+    list.cacheAjax = true;
+  }
 
   // default for maxOptions is false
   if (typeof list.maxOptions !== 'number' || list.maxOptions < 1) {
@@ -353,6 +372,12 @@ var initConfig = function() {
   }
 
   // TODO: they should be able to pass in onChange in the main config
+
+  // default for showErrors is false
+  if (cfg.showErrors !== 'console' && cfg.showErrors !== 'alert' &&
+      typeof cfg.showErrors !== 'function') {
+    cfg.showErrors = false;
+  }
 
   // expand lists
   for (var i in cfg.lists) {
@@ -575,14 +600,14 @@ var positionDropdownEl = function() {
   var height = parseInt(inputEl.height(), 10);
 
   // put the dropdown directly beneath the input element
-  listEl.css({
+  dropdownEl.css({
     top: (height + pos.top),
     left: pos.left
   });
 };
 
 var hideDropdownEl = function() {
-  listEl.css('display', 'none').html('');
+  dropdownEl.css('display', 'none').html('');
 };
 
 // returns the current value of the widget
@@ -657,7 +682,7 @@ var stopInput = function() {
 };
 
 var highlightFirstOption = function() {
-  highlightOption(listEl.find('li.option').filter(':first'));
+  highlightOption(dropdownEl.find('li.option').filter(':first'));
 };
 
 var clearTokenGroupHighlight = function() {
@@ -742,7 +767,7 @@ var getChildrenListName = function(option, parentList) {
 
 var addHighlightedOption = function() {
   // get the highlighted value
-  var highlightedEl = listEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.highlighted');
 
   // do nothing if no entry is highlighted
   if (highlightedEl.length !== 1) return;
@@ -824,7 +849,7 @@ var filterOptions = function(options, input) {
 
 var highlightOption = function(optionEl) {
   // remove highlighted from all values in the list
-  listEl.find('li.option').removeClass('highlighted');
+  dropdownEl.find('li.option').removeClass('highlighted');
 
   // add highlight class to the value clicked
   $(optionEl).addClass('highlighted');
@@ -836,11 +861,11 @@ var highlightOption = function(optionEl) {
 
 var pressUpArrow = function() {
   // get the highlighted element
-  var highlightedEl = listEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.highlighted');
 
   // no row highlighted, highlight the last list element
   if (highlightedEl.length === 0) {
-    listEl.find('li.option').last().addClass('highlighted');
+    dropdownEl.find('li.option').last().addClass('highlighted');
     return;
   }
 
@@ -853,11 +878,11 @@ var pressUpArrow = function() {
 
 var pressDownArrow = function() {
   // get the highlighted element
-  var highlightedEl = listEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.highlighted');
 
   // no row highlighted, highlight the first option
   if (highlightedEl.length === 0) {
-    listEl.find('li.option').first().addClass('highlighted');
+    dropdownEl.find('li.option').first().addClass('highlighted');
     return;
   }
 
@@ -927,11 +952,11 @@ var pressEnterOrTab = function() {
 // returns true if there is a valid option showing
 // false otherwise
 var isOptionShowing = function() {
-  return (listEl.find('li.option').length > 0);
+  return (dropdownEl.find('li.option').length > 0);
 };
 
 var isOptionHighlighted = function() {
-  return (listEl.find('li.highlighted').length !== 0);
+  return (dropdownEl.find('li.highlighted').length !== 0);
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
@@ -952,15 +977,28 @@ var sendAjaxRequest = function(list, inputValue) {
     url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
   }
   if (typeof list.url === 'function') {
-    url = list.url(getValue(), inputValue);
+    url = list.url(inputValue, getValue());
+  }
+  
+  // throw an error if url is not a string
+  if (typeof url !== 'string') {
+    error(8721, 'AJAX url must be a string.  Did your custom url function not return one?', url);
+    stopInput();
+    return;
   }
 
-  var ajaxSuccess = function(data, status, xhr) {
+  var ajaxSuccess = function(data) {
+    // save the result in the cache
+    if (list.cacheAjax === true
+        && LOCAL_STORAGE_AVAILABLE === true) {
+      localStorage.setItem(url, JSON.stringify(data));
+    }
+    
     if (INPUT_HAPPENING !== true) return;
 
     // run their custom postProcess function
     if (typeof list.postProcess === 'function') {
-      data = list.postProcess(getValue(), data);
+      data = list.postProcess(data, getValue());
     }
 
     // expand the options and make sure they're valid
@@ -985,7 +1023,7 @@ var sendAjaxRequest = function(list, inputValue) {
       html = buildOptions(options, list, true);
     }
 
-    listEl.find('li.searching').replaceWith(html);
+    dropdownEl.find('li.searching').replaceWith(html);
 
     // highlight the option if there are no others highlighted
     if (isOptionHighlighted() === false) {
@@ -998,17 +1036,27 @@ var sendAjaxRequest = function(list, inputValue) {
     // TODO: write me
     //}
     if (errType === 'error') {
-      listEl.find('li.searching').replaceWith(buildAjaxError());
+      dropdownEl.find('li.searching').replaceWith(buildAjaxError());
     }
   };
-
-  JQUERY_AJAX_OBJECT = $.ajax({
-    dataType: 'json',
-    error: ajaxError,
-    success: ajaxSuccess,
-    type: 'GET',
-    url: url
-  });
+  
+  // check the cache
+  if (list.cacheAjax === true &&
+      LOCAL_STORAGE_AVAILABLE === true &&
+      // would prefer to check for something more than just truthy here
+      localStorage.getItem(url)) {
+    ajaxSuccess(JSON.parse(localStorage.getItem(url)));
+  }
+  // else send the AJAX request
+  else {
+    JQUERY_AJAX_OBJECT = $.ajax({
+      dataType: 'json',
+      error: ajaxError,
+      success: ajaxSuccess,
+      type: 'GET',
+      url: url
+    });
+  }
 };
 
 var pressRegularKey = function() {
@@ -1051,17 +1099,17 @@ var pressRegularKey = function() {
   // hide the dropdown and exit
   if (options.length === 0 && inputValue === '' &&
       list.ajaxEnabled === false) {
-    listEl.css('display', 'none');
+    dropdownEl.css('display', 'none');
     return;
   }
 
   // else we will show something in the dropdown
-  listEl.css('display', '');
+  dropdownEl.css('display', '');
 
   // no options found and no AJAX
   // show "No Results" and exit
   if (options.length === 0 && list.ajaxEnabled === false) {
-    listEl.html(buildNoResults(list.noResultsHTML, inputValue));
+    dropdownEl.html(buildNoResults(list.noResultsHTML, inputValue));
     return;
   }
 
@@ -1071,24 +1119,22 @@ var pressRegularKey = function() {
   // add AJAX indicator
   if (list.ajaxEnabled === true) {
     html += buildSearching(list.searchingHTML, inputValue);
+  }
 
-    /*
-    // TODO: buffer ajax requests
-    AJAX_BUFFER_TIMEOUT = setTimeout(function() {
-
-    }, AJAX_BUFFER_LENGTH);
-    */
-
+  // show the dropdown
+  dropdownEl.html(html);
+  highlightFirstOption();
+  
+  // send the AJAX request
+  // NOTE: we have to send the AJAX request after we've updated the DOM
+  //       because of localStorage caching
+  if (list.ajaxEnabled === true) {
     // cancel an existing AJAX request
     if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
       JQUERY_AJAX_OBJECT.abort();
     }
-    sendAjaxRequest(list, inputValue);
+    sendAjaxRequest(list, inputValue);    
   }
-
-  // show the dropdown
-  listEl.html(html);
-  highlightFirstOption();
 };
 
 //----------------------------------------------------------
@@ -1386,7 +1432,7 @@ var initDom = function() {
 
   // grab elements in memory
   inputEl = containerEl.find('input.autocomplete-input');
-  listEl = containerEl.find('ul.dropdown');
+  dropdownEl = containerEl.find('ul.dropdown');
   tokensEl = containerEl.find('div.tokens');
 };
 

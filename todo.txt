@@ -9,7 +9,6 @@ before launch checklist:
 
 Examples:
 > localStorage
-> AJAX using POST
 > AJAX with postprocessing function
 > simple usage
 > simple usage with groups

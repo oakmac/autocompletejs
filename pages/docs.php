@@ -5,7 +5,8 @@ include(APP_PATH . 'pages/header.php');
 <h1>Docs</h1>
 
 <!--
-TODO: Methods documentation
+TODO: "how it works" walk-through explanation of how the widget functions
+      including definitions of widget, tokens, lists, and options
 -->
 
 <h2 id="config_object">AutoComplete Config Object</h2>
@@ -36,7 +37,9 @@ TODO: Methods documentation
       <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
     </td>
     <td>
-
+      <p><a href="#">showErrors console example</a></p>
+      <p><a href="#">showErrors alert example</a></p>
+      <p><a href="#">showErrors custom function example</a></p>
     </td>
   </tr>
   <tr>
@@ -52,6 +55,30 @@ TODO: Methods documentation
         <p><a href="example/basic_list">Basic List</a></p>
         <p><a href="example/nested_lists1">Nested Lists 1</a></p>
         <p><a href="example/nested_lists2">Nested Lists 2</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">initialValue</code></td>
+    <td></td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>set the initial value of the widget</p>
+    </td>
+    <td>
+        <p><a href="#">initialValue example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">placeholderHTML</code></td>
+    <td>String</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>placeholder text - how are we going to deal with placeholder behavior?</p>
+    </td>
+    <td>
+      <p><a href="#">Placeholder Example</a></p>
     </td>
   </tr>
   <tr>
@@ -79,12 +106,13 @@ TODO: Methods documentation
       <p>Set <code class="js plain">maxTokenGroups</code> to <code class="js keyword">false</code> to allow unlimited token groups.</p>
     </td>
     <td>
+        <p>How many examples do we really need here?</p>
         <p><a href="example/maxtokengroups1">maxtokengroups1</a></p>
         <p><a href="example/maxtokengroups2">maxtokengroups2</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">clearBtnHTML</code></td>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">clearBtnHTML</code></td>
     <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
     <td><code class="js string">'foo'</code></td>
@@ -93,11 +121,11 @@ TODO: Methods documentation
       <p>Set <code class="js plain">clearBtnHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
-
+      <p><a href="#">clearBtnHTML Example</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">removeTokenGroupHTML</code></td>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">removeTokenGroupHTML</code></td>
     <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
     <td><code class="js string">'foo'</code></td>
@@ -106,7 +134,7 @@ TODO: Methods documentation
       <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
-
+      <p><a href="#">removeTokenGroupHTML Example</a></p>
     </td>
   </tr>
 </tbody>
@@ -147,6 +175,26 @@ TODO: Methods documentation
     </td>
   </tr>
   <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">ajaxErrorHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
+    <td>no</td>
+    <td><code class="js string">'AJAX Error!'</code></td>
+    <td>
+      <p>An HTML string to display when an AJAX request has failed.</p>
+      <p>If <code class="js plain">ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
+      <p>The function should return an HTML string.</p>
+    </td>
+  </tr>
+  <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">ajaxOptions</code></td>
+    <td>Object of jQuery AJAX options</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>extend the jQuery AJAX options</p>
+    </td>
+  </tr>
+  <tr>
     <td><code class="js plain">allowFreeform</code></td>
     <td>Boolean</td>
     <td>no</td>
@@ -155,6 +203,21 @@ TODO: Methods documentation
       <p>If <code class="js keyword">true</code>, allows the user to enter free-form text.</p>
       <p>If <code class="js keyword">false</code>, the user must select an option from the list.</p>
       <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
+    </td>
+    <td>
+
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">cacheAjax</code></td>
+    <td>Boolean</td>
+    <td>no</td>
+    <td><code class="js keyword">true</code></td>
+    <td>
+      <p>If <code class="js keyword">true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.</p>
+      <p>If <code class="js keyword">false</code>, it will not cache and send a new AJAX request every time.</p>
+      <p>If the browser does not support localStorage it will only cache results for the duration of the page.</p>
+      <p>If you need to support browsers that do not have localStorage I recommend using a <a href="https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage">polyfill</a>.</p>
     </td>
     <td>
 
@@ -204,7 +267,7 @@ TODO: Methods documentation
   </tr>
   -->
   <tr>
-    <td><code class="js plain">maxOptions</code></td>
+    <td>NOT IMPLEMENTED YET<br />DO SCROLLABLE = TRUE/FALSE INSTEAD<code class="js plain">maxOptions</code></td>
     <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
     <td>no</td>
     <td><code class="js keyword">false</code></td>
@@ -262,7 +325,7 @@ TODO: Methods documentation
     <td><small>n/a</small></td>
     <td>
       <p><code class="js plain">postProcess</code> is an optional function you can use to process data that is returned from the server.</p>
-      <p>The first argument is the data returned by the server.</p>
+      <p>The first argument is the data returned by the server and the second argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an array of <a href="docs#option_objects">Option Objects</a>.</p>
     </td>
   </tr>
@@ -381,6 +444,134 @@ TODO: Methods documentation
     </td>
   </tr>
 </tbody>
+</table>
+
+<h2 id="methods">AutoComplete Methods</h2>
+<p>Each AutoComplete object has methods you can use to interact with the widget.</p>
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>Method</th>
+    <th>Args</th>
+    <th>Return Value</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code class="js plain">addList(listName, listObj)</code></td>
+    <td></td>
+    <td>
+      <p><code class="js keyword">true</code> if adding the list was successful</p>
+      <p><code class="js keyword">false</code> if the list was not added</p>
+    </td>
+    <td>
+      <p>Adds a new list or updates an existing list.</p>
+    </td>
+    <td>
+      <p><a href="#">addList Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">addOption(listName, optionObj)</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Add an option to a list.</p>
+    </td>
+    <td>
+      <p><a href="#">addOption Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">blur()</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Remove focus from the widget.</p>
+    </td>
+    <td>
+      <p><a href="#">Blur Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">clear()</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Clear the value of the widget.  Has the same effect as doing <code class="js plain">val([])</code></p>
+    </td>
+    <td>
+      <p><a href="#">Clear Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">config()</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p></p>
+    </td>
+    <td>
+      <p><a href="#">Clear Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">destroy()</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Remove the widget from the DOM.</p>
+    </td>
+    <td>
+      <p><a href="#">Destroy Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">focus()</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Puts the input focus on the widget.</p>
+    </td>
+    <td>
+      <p><a href="#">Focus Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">removeList(listName)</code></td>
+    <td></td>
+    <td></td>
+    <td>
+      <p>Remove a list.</p>
+    </td>
+    <td>
+      <p><a href="#">Clear Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">getValue()</code></td>
+    <td><small>n/a</small></td>
+    <td></td>
+    <td>
+      <p>Returns the current value of the widget.</p>
+    </td>
+    <td>
+      <p><a href="#">Get val Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">setTokens(tokens)</code></td>
+    <td>tokens - an array of TokenGroups</td>
+    <td>
+      <p>Set the value of the widget.</p>
+    </td>
+    <td></td>
+    <td>
+      <p><a href="#">setTokens Example</a></p>
+    </td>
+  </tr>
 </table>
 
 <?php
