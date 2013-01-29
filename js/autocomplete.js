@@ -112,6 +112,10 @@ var isObject = function(thing) {
   return (Object.prototype.toString.call(thing) === '[object Object]');
 };
 
+var deepCopy = function(thing) {
+  return JSON.parse(JSON.stringify(thing));
+};
+
 // copied from modernizr
 var hasLocalStorage = function() {
   var str = 'test';
@@ -121,7 +125,7 @@ var hasLocalStorage = function() {
     return true;
   } catch(e) {
     return false;
-  }  
+  }
 };
 LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
 
@@ -307,7 +311,7 @@ var expandListObject = function(list) {
   if (list.allowFreeform !== true) {
     list.allowFreeform = false;
   }
-  
+
   // default for cacheAjax is true
   if (typeof list.cacheAjax !== false) {
     list.cacheAjax = true;
@@ -371,7 +375,10 @@ var initConfig = function() {
     cfg.maxTokenGroups = parseInt(cfg.maxTokenGroups, 10);
   }
 
-  // TODO: they should be able to pass in onChange in the main config
+  // onChange must be a function
+  if (typeof cfg.onChange !== 'function') {
+    cfg.onChange = false;
+  }
 
   // default for showErrors is false
   if (cfg.showErrors !== 'console' && cfg.showErrors !== 'alert' &&
@@ -576,7 +583,6 @@ var destroyWidget = function() {
 
 var clearWidget = function() {
   setValue([]);
-  updateTokens();
 };
 
 // empty the input element, unhide it, put the focus on it
@@ -612,27 +618,27 @@ var hideDropdownEl = function() {
 
 // returns the current value of the widget
 var getValue = function() {
-  var value = [];
-  for (var i = 0; i < TOKENS.length; i++) {
-    value[i] = [];
-
-    for (var j = 0; j < TOKENS[i].length; j++) {
-      value[i].push(TOKENS[i][j].value);
-    }
-  }
-  return value;
+  return deepCopy(TOKENS);
 };
 
 // set the current value of the widget
-var setValue = function(tokens) {
+var setValue = function(newValue) {
   var oldValue = getValue();
-  TOKENS = tokens;
-  var newValue = getValue();
-  widget.onChange(oldValue, newValue);
 
+  if (typeof cfg.onChange === 'function') {
+    var potentialNewValue = cfg.onChange(newValue, oldValue);
+
+    // only update tokens if their onChange function returned a valid
+    // tokens array
+    if (validTokensArray(potentialNewValue) === true) {
+      newValue = potentialNewValue;
+    }
+  }
+
+  // update state
+  TOKENS = newValue;
   ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   CURRENT_LIST_NAME = cfg.initialList;
-
   updateTokens();
 };
 
@@ -712,13 +718,9 @@ var removeTokenGroup = function(tokenGroupIndex) {
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
-  // remove the token group
-  var oldValue = getValue();
-  TOKENS.splice(tokenGroupIndex, 1);
-  var newValue = getValue();
-  widget.onChange(oldValue, newValue);
-
-  updateTokens();
+  var newTokens = deepCopy(TOKENS);
+  newTokens.splice(tokenGroupIndex, 1);
+  setValue(newTokens);
 
   if (INPUT_HAPPENING === true) {
     stopInput();
@@ -787,17 +789,16 @@ var addHighlightedOption = function() {
   var option = VISIBLE_OPTIONS[optionId];
   var token = createTokenFromOption(option, list);
 
+  var newTokens = deepCopy(TOKENS);
   // start a new token group
-  var previousValue = getValue();
   if (ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
-    TOKENS.push([token]);
+    newTokens.push([token]);
   }
   // add the token to the last token group
   else {
-    TOKENS[TOKENS.length - 1].push(token);
+    newTokens[newTokens.length - 1].push(token);
   }
-  var newValue = getValue();
-  widget.onChange(previousValue, newValue);
+  setValue(newTokens);
 
   var childrenListName = getChildrenListName(option, list);
   // this option has children, move to the next list
@@ -979,7 +980,7 @@ var sendAjaxRequest = function(list, inputValue) {
   if (typeof list.url === 'function') {
     url = list.url(inputValue, getValue());
   }
-  
+
   // throw an error if url is not a string
   if (typeof url !== 'string') {
     error(8721, 'AJAX url must be a string.  Did your custom url function not return one?', url);
@@ -993,7 +994,7 @@ var sendAjaxRequest = function(list, inputValue) {
         && LOCAL_STORAGE_AVAILABLE === true) {
       localStorage.setItem(url, JSON.stringify(data));
     }
-    
+
     if (INPUT_HAPPENING !== true) return;
 
     // run their custom postProcess function
@@ -1039,7 +1040,7 @@ var sendAjaxRequest = function(list, inputValue) {
       dropdownEl.find('li.searching').replaceWith(buildAjaxError());
     }
   };
-  
+
   // check the cache
   if (list.cacheAjax === true &&
       LOCAL_STORAGE_AVAILABLE === true &&
@@ -1124,7 +1125,7 @@ var pressRegularKey = function() {
   // show the dropdown
   dropdownEl.html(html);
   highlightFirstOption();
-  
+
   // send the AJAX request
   // NOTE: we have to send the AJAX request after we've updated the DOM
   //       because of localStorage caching
@@ -1133,7 +1134,7 @@ var pressRegularKey = function() {
     if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
       JQUERY_AJAX_OBJECT.abort();
     }
-    sendAjaxRequest(list, inputValue);    
+    sendAjaxRequest(list, inputValue);
   }
 };
 
@@ -1409,15 +1410,6 @@ widget.val = function(newTokens) {
   error(9992, 'Wrong number of arguments passed to val method.');
   return false;
 };
-
-//----------------------------------------------------------
-// Events
-//----------------------------------------------------------
-
-// TODO: require them to assign event functions through the config
-//       and validate that they're adding a function?
-//       ie: widget.config('onChange', function() {});
-widget.onChange = function(oldValue, newValue) {};
 
 //----------------------------------------------------------
 // Initialization

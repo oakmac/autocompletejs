@@ -112,6 +112,20 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
+    <td><code class="js plain">onChange</code></td>
+    <td>Function</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>Function to execute when the value of the widget changes.</p>
+      <p>The first argument to the function is the new value of the widget, the second argument is the old value of the widget.</p>
+      <p>If this function returns a valid widget value, then it becomes the new value.  If not, the new value stays the same.</p>
+    </td>
+    <td>
+        <p><a href="#">onChange Example</a></p>
+    </td>
+  </tr>
+  <tr>
     <td>NOT IMPLEMENTED YET<br /><code class="js plain">clearBtnHTML</code></td>
     <td>String</td>
     <td>no</td>
@@ -470,21 +484,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
 </thead>
 <tbody>
   <tr>
-    <td><code class="js plain">addList(name, list)</code></td>
-    <td>
-      <p><code class="js plain">name</code> - name of the list to add or update</p>
-      <p><code class="js plain">list</code> - list object</p>
-    </td>
-    <td>
-      <p>Adds a new list or updates an existing list.</p>
-      <p>Returns <code class="js keyword">true</code> if adding the list was successful.</p>
-      <p>Returns <code class="js keyword">false</code> otherwise.</p>
-    </td>
-    <td>
-      <p><a href="#">addList Example</a></p>
-    </td>
-  </tr>
-  <tr>
     <td><code class="js plain">addOption(listName, option)</code></td>
     <td>
       <p><code class="js plain">listName</code> - name of the list to add the option to</p>
@@ -587,6 +586,31 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
+    <td><code class="js plain">list(name)</code></td>
+    <td>
+      <p><code class="js plain">name</code> - name of the list to get</p>
+    </td>
+    <td>
+      <p>Alias of <code class="js plain">getList(name)</code></p>
+    </td>
+    <td>
+      <p><a href="#">list Example 1</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">list(name, list)</code></td>
+    <td>
+      <p><code class="js plain">name</code> - name of the list to add or update</p>
+      <p><code class="js plain">list</code> - list object</p>
+    </td>
+    <td>
+      <p>Alias of <code class="js plain">setList(name, list)</code></p>
+    </td>
+    <td>
+      <p><a href="#">list Example 2</a></p>
+    </td>
+  </tr>
+  <tr>
     <td><code class="js plain">removeList(name)</code></td>
     <td>
       <p><code class="js plain">name</code> - name of the list to remove</p>
@@ -647,6 +671,21 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   -->
+  <tr>
+    <td><code class="js plain">setList(name, list)</code></td>
+    <td>
+      <p><code class="js plain">name</code> - name of the list to add or update</p>
+      <p><code class="js plain">list</code> - list object</p>
+    </td>
+    <td>
+      <p>Adds a new list or updates an existing list.</p>
+      <p>Returns <code class="js keyword">true</code> if adding the list was successful.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
+    </td>
+    <td>
+      <p><a href="#">setList Example</a></p>
+    </td>
+  </tr>
   <tr>
     <td><code class="js plain">setValue(tokens)</code></td>
     <td>
