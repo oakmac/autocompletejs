@@ -30,7 +30,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <td><code class="js keyword">false</code></td>
     <td>
       <p><code class="js plain">showErrors</code> is an optional parameter to control how AutoComplete reports errors.</p>
-      <p>Every error in AutoComplete has a unique code to help diagnose and search for problems.</p>
+      <p>Every error in AutoComplete has a unique code to help diagnose problems and search for answers.</p>
       <p>If <code class="js plain">showErrors</code> is <code class="js keyword">false</code> then errors will be ignored.</p>
       <p>If <code class="js plain">showErrors</code> is <code class="js string">'console'</code> then errors will be sent to <code class="js plain">console.log()</code>.</p>
       <p>If <code class="js plain">showErrors</code> is <code class="js string">'alert'</code> then errors will annoyingly be sent to <code class="js plain">window.alert()</code>.</p>
@@ -113,24 +113,35 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </tr>
   <tr>
     <td>NOT IMPLEMENTED YET<br /><code class="js plain">clearBtnHTML</code></td>
-    <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
+    <td>String</td>
     <td>no</td>
     <td><code class="js string">'foo'</code></td>
     <td>
-      <p>An HTML string to clear the contents of the search bar.</p>
-      <p>Set <code class="js plain">clearBtnHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
+      <p>An HTML string used for the clear button.</p>
     </td>
     <td>
       <p><a href="#">clearBtnHTML Example</a></p>
     </td>
   </tr>
   <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">showClearBtn</code></td>
+    <td>Boolean</td>
+    <td>no</td>
+    <td><code class="js keyword">true</code></td>
+    <td>
+      <p>Toggle to show the clear button in the search bar.</p>
+    </td>
+    <td>
+      <p><a href="#">showClearBtn Example</a></p>
+    </td>
+  </tr>
+  <tr>
     <td>NOT IMPLEMENTED YET<br /><code class="js plain">removeTokenGroupHTML</code></td>
-    <td>String<br /><small>or</small><br /><code class="js keyword">false</code></td>
+    <td>String</td>
     <td>no</td>
     <td><code class="js string">'foo'</code></td>
     <td>
-      <p>An HTML string to clear the contents of the search bar.</p>
+      <p>An HTML string used to clear a token group.</p>
       <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
@@ -453,32 +464,36 @@ TODO: "how it works" walk-through explanation of how the widget functions
   <tr>
     <th>Method</th>
     <th>Args</th>
-    <th>Return Value</th>
     <th>Description</th>
     <th>Example</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-    <td><code class="js plain">addList(listName, listObj)</code></td>
-    <td></td>
+    <td><code class="js plain">addList(name, list)</code></td>
     <td>
-      <p><code class="js keyword">true</code> if adding the list was successful</p>
-      <p><code class="js keyword">false</code> if the list was not added</p>
+      <p><code class="js plain">name</code> - name of the list to add or update</p>
+      <p><code class="js plain">list</code> - list object</p>
     </td>
     <td>
       <p>Adds a new list or updates an existing list.</p>
+      <p>Returns <code class="js keyword">true</code> if adding the list was successful.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
       <p><a href="#">addList Example</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">addOption(listName, optionObj)</code></td>
-    <td></td>
-    <td></td>
+    <td><code class="js plain">addOption(listName, option)</code></td>
+    <td>
+      <p><code class="js plain">listName</code> - name of the list to add the option to</p>
+      <p><code class="js plain">option</code> - option to add to the list</p>
+    </td>
     <td>
       <p>Add an option to a list.</p>
+      <p>Returns <code class="js keyword">true</code> if adding the option was successful.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
       <p><a href="#">addOption Example</a></p>
@@ -486,90 +501,185 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </tr>
   <tr>
     <td><code class="js plain">blur()</code></td>
-    <td></td>
-    <td></td>
+    <td><small>n/a</small></td>
     <td>
       <p>Remove focus from the widget.</p>
     </td>
     <td>
-      <p><a href="#">Blur Example</a></p>
+      <p><a href="#">blur Example</a></p>
     </td>
   </tr>
   <tr>
     <td><code class="js plain">clear()</code></td>
-    <td></td>
-    <td></td>
+    <td><small>n/a</small></td>
     <td>
-      <p>Clear the value of the widget.  Has the same effect as doing <code class="js plain">val([])</code></p>
+      <p>Clear the value of the widget.</p>
+      <p>Has the same effect as doing <code class="js plain">setValue([])</code></p>
     </td>
     <td>
-      <p><a href="#">Clear Example</a></p>
+      <p><a href="#">clear Example</a></p>
     </td>
   </tr>
+  <!--
   <tr>
     <td><code class="js plain">config()</code></td>
-    <td></td>
     <td></td>
     <td>
       <p></p>
     </td>
     <td>
-      <p><a href="#">Clear Example</a></p>
+      <p><a href="#">config() Example</a></p>
     </td>
   </tr>
+  -->
   <tr>
     <td><code class="js plain">destroy()</code></td>
-    <td></td>
-    <td></td>
+    <td><small>n/a</small></td>
     <td>
       <p>Remove the widget from the DOM.</p>
     </td>
     <td>
-      <p><a href="#">Destroy Example</a></p>
+      <p><a href="#">destroy Example</a></p>
     </td>
   </tr>
   <tr>
     <td><code class="js plain">focus()</code></td>
-    <td></td>
-    <td></td>
+    <td><small>n/a</small></td>
     <td>
       <p>Puts the input focus on the widget.</p>
     </td>
     <td>
-      <p><a href="#">Focus Example</a></p>
+      <p><a href="#">focus Example</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">removeList(listName)</code></td>
-    <td></td>
-    <td></td>
+    <td><code class="js plain">getList(name)</code></td>
     <td>
-      <p>Remove a list.</p>
+      <p><code class="js plain">name</code> - name of the list to get</p>
     </td>
     <td>
-      <p><a href="#">Clear Example</a></p>
+      <p>Returns the list object if it exists.</p>
+      <p>Returns <code class="js keyword">false</code> if the list does not exist.</p>
+    </td>
+    <td>
+      <p><a href="#">getList Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">getLists()</code></td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>Returns an object of all the lists.</p>
+    </td>
+    <td>
+      <p><a href="#">getLists Example</a></p>
     </td>
   </tr>
   <tr>
     <td><code class="js plain">getValue()</code></td>
     <td><small>n/a</small></td>
-    <td></td>
     <td>
       <p>Returns the current value of the widget.</p>
+      <p>Returns an empty array if the widget has no token groups.</p>
     </td>
     <td>
-      <p><a href="#">Get val Example</a></p>
+      <p><a href="#">getValue Example</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">setTokens(tokens)</code></td>
-    <td>tokens - an array of TokenGroups</td>
+    <td><code class="js plain">removeList(name)</code></td>
     <td>
-      <p>Set the value of the widget.</p>
+      <p><code class="js plain">name</code> - name of the list to remove</p>
     </td>
-    <td></td>
     <td>
-      <p><a href="#">setTokens Example</a></p>
+      <p>Returns <code class="js keyword">true</code> if the list was removed.</p>
+      <p>Returns <code class="js keyword">false</code> if not.</p>
+      <p>Note: you cannot remove the initialList.</p>
+    </td>
+    <td>
+      <p><a href="#">removeList Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">removeTokenGroup(index)</code></td>
+    <td>
+      <p><code class="js plain">index</code> - zero-based index of the token group to remove</p>
+    </td>
+    <td>
+      <p>Remove a token group by array index.</p>
+      <p>Returns <code class="js keyword">true</code> and updates the widget if the token was removed.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
+    </td>
+    <td>
+      <p><a href="#">removeTokenGroup Example</a></p>
+    </td>
+  </tr>
+  <!--
+  <tr>
+    <td><code class="js plain">setConfig(config)</code></td>
+    <td>
+      <p><code class="js plain">config</code> - config object</p>
+    </td>
+    <td>
+      <p>Set an individual config property.</p>
+      <p>Returns <code class="js keyword">true</code> if the property was updated.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
+    </td>
+    <td>
+      <p><a href="#">setValue Example</a></p>
+    </td>
+  </tr>
+  -->
+  <!--
+  <tr>
+    <td><code class="js plain">setConfig(property, value)</code></td>
+    <td>
+      <p><code class="js plain">property</code> - config property name</p>
+      <p><code class="js plain">value</code> - config value</p>
+    </td>
+    <td>
+      <p>Set an individual config property.</p>
+      <p>Returns <code class="js keyword">true</code> if the property was updated.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
+    </td>
+    <td>
+      <p><a href="#">setValue Example</a></p>
+    </td>
+  </tr>
+  -->
+  <tr>
+    <td><code class="js plain">setValue(tokens)</code></td>
+    <td>
+      <p><code class="js plain">tokens</code> - array of Token Objects</p>
+    </td>
+    <td>
+      <p>Returns <code class="js keyword">true</code> and updates the widget if <code class="js plain">tokens</code> is valid.</p>
+      <p>Returns <code class="js keyword">false</code> otherwise.</p>
+    </td>
+    <td>
+      <p><a href="#">setValue Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">val()</code></td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>Alias of <code class="js plain">getValue()</code></p>
+    </td>
+    <td>
+      <p><a href="#">val Example 1</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">val(tokens)</code></td>
+    <td>
+      <p><code class="js plain">tokens</code> - array of Token Objects</p>
+    </td>
+    <td>
+      <p>Alias of <code class="js plain">setValue(tokens)</code></p>
+    </td>
+    <td>
+      <p><a href="#">val Example 2</a></p>
     </td>
   </tr>
 </table>

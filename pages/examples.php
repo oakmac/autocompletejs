@@ -43,5 +43,12 @@ prettyPrint();
 }; // end init()
 $(document).ready(init);
 </script>
+<script>
+var examples = [
+
+
+
+];
+</script>
 </body>
 </html>
