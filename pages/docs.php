@@ -106,9 +106,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Set <code class="js plain">maxTokenGroups</code> to <code class="js keyword">false</code> to allow unlimited token groups.</p>
     </td>
     <td>
-        <p>How many examples do we really need here?</p>
-        <p><a href="example/maxtokengroups1">maxtokengroups1</a></p>
-        <p><a href="example/maxtokengroups2">maxtokengroups2</a></p>
+        <p><a href="example/maxtokengroups">maxTokenGroups Example</a></p>
     </td>
   </tr>
   <tr>
