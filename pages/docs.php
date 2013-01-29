@@ -122,7 +122,8 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>If this function returns a valid widget value, then it becomes the new value.  If not, the new value stays the same.</p>
     </td>
     <td>
-        <p><a href="#">onChange Example</a></p>
+        <p><a href="example/onchange_event1">onChange Example 1</a></p>
+        <p><a href="example/onchange_event2">onChange Example 2</a></p>
     </td>
   </tr>
   <tr>
