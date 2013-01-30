@@ -264,26 +264,26 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">filterOptions</code></td>
+    <td><code class="js plain">matchOptions</code></td>
     <td>Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">filterOptions</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
+      <p><code class="js plain">matchOptions</code> is an optional function you can include to determine which options get shown in the dropdown when the user is typing.</p>
       <p>The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an array of Option Objects.</p>
+      <p>You can return an array of <em>any</em> Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
       <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
-      <p>Note: You can return an array of any Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
     </td>
   </tr>
   <!--
   <tr>
-    <td><code class="js plain">filterOptionsProps</code></td>
+    <td><code class="js plain">matchOptionsProps</code></td>
     <td>String<br /></td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">filterOptionsProps</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
+      <p><code class="js plain">matchOptionsProps</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
       <p>The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.</p>
       <p>The function should return an array of Option Objects.</p>
       <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>

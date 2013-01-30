@@ -12,7 +12,7 @@
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
-// TODO: filterOptions should take a callback in the args
+// TODO: matchOptions should take a callback in the args
 // TODO: show an error when a value.children is not a valid list option
 
 
@@ -49,6 +49,13 @@ var KEYS = {
 
 // DOM elements
 var containerEl, dropdownEl, inputEl, tokensEl;
+
+// CSS classes
+var CLASSES = {
+  highlightedOption: 'highlighted',
+  selectedTokenGroup: 'selected',
+  tokenGroup: 'token-group'
+};
 
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
@@ -435,6 +442,8 @@ var initConfig = function() {
   // expand lists
   for (var i in cfg.lists) {
     if (cfg.lists.hasOwnProperty(i) !== true) continue;
+    // TODO: need to validate the list object here first
+    //       do not add it if it's invalid and throw an error
     cfg.lists[i] = expandListObject(cfg.lists[i]);
   }
 };
@@ -563,7 +572,8 @@ var buildTokens = function(tokens) {
   for (var i = 0; i < tokens.length; i++) {
     var tokenGroup = tokens[i];
 
-    html += '<div class="token-group" data-token-group-index="' + i + '">' +
+    html += '<div class="' + CLASSES.tokenGroup + '"' +
+    ' data-token-group-index="' + i + '">' +
     '<span class="remove-token-group">&times;</span>';
 
     for (var j = 0; j < tokenGroup.length; j++) {
@@ -733,20 +743,20 @@ var highlightFirstOption = function() {
 };
 
 var clearTokenGroupHighlight = function() {
-  tokensEl.find('div.token-group').removeClass('selected');
+  tokensEl.find('div.' + CLASSES.tokenGroup).removeClass(CLASSES.selectedTokenGroup);
 };
 
 var highlightLastTokenGroup = function() {
-  tokensEl.find('div.token-group').
-    removeClass('selected').
+  tokensEl.find('div.' + CLASSES.tokenGroup).
+    removeClass(CLASSES.selectedTokenGroup).
     filter(':last').
-    addClass('selected');
+    addClass(CLASSES.selectedTokenGroup);
 };
 
 // returns true if a tokenGroup is highlighted
 // false otherwise
 var isTokenGroupHighlighted = function() {
-  return (tokensEl.find('div.selected').length === 1);
+  return (tokensEl.find('div.' + CLASSES.selectedTokenGroup).length === 1);
 };
 
 var removeTokenGroup = function(tokenGroupIndex) {
@@ -773,8 +783,9 @@ var removeHighlightedTokenGroup = function() {
   // do nothing if there are no token groups highlighted
   if (isTokenGroupHighlighted() !== true) return;
 
-  var tokenGroupIndex = tokensEl.find('div.selected').attr('data-token-group-index');
-  tokenGroupIndex = parseInt(tokenGroupIndex, 10);
+  var tokenGroupIndex = parseInt(tokensEl
+    .find('div.' + CLASSES.selectedTokenGroup)
+    .attr('data-token-group-index'), 10);
 
   // make sure the token group index is valid
   if (validTokenGroupIndex(tokenGroupIndex) !== true) {
@@ -810,7 +821,7 @@ var getChildrenListName = function(option, parentList) {
 
 var addHighlightedOption = function() {
   // get the highlighted value
-  var highlightedEl = dropdownEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
 
   // do nothing if no entry is highlighted
   if (highlightedEl.length !== 1) return;
@@ -863,7 +874,7 @@ var updateTokens = function() {
   tokensEl.html(buildTokens(TOKENS));
 };
 
-var filterOptions = function(options, input) {
+var matchOptions = function(options, input) {
   input = input.toLowerCase();
 
   if (input === '') {
@@ -892,10 +903,10 @@ var filterOptions = function(options, input) {
 
 var highlightOption = function(optionEl) {
   // remove highlighted from all values in the list
-  dropdownEl.find('li.option').removeClass('highlighted');
+  dropdownEl.find('li.option').removeClass(CLASSES.highlightedOption);
 
   // add highlight class to the value clicked
-  $(optionEl).addClass('highlighted');
+  $(optionEl).addClass(CLASSES.highlightedOption);
 };
 
 //----------------------------------------------------------
@@ -904,36 +915,36 @@ var highlightOption = function(optionEl) {
 
 var pressUpArrow = function() {
   // get the highlighted element
-  var highlightedEl = dropdownEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
 
   // no row highlighted, highlight the last list element
   if (highlightedEl.length === 0) {
-    dropdownEl.find('li.option').last().addClass('highlighted');
+    dropdownEl.find('li.option').last().addClass(CLASSES.highlightedOption);
     return;
   }
 
   // remove the highlight from the current element
-  highlightedEl.removeClass('highlighted');
+  highlightedEl.removeClass(CLASSES.highlightedOption);
 
   // highlight the previous option
-  highlightedEl.prevAll('li.option').first().addClass('highlighted');
+  highlightedEl.prevAll('li.option').first().addClass(CLASSES.highlightedOption);
 };
 
 var pressDownArrow = function() {
   // get the highlighted element
-  var highlightedEl = dropdownEl.find('li.highlighted');
+  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
 
   // no row highlighted, highlight the first option
   if (highlightedEl.length === 0) {
-    dropdownEl.find('li.option').first().addClass('highlighted');
+    dropdownEl.find('li.option').first().addClass(CLASSES.highlightedOption);
     return;
   }
 
   // remove the highlight from the current element
-  highlightedEl.removeClass('highlighted');
+  highlightedEl.removeClass(CLASSES.highlightedOption);
 
   // highlight the next option
-  highlightedEl.nextAll('li.option').first().addClass('highlighted');
+  highlightedEl.nextAll('li.option').first().addClass(CLASSES.highlightedOption);
 };
 
 var pressEscapeKey = function() {
@@ -942,40 +953,40 @@ var pressEscapeKey = function() {
 };
 
 var moveTokenHighlightLeft = function() {
-  var selectedEl = tokensEl.find('div.selected');
+  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
   // NOTE: should never happen
   if (selectedEl.length !== 1) {
     return;
   }
 
-  var prev = selectedEl.prev('div.token-group');
-  selectedEl.removeClass('selected');
+  var prev = selectedEl.prev('div.' + CLASSES.tokenGroup);
+  selectedEl.removeClass(CLASSES.selectedTokenGroup);
   if (prev.length === 1) {
-    prev.addClass('selected');
+    prev.addClass(CLASSES.selectedTokenGroup);
   }
   else {
-    tokensEl.find('div.token-group').filter(':last')
-      .addClass('selected');
+    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':last')
+      .addClass(CLASSES.selectedTokenGroup);
   }
 };
 
 var moveTokenHighlightRight = function() {
-  var selectedEl = tokensEl.find('div.selected');
+  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
   // NOTE: should never happen
   if (selectedEl.length !== 1) {
     return;
   }
 
-  var next = selectedEl.next('div.token-group');
-  selectedEl.removeClass('selected');
+  var next = selectedEl.next('div.' + CLASSES.tokenGroup);
+  selectedEl.removeClass(CLASSES.selectedTokenGroup);
   if (next.length === 1) {
-    next.addClass('selected');
+    next.addClass(CLASSES.selectedTokenGroup);
   }
   else {
-    tokensEl.find('div.token-group').filter(':first')
-      .addClass('selected');
+    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':first')
+      .addClass(CLASSES.selectedTokenGroup);
   }
 };
 
@@ -999,7 +1010,7 @@ var isOptionShowing = function() {
 };
 
 var isOptionHighlighted = function() {
-  return (dropdownEl.find('li.highlighted').length !== 0);
+  return (dropdownEl.find('li.' + CLASSES.highlightedOption).length !== 0);
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
@@ -1114,12 +1125,12 @@ var pressRegularKey = function() {
   var options = [];
 
   // filter options with their custom function
-  if (typeof list.filterOptions === 'function') {
-    options = list.filterOptions(getValue(), list.options, inputValue);
+  if (typeof list.matchOptions === 'function') {
+    options = list.matchOptions(getValue(), list.options, inputValue);
   }
   // else default to mine
   else {
-    options = filterOptions(list.options, inputValue);
+    options = matchOptions(list.options, inputValue);
   }
 
   // cut options down to maxOptions
@@ -1270,7 +1281,7 @@ var clickTokenGroup = function(e) {
   clearTokenGroupHighlight();
 
   // highlight this token group
-  $(this).addClass('selected');
+  $(this).addClass(CLASSES.selectedTokenGroup);
 };
 
 // TODO this needs to be better; should run up the DOM from the e.target
@@ -1319,7 +1330,7 @@ var addEvents = function() {
   containerEl.on('keydown', 'input.autocomplete-input', keydownInputElement);
   containerEl.on('click', 'li.option', clickOption);
   containerEl.on('mouseover', 'li.option', mouseoverOption);
-  containerEl.on('click', 'div.token-group', clickTokenGroup);
+  containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
 
   // catch all clicks on the page
   $('html').on('click', clickPage);
