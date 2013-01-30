@@ -24,25 +24,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
 </thead>
 <tbody>
   <tr>
-    <td><code class="js plain">showErrors</code></td>
-    <td><code class="js keyword">false</code><br /><small>or</small><br />String<br /><small>or</small><br />Function</td>
-    <td>no</td>
-    <td><code class="js keyword">false</code></td>
-    <td>
-      <p><code class="js plain">showErrors</code> is an optional parameter to control how AutoComplete reports errors.</p>
-      <p>Every error in AutoComplete has a unique code to help diagnose problems and search for answers.</p>
-      <p>If <code class="js plain">showErrors</code> is <code class="js keyword">false</code> then errors will be ignored.</p>
-      <p>If <code class="js plain">showErrors</code> is <code class="js string">'console'</code> then errors will be sent to <code class="js plain">console.log()</code>.</p>
-      <p>If <code class="js plain">showErrors</code> is <code class="js string">'alert'</code> then errors will annoyingly be sent to <code class="js plain">window.alert()</code>.</p>
-      <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
-    </td>
-    <td>
-      <p><a href="#">showErrors console example</a></p>
-      <p><a href="#">showErrors alert example</a></p>
-      <p><a href="#">showErrors custom function example</a></p>
-    </td>
-  </tr>
-  <tr>
     <td><code class="js plain">initialList</code></td>
     <td>String</td>
     <td>yes</td>
@@ -58,31 +39,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">initialValue</code></td>
-    <td>Array of Token Groups</td>
-    <td>no</td>
-    <td><small>n/a</small></td>
-    <td>
-      <p>Set the initial value of the widget.</p>
-    </td>
-    <td>
-        <p><a href="example/initialvalue1">initialValue Example 1</a></p>
-        <p><a href="example/initialvalue2">initialValue Example 2</a></p>
-    </td>
-  </tr>
-  <tr>
-    <td>NOT IMPLEMENTED YET<br /><code class="js plain">placeholderHTML</code></td>
-    <td>String</td>
-    <td>no</td>
-    <td><small>n/a</small></td>
-    <td>
-      <p>placeholder text - how are we going to deal with placeholder behavior?</p>
-    </td>
-    <td>
-      <p><a href="#">Placeholder Example</a></p>
-    </td>
-  </tr>
-  <tr>
     <td><code class="js plain">lists</code></td>
     <td>Object of List Objects</td>
     <td>yes</td>
@@ -95,6 +51,31 @@ TODO: "how it works" walk-through explanation of how the widget functions
         <p><a href="example/basic_list">Basic List</a></p>
         <p><a href="example/nested_lists1">Nested Lists 1</a></p>
         <p><a href="example/nested_lists2">Nested Lists 2</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">clearBtnHTML</code></td>
+    <td>String</td>
+    <td>no</td>
+    <td><code class="js string">'foo'</code></td>
+    <td>
+      <p>An HTML string used for the clear button.</p>
+    </td>
+    <td>
+      <p><a href="#">clearBtnHTML Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">initialValue</code></td>
+    <td>Array of Token Groups</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>Set the initial value of the widget.</p>
+    </td>
+    <td>
+        <p><a href="example/initialvalue1">initialValue Example 1</a></p>
+        <p><a href="example/initialvalue2">initialValue Example 2</a></p>
     </td>
   </tr>
   <tr>
@@ -126,15 +107,28 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td>NOT IMPLEMENTED YET<br /><code class="js plain">clearBtnHTML</code></td>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">placeholderHTML</code></td>
+    <td>String</td>
+    <td>no</td>
+    <td><small>n/a</small></td>
+    <td>
+      <p>placeholder text - how are we going to deal with placeholder behavior?</p>
+    </td>
+    <td>
+      <p><a href="#">Placeholder Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">removeTokenGroupHTML</code></td>
     <td>String</td>
     <td>no</td>
     <td><code class="js string">'foo'</code></td>
     <td>
-      <p>An HTML string used for the clear button.</p>
+      <p>An HTML string used to clear a token group.</p>
+      <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
     </td>
     <td>
-      <p><a href="#">clearBtnHTML Example</a></p>
+      <p><a href="#">removeTokenGroupHTML Example</a></p>
     </td>
   </tr>
   <tr>
@@ -150,16 +144,22 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td>NOT IMPLEMENTED YET<br /><code class="js plain">removeTokenGroupHTML</code></td>
-    <td>String</td>
+    <td><code class="js plain">showErrors</code></td>
+    <td><code class="js keyword">false</code><br /><small>or</small><br />String<br /><small>or</small><br />Function</td>
     <td>no</td>
-    <td><code class="js string">'foo'</code></td>
+    <td><code class="js keyword">false</code></td>
     <td>
-      <p>An HTML string used to clear a token group.</p>
-      <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
+      <p><code class="js plain">showErrors</code> is an optional parameter to control how AutoComplete reports errors.</p>
+      <p>Every error in AutoComplete has a unique code to help diagnose problems and search for answers.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js keyword">false</code> then errors will be ignored.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js string">'console'</code> then errors will be sent to <code class="js plain">console.log()</code>.</p>
+      <p>If <code class="js plain">showErrors</code> is <code class="js string">'alert'</code> then errors will annoyingly be sent to <code class="js plain">window.alert()</code>.</p>
+      <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
     </td>
     <td>
-      <p><a href="#">removeTokenGroupHTML Example</a></p>
+      <p><a href="#">showErrors console example</a></p>
+      <p><a href="#">showErrors alert example</a></p>
+      <p><a href="#">showErrors custom function example</a></p>
     </td>
   </tr>
 </tbody>
@@ -631,7 +631,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
     <td>
       <p>Remove a token group by array index.</p>
-      <p>Returns <code class="js keyword">true</code> and updates the widget if the token was removed.</p>
+      <p>Returns the updated value of the widget if successful.</p>
       <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>

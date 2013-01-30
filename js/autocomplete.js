@@ -131,6 +131,11 @@ LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
 // Validation
 //----------------------------------------------------------
 
+// list name must be a non-empty string
+var validListName = function(name) {
+  return (typeof name === 'string' && name !== '');
+};
+
 var validTokenGroupIndex = function(index) {
   if (typeof index !== 'number') {
     return false;
@@ -621,10 +626,6 @@ var removeList = function(listName) {
 var destroyWidget = function() {
   containerEl.html('');
   // TODO: unbind event handlers on the container element?
-};
-
-var clearWidget = function() {
-  setValue([]);
 };
 
 // empty the input element, unhide it, put the focus on it
@@ -1332,30 +1333,30 @@ var addEvents = function() {
 // Public Methods
 //----------------------------------------------------------
 
-// returns true if adding the list was successful
-// false otherwise
-widget.addList = function(name, list) {
-  // name must be a string
-  if (typeof name !== 'string' || name === '') {
-    error(7283, 'The first argument to the addList method must be a non-empty string');
-    return false;
-  }
-
-  // list must be valid
-  if (validListObject(list) !== true) {
-    error(2732, 'The list object passed to addList method is not valid.', list);
-    return false;
-  }
-
-  // add the list
-  cfg.lists[name] = expandListObject(list);
-  return true;
-};
-
 // returns true if adding the option was successful
 // false otherwise
 widget.addOption = function(listName, option) {
-  // TODO: write me
+  // list name must be valid
+  if (validListName(listName) !== true) {
+    error(8366, 'The first argument to the addOption method must be a non-empty string.');
+    return false;
+  }
+
+  // list must exist
+  if (listExists(listName) !== true) {
+    error(5732, 'Error in addOption method. List "' + listName + '" does not exist.');
+    return false;
+  }
+
+  // option must be valid
+  if (validOption(option) !== true) {
+    error(7887, 'Invalid option passed to addOption method.', option);
+    return false;
+  }
+
+  // add the option
+  cfg.lists[listName].options.push(option);
+  return true;
 };
 
 widget.blur = function() {
@@ -1363,9 +1364,10 @@ widget.blur = function() {
 };
 
 widget.clear = function() {
-  clearWidget();
+  setValue([]);
 };
 
+/*
 widget.config = function(prop, value) {
   // TODO: write me
   // no args, return the current config
@@ -1374,6 +1376,7 @@ widget.config = function(prop, value) {
 
   // what's the difference between this function and reload?
 };
+*/
 
 widget.destroy = function() {
   destroyWidget();
@@ -1385,13 +1388,18 @@ widget.focus = function() {
 
 // return a list object
 // returns false if the list does not exist
-widget.getList = function(listName) {
-  if (listExists(listName) !== true) {
-    // NOTE: not throwing error here because it's sufficient to return false
-    //       if the list does not exist
-    //       Would it be better to throw an error?
+widget.getList = function(name) {
+  if (validListName(name) !== true) {
+    error(2789, 'The first argument to the getList method must be a non-empty string.');
     return false;
   }
+
+  // do not throw error if the list does not exist
+  // that's normal behavior for this function
+  if (listExists(listName) !== true) {
+    return false;
+  }
+
   return cfg.lists[listName];
 };
 
@@ -1405,8 +1413,47 @@ widget.getValue = function() {
   return getValue();
 };
 
+// shorthand for getList, setList
+widget.list = function(name, list) {
+  if (arguments.length === 0) {
+    return getList(name);
+  }
+
+  if (arguments.length === 1) {
+    return setList(name, list);
+  }
+
+  error(5938, 'Wrong number of arguments passed to list method.');
+  return false;
+};
+
+/*
 widget.reload = function(config) {
   // TODO: write me
+};
+*/
+
+widget.removeList = function(name) {
+  // name must be valid
+  if (validListName(name) !== true) {
+    error(2231, 'The first argument to the removeList method must be a non-empty string.');
+    return false;
+  }
+
+  // return false if the list does not exist
+  if (listExists(name) !== true) {
+    error(1328, 'Error in removeList method. List "' + name + '" does not exist.');
+    return false;
+  }
+
+  // they cannot remove the initialList
+  if (name === cfg.initialList) {
+    error(1424, 'Error in removeList method. You cannot remove the initialList "' + name + '"');
+    return false;
+  }
+
+  removeList(name);
+  return true;
 };
 
 // returns false if the token group index is invalid
@@ -1421,19 +1468,23 @@ widget.removeTokenGroup = function(tokenGroupIndex) {
   return getValue();
 };
 
-widget.removeList = function(listName) {
-  // return false if the list does not exist
-  if (listExists(listName) !== true) {
-    error(1328, 'Error in removeList method. List "' + listName + '" does not exist.');
+// returns true if updating the list was successful
+// false otherwise
+widget.setList = function(name, list) {
+  // name must be valid
+  if (validListName(name) !== true) {
+    error(7283, 'The first argument to the setList method must be a non-empty string.');
     return false;
   }
 
-  // they cannot remove the initialList
-  if (listName === cfg.initialList) {
-    error(1424, 'Error in removeList method. You cannot remove the initialList "' + listName + '"');
+  // list must be valid
+  if (validListObject(list) !== true) {
+    error(2732, 'The list object passed to setList method is not valid.', list);
     return false;
   }
-  removeList(listName);
+
+  // add the list
+  cfg.lists[name] = expandListObject(list);
   return true;
 };
 
