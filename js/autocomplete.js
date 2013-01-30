@@ -9,11 +9,12 @@
  * Date: 25 Jan 2013
  */
 
+
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
-// TODO: matchOptions should take a callback in the args
-// TODO: show an error when a value.children is not a valid list option
+// TODO: matchOptions should take a callback in the args - definitely!
+// TODO: allow children on the List Object to be a function
 
 
 ;(function() {
@@ -75,10 +76,22 @@ var widget = {};
 // Util Functions
 //----------------------------------------------------------
 // simple string replacement
-var tmpl = function(str, obj) {
+var tmpl = function(str, obj, htmlEscape) {
+  if (htmlEscape !== true) {
+    htmlEscape = false;
+  }
+
   for (var i in obj) {
-    if (obj.hasOwnProperty(i) !== true) continue;
-    str = str.replace(new RegExp('{' + i + '}', 'g'), obj[i]);
+    if (obj.hasOwnProperty(i) !== true ||
+        typeof obj[i] !== 'string') {
+      continue;
+    }
+    var value = obj[i];
+    if (htmlEscape === true) {
+      value = encode(value);
+    }
+
+    str = str.replace(new RegExp('{' + i + '}', 'g'), value);
   }
   return str;
 };
@@ -123,7 +136,7 @@ var deepCopy = function(thing) {
 
 // copied from modernizr
 var hasLocalStorage = function() {
-  var str = 'test';
+  var str = createId();
   try {
     localStorage.setItem(str, str);
     localStorage.removeItem(str);
@@ -223,11 +236,14 @@ var validOption = function(option) {
     return false;
   }
 
-  return false;
+  return true;
 };
 
 var validListObject = function(obj) {
+
   // TODO: write me
+  // TODO: show an error when a value.children is not a valid list option
+
   return true;
 };
 
@@ -310,13 +326,20 @@ var expandValue = function(value) {
 };
 
 // expand a single option object
-var expandOptionObject = function(option) {
+var expandOptionObject = function(option, parentList) {
   // string becomes the value
   if (typeof option === 'string') {
     option = {
+      optionHTML: encode(option),
+      tokenHTML: encode(option),
       value: option
     };
+    return option;
   }
+
+  // build optionHTML and tokenHTML
+  option.optionHTML = buildOptionHTML(option, parentList);
+  option.tokenHTML = buildTokenHTML(option, parentList);
 
   return option;
 };
@@ -357,6 +380,7 @@ var expandListObject = function(list) {
     list.cacheAjax = true;
   }
 
+  /*
   // default for maxOptions is false
   if (typeof list.maxOptions !== 'number' || list.maxOptions < 1) {
     list.maxOptions = false;
@@ -364,6 +388,7 @@ var expandListObject = function(list) {
   if (typeof list.maxOptions === 'number') {
     list.maxOptions = parseInt(list.maxOptions, 10);
   }
+  */
 
   // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
@@ -382,7 +407,7 @@ var expandListObject = function(list) {
 
   // expand options
   for (var i = 0; i < list.options.length; i++) {
-    list.options[i] = expandOptionObject(list.options[i]);
+    list.options[i] = expandOptionObject(list.options[i], list);
   }
 
   return list;
@@ -464,15 +489,15 @@ var buildWidget = function() {
   return html;
 };
 
-// TODO: need to add a check here that the return value of optionHTML()
-//       and tokenHTML are strings
+// TODO: throw error if their optionHTML function did not return a string
+// TODO: need to revisit this; was very distracted when I last re-factored it
 var buildOptionHTML = function(option, parentList) {
   if (typeof option.optionHTML === 'string') {
     return option.optionHTML;
   }
 
-  if (typeof option.optionHTML === 'function') {
-    return option.optionHTML(option);
+  if (typeof parentList.optionHTML === 'string') {
+    return tmpl(parentList.optionHTML, option.value, true);
   }
 
   if (typeof parentList.optionHTML === 'function') {
@@ -500,7 +525,7 @@ var buildOption = function(option, parentList) {
 
   var html = '<li class="option" ' +
   'data-option-id="' + encode(optionId) + '">' +
-  buildOptionHTML(option, parentList);
+  option.optionHTML;
 
   if (typeof childrenListName === 'string') {
     html += '<span class="children-indicator">&rarr;</span>';
@@ -522,6 +547,7 @@ var buildOptions = function(options, parentList, appendVisibleOptions) {
   var i;
 
   // sort the groups
+  // TODO: need to document this
   if (typeof parentList.groupSort === 'function') {
     groups.sort(parentList.groupSort);
   }
@@ -555,8 +581,8 @@ var buildTokenHTML = function(option, parentList) {
     return option.tokenHTML;
   }
 
-  if (typeof option.tokenHTML === 'function') {
-    return option.tokenHTML(option);
+  if (typeof parentList.tokenHTML === 'string') {
+    return tmpl(parentList.tokenHTML, option.value, true);
   }
 
   if (typeof parentList.tokenHTML === 'function') {
@@ -796,12 +822,11 @@ var removeHighlightedTokenGroup = function() {
   removeTokenGroup(tokenGroupIndex);
 };
 
-var createTokenFromOption = function(option, parentList) {
-  var token = {
-    tokenHTML: buildTokenHTML(option, parentList),
+var createTokenFromOption = function(option) {
+  return {
+    tokenHTML: option.tokenHTML,
     value: option.value
   };
-  return token;
 };
 
 // returns false if the option has no children
@@ -840,7 +865,7 @@ var addHighlightedOption = function() {
   // get the list, option, and create the token
   var list = cfg.lists[CURRENT_LIST_NAME];
   var option = VISIBLE_OPTIONS[optionId];
-  var token = createTokenFromOption(option, list);
+  var token = createTokenFromOption(option);
 
   var newTokens = deepCopy(TOKENS);
   // start a new token group
@@ -874,7 +899,7 @@ var updateTokens = function() {
   tokensEl.html(buildTokens(TOKENS));
 };
 
-var matchOptions = function(options, input) {
+var matchOptions = function(input, options) {
   input = input.toLowerCase();
 
   if (input === '') {
@@ -1062,7 +1087,7 @@ var sendAjaxRequest = function(list, inputValue) {
         // skip any objects that are not valid Options
         if (validOption(data[i]) !== true) continue;
 
-        options.push(expandOptionObject(data[i]));
+        options.push(expandOptionObject(data[i], list));
       }
     }
 
@@ -1124,15 +1149,16 @@ var pressRegularKey = function() {
   var list = cfg.lists[CURRENT_LIST_NAME];
   var options = [];
 
-  // filter options with their custom function
+  // match options with their custom function
   if (typeof list.matchOptions === 'function') {
-    options = list.matchOptions(getValue(), list.options, inputValue);
+    options = list.matchOptions(inputValue, list.options, getValue());
   }
   // else default to mine
   else {
-    options = matchOptions(list.options, inputValue);
+    options = matchOptions(inputValue, list.options);
   }
 
+  /*
   // cut options down to maxOptions
   if (typeof list.maxOptions === 'number' &&
       options.length > list.maxOptions) {
@@ -1142,11 +1168,12 @@ var pressRegularKey = function() {
     }
     options = options2;
   }
+  */
 
   // add freeform as an option if that's allowed
   if (options.length === 0 && inputValue !== '' &&
       list.allowFreeform === true) {
-    options.push(expandOptionObject(inputValue));
+    options.push(expandOptionObject(inputValue, list));
   }
 
   // no input, no options, no freeform, and no ajax
@@ -1183,7 +1210,7 @@ var pressRegularKey = function() {
   // NOTE: we have to send the AJAX request after we've updated the DOM
   //       because of localStorage caching
   if (list.ajaxEnabled === true) {
-    // cancel an existing AJAX request
+    // cancel any existing AJAX request
     if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
       JQUERY_AJAX_OBJECT.abort();
     }

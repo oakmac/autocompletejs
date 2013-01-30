@@ -230,7 +230,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
     </td>
     <td>
-
+      <p><a href="#">allowFreeform Example</a></p>
     </td>
   </tr>
   <tr>
@@ -245,7 +245,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>If you need to support browsers that do not have localStorage I recommend using a <a href="https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage">polyfill</a>.</p>
     </td>
     <td>
-
+      <p><a href="#">cacheAjax Example</a></p>
     </td>
   </tr>
   <tr>
@@ -260,7 +260,22 @@ TODO: "how it works" walk-through explanation of how the widget functions
          See the <code class="js plain">children</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
     </td>
     <td>
-
+      <p><a href="#">children Example</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td><code class="js plain">highlightMatches</code></td>
+    <td>Boolean</td>
+    <td>no</td>
+    <td><code class="js keyword">true</code></td>
+    <td>
+      <p>If <code class="js keyword">true</code>, will highlight letter matches between what the user has typed and which options have matched.</p>
+      <p>This option programmatically changes the <code class="js plain">optionHTML</code> value by adding <code class="js plain">&lt;strong&gt;</code> tags around matching characters.
+         It tries to not replace letters that are inside HTML tags, but if you have complicated HTML markup in your <code class="js plain">optionHTML</code> it may break.</p>
+      <p><code class="js plain">highlightMatches</code> gets ignored if you provide a custom <code class="js plain">matchOptions</code> function.</p>
+    </td>
+    <td>
+      <p><a href="#">highlightMatches Example</a></p>
     </td>
   </tr>
   <tr>
@@ -275,22 +290,28 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>You can return an array of <em>any</em> Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
       <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
     </td>
+    <td>
+      <p><a href="#">matchOptions Example 1</a></p>
+      <p><a href="#">matchOptions Example 2</a></p>
+    </td>
   </tr>
-  <!--
   <tr>
-    <td><code class="js plain">matchOptionsProps</code></td>
-    <td>String<br /></td>
+    <td><code class="js plain">matchProperties</code></td>
+    <td>Array of value properties</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">matchOptionsProps</code> is an optional function you can use to filter what options get shown in the dropdown.</p>
-      <p>The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.</p>
-      <p>The function should return an array of Option Objects.</p>
-      <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
-      <p>Note: You can return an array of any Option Objects from this function.  They do not have to come from the existing Option Objects in the list.</p>
+      <p><code class="js plain">matchProperties</code> is an array of <code class="js plain">value</code> properties to try and match against as the user types.</p>
+      <p>The order of the array will be the same order the options are matched against.</p>
+      <p>If your option value is a string, <code class="js plain">matchProperties</code> will be ignored and the match function will try to match against the string.</p>
+      <p><code class="js plain">matchProperties</code> gets ignored if you provide a custom <code class="js plain">matchOptions</code> function.</p>
+    </td>
+    <td>
+      <p><a href="#">matchProperties Example 1</a></p>
+      <p><a href="#">matchProperties Example 2</a></p>
     </td>
   </tr>
-  -->
+  <!--
   <tr>
     <td>NOT IMPLEMENTED YET<br />DO SCROLLABLE = TRUE/FALSE INSTEAD<code class="js plain">maxOptions</code></td>
     <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
@@ -302,6 +323,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Set <code class="js plain">maxOptions</code> to <code class="js keyword">false</code> to show all options available.</p>
     </td>
   </tr>
+  -->
   <tr>
     <td><code class="js plain">noResultsHTML</code></td>
     <td>String<br /><small>or</small><br />Function</td>
@@ -315,24 +337,23 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">optionHTML</code></td>
-    <td>Function</td>
+    <td>FINISH DOCUMENTING ME<br /><code class="js plain">optionHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">optionHTML</code> is an optional function used to build the option HTML in the dropdown for every option in the list.</p>
-      <p>The first argument to the function is the option itself.</p>
+      <p>If <code class="js plain">optionHTML</code> is a string, strings inside curly braces will be replaced with HTML-escaped option values.</p>
+      <p>If <code class="js plain">optionHTML</code> is a function the first argument is the option.</p>
       <p>The function should return an HTML string.</p>
-      <p>Note: If there is a <code class="js plain">optionHTML</code> property on the Option Object selected it will supersede this <code class="js plain">optionHTML</code> property.
-         See the <code class="js plain">optionHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
+      <p>If there is an <code class="js plain">optionHTML</code> property on the Option Object it will supersede this <code class="js plain">optionHTML</code> property.</p>
     </td>
     <td>
-      <p><a href="example/list_optionhtml1">list_optionhtml1</a></p>
+      <p><a href="example/list_optionhtml1">optionHTML Example</a></p>
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">tokenHTML</code></td>
-    <td>Function</td>
+    <td>FINISH DOCUMENTING ME<br /><code class="js plain">tokenHTML</code></td>
+    <td>String<br /><small>or</small><br />Function</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
@@ -433,29 +454,24 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </tr>
   <tr>
     <td><code class="js plain">optionHTML</code></td>
-    <td>String<br /><small>or</small><br />Function</td>
+    <td>String</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
       <p>An HTML string to show inside the dropdown.</p>
-      <p>If there is no <code class="js plain">optionHTML</code> property and <code class="js plain">value</code> is a string, then <code class="js plain">optionHTML</code> gets an HTML-escaped <code class="js plain">value</code>.</p>
-      <p>If <code class="js plain">value</code> is not a string, you must include an <code class="js plain">optionHTML</code> property.</p>
-      <p>If <code class="js plain">optionHTML</code> is a function, the first argument is the option itself.</p>
-      <p>The function should return an HTML string.</p>
-      <p>Note: This <code class="js plain">optionHTML</code> property will supersede an <code class="js plain">optionHTML</code> property on the parent List Object.</p>
+      <p>This <code class="js plain">optionHTML</code> property will supersede an <code class="js plain">optionHTML</code> function on the parent list.</p>
+      <p>If there is no <code class="js plain">optionHTML</code> on the option and there is no <code class="js plain">optionHTML</code> on the parent list and <code class="js plain">value</code> is a string, then <code class="js plain">optionHTML</code> gets an HTML-escaped <code class="js plain">value</code>.</p>
     </td>
   </tr>
   <tr>
     <td><code class="js plain">tokenHTML</code></td>
-    <td>String<br /><small>or</small><br />Function</td>
+    <td>String</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
       <p>An HTML string to show inside the search bar.</p>
-      <p>If <code class="js plain">tokenHTML</code> is a function, the first argument is the option itself.</p>
-      <p>The function should return an HTML string.</p>
-      <p>If there is no <code class="js plain">tokenHTML</code> property it uses <code class="js plain">optionHTML</code>.</p>
-      <p>Note: This <code class="js plain">tokenHTML</code> property will supersede a <code class="js plain">tokenHTML</code> property on the parent List Object.</p>
+      <p>This <code class="js plain">tokenHTML</code> property will supersede a <code class="js plain">tokenHTML</code> property on the parent list.</p>
+      <p>If there is no <code class="js plain">tokenHTML</code> on the option and there is no <code class="js plain">tokenHTML</code> on the parent <code class="js plain">tokenHTML</code> gets the value of <code class="js plain">optionHTML</code>.</p>
     </td>
   </tr>
   <tr>
