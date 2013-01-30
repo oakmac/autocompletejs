@@ -326,7 +326,6 @@ var expandListObject = function(list) {
   // a string is shorthand for the AJAX url
   if (typeof list === 'string') {
     list = {
-      ajaxEnabled: true,
       url: list
     };
   }
@@ -359,7 +358,7 @@ var expandListObject = function(list) {
     list.maxOptions = parseInt(list.maxOptions, 10);
   }
 
-  // noResults default
+  // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
     list.noResultsHTML = 'No results found.';
   }
