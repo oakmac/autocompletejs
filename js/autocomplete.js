@@ -13,10 +13,8 @@
 // TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
 //       in their buildHTML functions
 // TODO: filterOptions should take a callback in the args
+// TODO: show an error when a value.children is not a valid list option
 
-// Events:
-// > preChange
-// > postChange
 
 ;(function() {
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
@@ -130,7 +128,7 @@ var hasLocalStorage = function() {
 LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
 
 //----------------------------------------------------------
-// Sanity Checks
+// Validation
 //----------------------------------------------------------
 
 var validTokenGroupIndex = function(index) {
@@ -152,6 +150,11 @@ var validToken = function(token) {
     return true;
   }
 
+  // else it must be an object
+  if (isObject(token) !== true) {
+    return false;
+  }
+
   // else must be an object with .value and .tokenHTML
   // and .tokenHTML must be a string
   if (isObject(token) !== true ||
@@ -164,24 +167,35 @@ var validToken = function(token) {
   return true;
 };
 
-var validTokensArray = function(newTokens) {
-  // must be an array
-  if (isArray(newTokens) !== true) {
+var validTokenGroup = function(tokenGroup) {
+  if (isArray(tokenGroup) !== true) {
     return false;
   }
 
-  // must be an array of tokenGroups
-  for (var i = 0; i < newTokens.length; i++) {
-    if (isArray(newTokens[i]) !== true) {
+  // token group must have at least one item in it
+  if (tokenGroup.length === 0) {
+    return false;
+  }
+
+  for (var i = 0; i < tokenGroup.length; i++) {
+    if (validToken(tokenGroup[i]) !== true) {
       return false;
-    }
-    for (var j = 0; j < newTokens[i].length; j++) {
-      if (validToken(newTokens[i][j]) !== true) {
-        return false;
-      }
     }
   }
 
+  return true;
+};
+
+var validValue = function(value) {
+  if (isArray(value) !== true) {
+    return false;
+  }
+
+  for (var i = 0; i < value.length; i++) {
+    if (validTokenGroup(value[i]) !== true) {
+      return false;
+    }
+  }
   return true;
 };
 
@@ -242,8 +256,7 @@ var checkDeps = function() {
   return true;
 };
 
-// NOTE: all of the errors have unique codes so that people who search
-//       for them can find them easily :)
+// basic checks before we load the config or show anything on screen
 var sanityChecks = function() {
   // container ID must be a string
   if (typeof containerElId !== 'string' || containerElId === '') {
@@ -257,16 +270,32 @@ var sanityChecks = function() {
     return false;
   }
 
-  // TODO: make sure cfg are formatted correctly
-  // TODO: allow them to set the initial value of the widget (tokens object)
-  // TODO: show an error when a value.children is not a valid list option
-
   return true;
 };
 
 //----------------------------------------------------------
 // Expand Shorthand / Set Default Options
 //----------------------------------------------------------
+
+var expandTokenObject = function(token) {
+  if (typeof token === 'string') {
+    token = {
+      tokenHTML: encode(token),
+      value: token
+    };
+  }
+
+  return token;
+};
+
+var expandValue = function(value) {
+  for (var i = 0; i < value.length; i++) {
+    for (var j = 0; j < value[i].length; j++) {
+      value[i][j] = expandTokenObject(value[i][j]);
+    }
+  }
+  return value;
+};
 
 // expand a single option object
 var expandOptionObject = function(option) {
@@ -378,6 +407,19 @@ var initConfig = function() {
   // onChange must be a function
   if (typeof cfg.onChange !== 'function') {
     cfg.onChange = false;
+  }
+
+  // set an initiaValue
+  if (cfg.hasOwnProperty('initialValue') === true) {
+    // check that the initialValue is valid
+    if (validValue(cfg.initialValue) === true) {
+      // TODO: is deepCopy necessary here?
+      TOKENS = deepCopy(expandValue(cfg.initialValue));
+    }
+    // else show an error
+    else {
+      error(6447, 'Invalid value passed to initialValue', cfg.initialValue);
+    }
   }
 
   // default for showErrors is false
@@ -628,9 +670,8 @@ var setValue = function(newValue) {
   if (typeof cfg.onChange === 'function') {
     var potentialNewValue = cfg.onChange(newValue, oldValue);
 
-    // only update tokens if their onChange function returned a valid
-    // tokens array
-    if (validTokensArray(potentialNewValue) === true) {
+    // only change the value if their onChange function returned a valid value
+    if (validValue(potentialNewValue) === true) {
       newValue = potentialNewValue;
     }
   }
@@ -780,6 +821,7 @@ var addHighlightedOption = function() {
   // close input if we did not find the object
   // NOTE: this should never happen, but it's here for a safeguard
   if (! VISIBLE_OPTIONS[optionId]) {
+    // TODO: throw error
     stopInput();
     return;
   }
@@ -1358,6 +1400,11 @@ widget.getLists = function() {
   return cfg.lists;
 };
 
+// get the value
+widget.getValue = function() {
+  return getValue();
+};
+
 widget.reload = function(config) {
   // TODO: write me
 };
@@ -1390,21 +1437,22 @@ widget.removeList = function(listName) {
   return true;
 };
 
-widget.val = function(newTokens) {
-  // return the current value
+widget.setValue = function(value) {
+  if (validValue(value) !== true) {
+    error(6823, 'Invalid value passed to setValue method.', value);
+    return false;
+  }
+  setValue(value);
+  return true;
+};
+
+widget.val = function(value) {
   if (arguments.length === 0) {
     return getValue();
   }
 
   if (arguments.length === 1) {
-    if (validTokensArray(newTokens) !== true) {
-      error(6823, 'Invalid tokens array passed to val method.', newTokens);
-      return false;
-    }
-
-    // update the tokens
-    setValue(newTokens);
-    return true;
+    return setValue(value);
   }
 
   error(9992, 'Wrong number of arguments passed to val method.');
@@ -1429,10 +1477,12 @@ var initDom = function() {
 };
 
 var init = function() {
+  // TODO: check Deps here
   if (sanityChecks() !== true) return;
   initConfig();
   initDom();
   addEvents();
+  updateTokens();
 };
 init();
 

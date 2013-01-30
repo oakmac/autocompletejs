@@ -58,15 +58,16 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td>NOT IMPLEMENTED YET<br /><code class="js plain">initialValue</code></td>
-    <td></td>
+    <td><code class="js plain">initialValue</code></td>
+    <td>Array of Token Groups</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p>set the initial value of the widget</p>
+      <p>Set the initial value of the widget.</p>
     </td>
     <td>
-        <p><a href="#">initialValue example</a></p>
+        <p><a href="example/initialvalue1">initialValue Example 1</a></p>
+        <p><a href="example/initialvalue2">initialValue Example 2</a></p>
     </td>
   </tr>
   <tr>
