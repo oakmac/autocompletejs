@@ -10,9 +10,7 @@ var initialUsers = [
 ];
 
 var usersList = {
-  optionHTML: function(option) {
-    return option.value.name;
-  },
+  optionHTML: '{name}',
   options: [
     {
       value: { id: 28292, name: 'Grace Gardner', role: 'admin' }

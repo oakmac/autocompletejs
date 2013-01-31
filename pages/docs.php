@@ -272,7 +272,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>If <code class="js keyword">true</code>, will highlight letter matches between what the user has typed and which options have matched.</p>
       <p>This option programmatically changes the <code class="js plain">optionHTML</code> value by adding <code class="js plain">&lt;strong&gt;</code> tags around matching characters.
          It tries to not replace letters that are inside HTML tags, but if you have complicated HTML markup in your <code class="js plain">optionHTML</code> it may break.</p>
-      <p><code class="js plain">highlightMatches</code> gets ignored if you provide a custom <code class="js plain">matchOptions</code> function.</p>
     </td>
     <td>
       <p><a href="#">highlightMatches Example</a></p>

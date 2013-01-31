@@ -51,7 +51,7 @@ var KEYS = {
 // DOM elements
 var containerEl, dropdownEl, inputEl, tokensEl;
 
-// CSS classes
+// CSS class names
 var CLASSES = {
   highlightedOption: 'highlighted',
   selectedTokenGroup: 'selected',
@@ -60,8 +60,8 @@ var CLASSES = {
 
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-var AJAX_BUFFER_LENGTH = 20;
-var AJAX_BUFFER_TIMEOUT;
+//var AJAX_BUFFER_LENGTH = 20;
+//var AJAX_BUFFER_TIMEOUT;
 var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
@@ -75,6 +75,7 @@ var widget = {};
 //----------------------------------------------------------
 // Util Functions
 //----------------------------------------------------------
+
 // simple string replacement
 var tmpl = function(str, obj, htmlEscape) {
   if (htmlEscape !== true) {
@@ -82,8 +83,9 @@ var tmpl = function(str, obj, htmlEscape) {
   }
 
   for (var i in obj) {
-    if (obj.hasOwnProperty(i) !== true ||
-        typeof obj[i] !== 'string') {
+    // TODO: what to do about things that are not strings here?
+    //       like numbers?
+    if (obj.hasOwnProperty(i) !== true || typeof obj[i] !== 'string') {
       continue;
     }
     var value = obj[i];
@@ -253,13 +255,13 @@ var error = function(code, msg, obj) {
     return;
   }
 
-  // NOTE: should we check that window.console.log is defined on
-  //       initial config?
+  // TODO: we should check that console.log is defined if they set showErrors to "console"
+  //       do this check on the config init though
 
   var errorText = 'AutoComplete Error ' + code + ': ' + msg;
   if (cfg.showErrors === 'console') {
     console.log(errorText);
-    if (obj) {
+    if (arguments.length >= 2) {
       console.log(obj);
     }
     return;
@@ -278,25 +280,27 @@ var error = function(code, msg, obj) {
   }
 };
 
-var checkDeps = function() {
-  // TODO: make sure jQuery is defined
-  // TODO: make sure JSON is defined
-  return true;
-};
-
 // basic checks before we load the config or show anything on screen
+// NOTE: these are just being alerted and not going through the normal
+//       error process because they happen before any config is loaded
 var sanityChecks = function() {
   // container ID must be a string
   if (typeof containerElId !== 'string' || containerElId === '') {
-    error(1001, 'Container element id must be a non-empty string.');
+    window.alert('AutoComplete Error 1001: The first argument to AutoComplete() must be a non-empty string.\n\nExiting...');
     return false;
   }
 
   // make sure the container element exists in the DOM
   if (! document.getElementById(containerElId)) {
-    error(1002, 'Element with id "' + containerElId + '" does not exist in DOM.');
+    window.alert('AutoComplete Error 1002: Element with id "' + containerElId + '" does not exist in the DOM.\n\nExiting...');
     return false;
   }
+  
+ 
+  
+  // TODO: check that jQuery exists
+  
+  // TODO: check that JSON exists
 
   return true;
 };
@@ -389,6 +393,11 @@ var expandListObject = function(list) {
     list.maxOptions = parseInt(list.maxOptions, 10);
   }
   */
+  
+  // default for highlightMatches is true
+  if (list.highlightMatches !== false) {
+    list.highlightMatches = true;
+  }
 
   // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
@@ -413,7 +422,7 @@ var expandListObject = function(list) {
   return list;
 };
 
-var initConfig = function() {
+var expandConfig = function() {
   // if cfg is an array or a string, then it is a single list object
   if (isArray(cfg) === true || typeof cfg === 'string') {
     cfg = {
@@ -496,7 +505,8 @@ var buildOptionHTML = function(option, parentList) {
     return option.optionHTML;
   }
 
-  if (typeof parentList.optionHTML === 'string') {
+  if (typeof parentList.optionHTML === 'string' &&
+      isObject(option.value) === true) {
     return tmpl(parentList.optionHTML, option.value, true);
   }
 
@@ -581,7 +591,8 @@ var buildTokenHTML = function(option, parentList) {
     return option.tokenHTML;
   }
 
-  if (typeof parentList.tokenHTML === 'string') {
+  if (typeof parentList.tokenHTML === 'string' &&
+      isObject(option.value) === true) {
     return tmpl(parentList.tokenHTML, option.value, true);
   }
 
@@ -592,6 +603,10 @@ var buildTokenHTML = function(option, parentList) {
   // default to optionHTML
   return buildOptionHTML(option, parentList);
 };
+
+
+// TODO: add click event handler on .remove-token-group
+
 
 var buildTokens = function(tokens) {
   var html = '';
@@ -899,31 +914,127 @@ var updateTokens = function() {
   tokensEl.html(buildTokens(TOKENS));
 };
 
-var matchOptions = function(input, options) {
-  input = input.toLowerCase();
-
-  if (input === '') {
-    return options;
+// TODO: this function needs to be improved
+//       check out the regex code from tokeninput
+var highlightMatchChars = function(optionHTML, input) {
+  if (optionHTML.indexOf('<') !== -1 ||
+      optionHTML.indexOf('>') !== -1) {
+    return optionHTML;
   }
 
+  var inputChars = input.split('');
+  var optionChars = optionHTML.split('');
+  for (var i = 0; i < optionChars.length; i++) {
+    for (var j = 0; j < inputChars.length; j++) {
+      if (inputChars[j] === ' ') continue;
+      if (inputChars[j].search(/[^a-zA-Z]/) !== -1) continue;
+      
+      var upper = inputChars[j].toUpperCase();
+      var lower = inputChars[j].toLowerCase();
+      
+      if (optionChars[i] === upper || optionChars[i] === lower) {
+        optionChars[i] = '<strong>' + optionChars[i] + '</strong>';
+      }
+    }
+  }
+  
+  return optionChars.join('');
+};
+
+// does input match the beginning of str?
+var isFrontMatch = function(input, str) {
+  return input === str.toLowerCase().substring(0, input.length);
+};
+
+// does str contain all of the characters found in input?
+var isCharMatch = function(input, str) {
+  var chars = input.split('');
+  str = str.toLowerCase();
+  for (var i = 0; i < chars.length; i++) {
+    // we don't care about spaces
+    if (chars[i] === ' ') continue;
+    
+    if (str.indexOf(chars[i]) === -1) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// TODO: this is an exceedingly ugly function that needs to be refactored
+var matchOptions = function(input, list) {
+  input = input.toLowerCase();
+
+  // return all the options with no user input
+  if (input === '') {
+    return list.options;
+  }
+
+  var options = deepCopy(list.options);
   var options2 = [];
-  for (var i = 0; i < options.length; i++) {
-    // try to match the optionHTML
-    if (typeof options[i].optionHTML === 'string') {
-      if (input === options[i].optionHTML.toLowerCase().substring(0, input.length)) {
+  
+  // do they have a list of properties to match against?
+  if (isArray(list.matchProperties) === true) {
+    
+  }
+  // else try to match against the value or optionHTML
+  else {
+    var i, matchValue;
+    
+    // front match
+    for (i = 0; i < options.length; i++) {
+      // if value is a string, try to match against it
+      // else use optionHTML
+      matchValue = options[i].optionHTML;
+      if (typeof options[i].value === 'string') {
+        matchValue = options[i].value;
+      }
+      
+      if (isFrontMatch(input, matchValue) === true) { 
         options2.push(options[i]);
+        // remove this option for the next search
+        options[i] = false;
+      }
+    }
+    
+    // character match
+    for (i = 0; i < options.length; i++) {
+      // ignore any options we've already matched
+      if (options[i] === false) continue;
+      
+      matchValue = options[i].optionHTML;
+      if (typeof options[i].value === 'string') {
+        matchValue = options[i].value;
+      }
+      
+      if (isCharMatch(input, matchValue) === true) {
+        options2.push(options[i]);
+      }
+    }
+  }
+  
+  return options2;
+
+  /*
+  for (var i = 0; i < list.options.length; i++) {
+    // try to match the optionHTML
+    if (typeof list.options[i].optionHTML === 'string') {
+      if (input === list.options[i].optionHTML.toLowerCase().substring(0, input.length)) {
+        options2.push(list.options[i]);
         continue;
       }
     }
 
-    // try to match the value
-    if (typeof options[i].value === 'string') {
-      if (input === options[i].value.toLowerCase().substring(0, input.length)) {
-        options2.push(options[i]);
+    // if value is a string, try to match against it
+    if (typeof list.options[i].value === 'string') {
+      if (input === list.options[i].value.toLowerCase().substring(0, input.length)) {
+        options2.push(list.options[i]);
       }
     }
+    
+    // then try to match against properties in order 
   }
-  return options2;
+  */
 };
 
 var highlightOption = function(optionEl) {
@@ -1155,20 +1266,8 @@ var pressRegularKey = function() {
   }
   // else default to mine
   else {
-    options = matchOptions(inputValue, list.options);
+    options = matchOptions(inputValue, list);
   }
-
-  /*
-  // cut options down to maxOptions
-  if (typeof list.maxOptions === 'number' &&
-      options.length > list.maxOptions) {
-    var options2 = [];
-    for (var i = 0; i < list.maxOptions; i++) {
-      options2.push(options[i]);
-    }
-    options = options2;
-  }
-  */
 
   // add freeform as an option if that's allowed
   if (options.length === 0 && inputValue !== '' &&
@@ -1194,7 +1293,14 @@ var pressRegularKey = function() {
     return;
   }
 
-  // build the options found
+  // highlight matches
+  if (list.highlightMatches === true) {
+    for (var i = 0; i < options.length; i++) {
+      options[i].optionHTML = highlightMatchChars(options[i].optionHTML, inputValue);
+    }
+  }
+
+  // build the options
   var html = buildOptions(options, list);
 
   // add AJAX indicator
@@ -1534,6 +1640,7 @@ widget.setValue = function(value) {
   return true;
 };
 
+// shorthand for getValue and setValue
 widget.val = function(value) {
   if (arguments.length === 0) {
     return getValue();
@@ -1565,9 +1672,9 @@ var initDom = function() {
 };
 
 var init = function() {
-  // TODO: check Deps here
   if (sanityChecks() !== true) return;
-  initConfig();
+  
+  expandConfig();
   initDom();
   addEvents();
   updateTokens();
