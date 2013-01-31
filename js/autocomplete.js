@@ -399,6 +399,10 @@ var expandListObject = function(list) {
     list.highlightMatches = true;
   }
 
+  if (typeof list.matchProperties === 'string') {
+    list.matchProperties = [list.matchProperties];
+  }
+
   // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
     list.noResultsHTML = 'No results found.';
@@ -914,32 +918,85 @@ var updateTokens = function() {
   tokensEl.html(buildTokens(TOKENS));
 };
 
-// TODO: this function needs to be improved
-//       check out the regex code from tokeninput
-var highlightMatchChars = function(optionHTML, input) {
-  // just avoid HTML all together
-  if (optionHTML.indexOf('<') !== -1 ||
-      optionHTML.indexOf('>') !== -1) {
-    return optionHTML;
+// attempts to return all non-HTML characters from a string
+var findNonHTMLChars = function(str) {
+  var str2 = '';
+  var chars = str.split('');
+
+  var inATag = false;
+  var inEscapeSequence = false;
+
+  for (var i = 0; i < chars.length; i++) {
+    if (chars[i] === '<') {
+      inATag = true;
+      continue;
+    }
+    if (inATag === true && chars[i] === '>') {
+      inATag = false;
+      continue;
+    }
+    if (chars[i] === '&') {
+      inEscapeSequence = true;
+      continue;
+    }
+    if (inEscapeSequence === true && chars[i] === ';') {
+      inEscapeSequence = false;
+      continue;
+    }
+
+    if (inATag === true || inEscapeSequence === true) continue;
+
+    str2 += chars[i];
   }
 
+  return str2;
+};
+
+// it is doubtful that there are not bugs in this function
+var highlightMatchChars = function(optionHTML, input) {
+  var htmlChars = optionHTML.split('');
   var inputChars = input.split('');
-  var optionChars = optionHTML.split('');
-  for (var i = 0; i < optionChars.length; i++) {
-    for (var j = 0; j < inputChars.length; j++) {
-      // skip anything that is not alphanumeric
-      if (inputChars[j].search(/[^a-zA-Z0-9]/) !== -1) continue;
 
-      var upper = inputChars[j].toUpperCase();
-      var lower = inputChars[j].toLowerCase();
+  var charsToHighlight = [];
+  for (var i = 0; i < inputChars.length; i++) {
+    // skip anything that is not alphanumeric
+    if (inputChars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
 
-      if (optionChars[i] === upper || optionChars[i] === lower) {
-        optionChars[i] = '<strong>' + optionChars[i] + '</strong>';
+    charsToHighlight.push(inputChars[i].toLowerCase(), inputChars[i].toUpperCase());
+  }
+
+  var inATag = false;
+  var inEscapeSequence = false;
+
+  for (var i = 0; i < htmlChars.length; i++) {
+    if (htmlChars[i] === '<') {
+      inATag = true;
+      continue;
+    }
+    if (inATag === true && htmlChars[i] === '>') {
+      inATag = false;
+      continue;
+    }
+    if (htmlChars[i] === '&') {
+      inEscapeSequence = true;
+      continue;
+    }
+    if (inEscapeSequence === true && htmlChars[i] === ';') {
+      inEscapeSequence = false;
+      continue;
+    }
+
+    if (inATag === true || inEscapeSequence === true) continue;
+
+    for (var j = 0; j < charsToHighlight.length; j++) {
+      if (htmlChars[i] === charsToHighlight[j]) {
+        htmlChars[i] = '<strong>' + htmlChars[i] + '</strong>';
+        break;
       }
     }
   }
 
-  return optionChars.join('');
+  return htmlChars.join('');
 };
 
 // does input match the beginning of str?
@@ -947,14 +1004,28 @@ var isFrontMatch = function(input, str) {
   return input === str.toLowerCase().substring(0, input.length);
 };
 
+// is input a substring inside str?
+var isSubstringMatch = function(input, str) {
+  return str.toLowerCase().indexOf(input.toLowerCase()) !== -1;
+};
+
 // does str contain all of the characters found in input?
 var isCharMatch = function(input, str) {
-  var chars = input.split('');
-  str = str.toLowerCase();
-  for (var i = 0; i < chars.length; i++) {
-    // we don't care about spaces
-    if (chars[i] === ' ') continue;
+  var chars = input.split(''),
+      charsObj = {},
+      i;
 
+  for (i = 0; i < chars.length; i++) {
+    // only look at alphanumeric
+    if (chars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
+
+    charsObj[chars[i].toLowerCase()] = 0;
+  }
+  chars = objectKeysToArray(charsObj);
+
+  str = str.toLowerCase();
+
+  for (i = 0; i < chars.length; i++) {
     if (str.indexOf(chars[i]) === -1) {
       return false;
     }
@@ -962,8 +1033,51 @@ var isCharMatch = function(input, str) {
   return true;
 };
 
+// returns an array of options that match against ._matchValue
+var matchOptionsSpecial = function(options, input) {
+  var options2 = [],
+      i,
+      len = options.length;
+
+  options = deepCopy(options); // necessary?
+
+  // do a front match first
+  for (i = 0; i < len; i++) {
+    if (isFrontMatch(input, options[i]._matchValue) === true) {
+      options2.push(options[i]);
+      options[i] = false;
+    }
+  }
+
+  // then a substring match
+  for (i = 0; i < len; i++) {
+    // ignore any options we've already matched
+    if (options[i] === false) continue;
+
+    if (isSubstringMatch(input, options[i]._matchValue) === true) {
+      options2.push(options[i]);
+      options[i] = false;
+    }
+  }
+
+  // then a character match
+  for (i = 0; i < len; i++) {
+    // ignore any options we've already matched
+    if (options[i] === false) continue;
+
+    if (isCharMatch(input, options[i]._matchValue) === true) {
+      options2.push(options[i]);
+    }
+  }
+
+  return options2;
+};
+
 // TODO: this is an ugly function that needs to be refactored
+//       need to break this out into more functions
+// investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
+  var i, matchValue;
   input = input.toLowerCase();
 
   // return all the options with no user input
@@ -975,43 +1089,24 @@ var matchOptions = function(input, list) {
   var options2 = [];
 
   // do they have a list of properties to match against?
-  if (isArray(list.matchProperties) === true) {
+  //if (isArray(list.matchProperties) === true) {
+  if (false) {
     // TODO: write me
   }
   // else try to match against the value or optionHTML
   else {
-    var i, matchValue;
 
-    // do a front match first
-    for (i = 0; i < options.length; i++) {
-      // if value is a string, try to match against it
-      // else use optionHTML
-      matchValue = options[i].optionHTML;
+    // set ._matchValue
+    for (var i = 0; i < options.length; i++) {
       if (typeof options[i].value === 'string') {
-        matchValue = options[i].value;
+        options[i]._matchValue = options[i].value.toLowerCase();
       }
-
-      if (isFrontMatch(input, matchValue) === true) {
-        options2.push(options[i]);
-        // remove this option for the next search
-        options[i] = false;
+      else {
+        options[i]._matchValue = findNonHTMLChars(options[i].optionHTML.toLowerCase());
       }
     }
 
-    // then put character matches after
-    for (i = 0; i < options.length; i++) {
-      // ignore any options we've already matched
-      if (options[i] === false) continue;
-
-      matchValue = options[i].optionHTML;
-      if (typeof options[i].value === 'string') {
-        matchValue = options[i].value;
-      }
-
-      if (isCharMatch(input, matchValue) === true) {
-        options2.push(options[i]);
-      }
-    }
+    options2 = matchOptionsSpecial(options, input);
   }
 
   return options2;

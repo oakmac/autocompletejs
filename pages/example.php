@@ -9,7 +9,7 @@ include(APP_PATH.'pages/header.php');
 <div class="example">
 <p><a href="examples">&larr; Back to all examples.</a></p>
 <pre class="prettyprint lang-js linenums">
-<?php echo $example['js']; ?>  
+<?php echo htmlspecialchars($example['js']); ?>
 </pre>
 <?php echo $example['html'] . "\n"; ?>
 </div><!-- end div.example -->

@@ -295,12 +295,12 @@ TODO: "how it works" walk-through explanation of how the widget functions
     </td>
   </tr>
   <tr>
-    <td><code class="js plain">matchProperties</code></td>
-    <td>Array of value properties</td>
+    <td>NOT IMPLEMENTED YET<br /><code class="js plain">matchProperties</code></td>
+    <td>Array of option value properties</td>
     <td>no</td>
     <td><small>n/a</small></td>
     <td>
-      <p><code class="js plain">matchProperties</code> is an array of <code class="js plain">value</code> properties to try and match against as the user types.</p>
+      <p><code class="js plain">matchProperties</code> lets you pick which option value properties you want to match against as the user types.</p>
       <p>The order of the array will be the same order the options are matched against.</p>
       <p>If your option value is a string, <code class="js plain">matchProperties</code> will be ignored and the match function will try to match against the string.</p>
       <p><code class="js plain">matchProperties</code> gets ignored if you provide a custom <code class="js plain">matchOptions</code> function.</p>
