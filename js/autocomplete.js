@@ -917,6 +917,7 @@ var updateTokens = function() {
 // TODO: this function needs to be improved
 //       check out the regex code from tokeninput
 var highlightMatchChars = function(optionHTML, input) {
+  // just avoid HTML all together
   if (optionHTML.indexOf('<') !== -1 ||
       optionHTML.indexOf('>') !== -1) {
     return optionHTML;
@@ -926,8 +927,8 @@ var highlightMatchChars = function(optionHTML, input) {
   var optionChars = optionHTML.split('');
   for (var i = 0; i < optionChars.length; i++) {
     for (var j = 0; j < inputChars.length; j++) {
-      if (inputChars[j] === ' ') continue;
-      if (inputChars[j].search(/[^a-zA-Z]/) !== -1) continue;
+      // skip anything that is not alphanumeric
+      if (inputChars[j].search(/[^a-zA-Z0-9]/) !== -1) continue;
       
       var upper = inputChars[j].toUpperCase();
       var lower = inputChars[j].toLowerCase();
@@ -961,7 +962,7 @@ var isCharMatch = function(input, str) {
   return true;
 };
 
-// TODO: this is an exceedingly ugly function that needs to be refactored
+// TODO: this is an ugly function that needs to be refactored
 var matchOptions = function(input, list) {
   input = input.toLowerCase();
 
@@ -975,13 +976,13 @@ var matchOptions = function(input, list) {
   
   // do they have a list of properties to match against?
   if (isArray(list.matchProperties) === true) {
-    
+    // TODO: write me
   }
   // else try to match against the value or optionHTML
   else {
     var i, matchValue;
     
-    // front match
+    // do a front match first
     for (i = 0; i < options.length; i++) {
       // if value is a string, try to match against it
       // else use optionHTML
@@ -997,7 +998,7 @@ var matchOptions = function(input, list) {
       }
     }
     
-    // character match
+    // then put character matches after
     for (i = 0; i < options.length; i++) {
       // ignore any options we've already matched
       if (options[i] === false) continue;
@@ -1014,27 +1015,6 @@ var matchOptions = function(input, list) {
   }
   
   return options2;
-
-  /*
-  for (var i = 0; i < list.options.length; i++) {
-    // try to match the optionHTML
-    if (typeof list.options[i].optionHTML === 'string') {
-      if (input === list.options[i].optionHTML.toLowerCase().substring(0, input.length)) {
-        options2.push(list.options[i]);
-        continue;
-      }
-    }
-
-    // if value is a string, try to match against it
-    if (typeof list.options[i].value === 'string') {
-      if (input === list.options[i].value.toLowerCase().substring(0, input.length)) {
-        options2.push(list.options[i]);
-      }
-    }
-    
-    // then try to match against properties in order 
-  }
-  */
 };
 
 var highlightOption = function(optionEl) {
