@@ -143,7 +143,7 @@ var hasLocalStorage = function() {
     localStorage.setItem(str, str);
     localStorage.removeItem(str);
     return true;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 };
@@ -295,11 +295,11 @@ var sanityChecks = function() {
     window.alert('AutoComplete Error 1002: Element with id "' + containerElId + '" does not exist in the DOM.\n\nExiting...');
     return false;
   }
-  
- 
-  
+
+
+
   // TODO: check that jQuery exists
-  
+
   // TODO: check that JSON exists
 
   return true;
@@ -393,7 +393,7 @@ var expandListObject = function(list) {
     list.maxOptions = parseInt(list.maxOptions, 10);
   }
   */
-  
+
   // default for highlightMatches is true
   if (list.highlightMatches !== false) {
     list.highlightMatches = true;
@@ -929,16 +929,16 @@ var highlightMatchChars = function(optionHTML, input) {
     for (var j = 0; j < inputChars.length; j++) {
       // skip anything that is not alphanumeric
       if (inputChars[j].search(/[^a-zA-Z0-9]/) !== -1) continue;
-      
+
       var upper = inputChars[j].toUpperCase();
       var lower = inputChars[j].toLowerCase();
-      
+
       if (optionChars[i] === upper || optionChars[i] === lower) {
         optionChars[i] = '<strong>' + optionChars[i] + '</strong>';
       }
     }
   }
-  
+
   return optionChars.join('');
 };
 
@@ -954,7 +954,7 @@ var isCharMatch = function(input, str) {
   for (var i = 0; i < chars.length; i++) {
     // we don't care about spaces
     if (chars[i] === ' ') continue;
-    
+
     if (str.indexOf(chars[i]) === -1) {
       return false;
     }
@@ -973,7 +973,7 @@ var matchOptions = function(input, list) {
 
   var options = deepCopy(list.options);
   var options2 = [];
-  
+
   // do they have a list of properties to match against?
   if (isArray(list.matchProperties) === true) {
     // TODO: write me
@@ -981,7 +981,7 @@ var matchOptions = function(input, list) {
   // else try to match against the value or optionHTML
   else {
     var i, matchValue;
-    
+
     // do a front match first
     for (i = 0; i < options.length; i++) {
       // if value is a string, try to match against it
@@ -990,30 +990,30 @@ var matchOptions = function(input, list) {
       if (typeof options[i].value === 'string') {
         matchValue = options[i].value;
       }
-      
-      if (isFrontMatch(input, matchValue) === true) { 
+
+      if (isFrontMatch(input, matchValue) === true) {
         options2.push(options[i]);
         // remove this option for the next search
         options[i] = false;
       }
     }
-    
+
     // then put character matches after
     for (i = 0; i < options.length; i++) {
       // ignore any options we've already matched
       if (options[i] === false) continue;
-      
+
       matchValue = options[i].optionHTML;
       if (typeof options[i].value === 'string') {
         matchValue = options[i].value;
       }
-      
+
       if (isCharMatch(input, matchValue) === true) {
         options2.push(options[i]);
       }
     }
   }
-  
+
   return options2;
 };
 
@@ -1159,8 +1159,8 @@ var sendAjaxRequest = function(list, inputValue) {
 
   var ajaxSuccess = function(data) {
     // save the result in the cache
-    if (list.cacheAjax === true
-        && LOCAL_STORAGE_AVAILABLE === true) {
+    if (list.cacheAjax === true &&
+        LOCAL_STORAGE_AVAILABLE === true) {
       localStorage.setItem(url, JSON.stringify(data));
     }
 
@@ -1653,7 +1653,7 @@ var initDom = function() {
 
 var init = function() {
   if (sanityChecks() !== true) return;
-  
+
   expandConfig();
   initDom();
   addEvents();
