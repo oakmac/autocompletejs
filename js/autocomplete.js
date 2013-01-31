@@ -762,6 +762,7 @@ var startInput = function() {
   showInputEl();
   positionDropdownEl();
   pressRegularKey();
+  adjustDropdownScroll();
 };
 
 var stopInput = function() {
@@ -1248,7 +1249,7 @@ var isOptionHighlighted = function() {
 // TODO: revisit this and make it better for different font sizes, etc
 // http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
 var updateInputWidth = function(text) {
-  var width = (text.length + 1) * 9;
+  var width = (text.length + 1) * 10;
   inputEl.css('width', width + 'px');
 };
 
