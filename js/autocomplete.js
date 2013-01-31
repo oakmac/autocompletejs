@@ -384,16 +384,6 @@ var expandListObject = function(list) {
     list.cacheAjax = true;
   }
 
-  /*
-  // default for maxOptions is false
-  if (typeof list.maxOptions !== 'number' || list.maxOptions < 1) {
-    list.maxOptions = false;
-  }
-  if (typeof list.maxOptions === 'number') {
-    list.maxOptions = parseInt(list.maxOptions, 10);
-  }
-  */
-
   // default for highlightMatches is true
   if (list.highlightMatches !== false) {
     list.highlightMatches = true;
@@ -1120,6 +1110,33 @@ var highlightOption = function(optionEl) {
   $(optionEl).addClass(CLASSES.highlightedOption);
 };
 
+var adjustDropdownScroll = function() {
+  // find the highlighted option
+  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+
+  // exit if we did not find one
+  if (highlightedEl.length !== 1) return;
+
+  var liTop = highlightedEl.position().top;
+  var scrollTop = dropdownEl.scrollTop();
+
+  // option is above the scroll window
+  if (liTop < 0) {
+    dropdownEl.scrollTop(scrollTop + liTop);
+    return;
+  }
+
+  var liHeight = highlightedEl.height();
+  var ddHeight = dropdownEl.height();
+
+  // option is below the scroll window
+  if ((liTop + liHeight) > ddHeight) {
+    // not sure why this doesn't work exactly, but seems
+    // to work better with the 6px fudge factor
+    dropdownEl.scrollTop(scrollTop + liTop + liHeight - ddHeight + 6);
+  }
+};
+
 //----------------------------------------------------------
 // Input Keypresses
 //----------------------------------------------------------
@@ -1131,6 +1148,7 @@ var pressUpArrow = function() {
   // no row highlighted, highlight the last list element
   if (highlightedEl.length === 0) {
     dropdownEl.find('li.option').last().addClass(CLASSES.highlightedOption);
+    adjustDropdownScroll();
     return;
   }
 
@@ -1139,6 +1157,7 @@ var pressUpArrow = function() {
 
   // highlight the previous option
   highlightedEl.prevAll('li.option').first().addClass(CLASSES.highlightedOption);
+  adjustDropdownScroll();
 };
 
 var pressDownArrow = function() {
@@ -1148,6 +1167,7 @@ var pressDownArrow = function() {
   // no row highlighted, highlight the first option
   if (highlightedEl.length === 0) {
     dropdownEl.find('li.option').first().addClass(CLASSES.highlightedOption);
+    adjustDropdownScroll();
     return;
   }
 
@@ -1156,6 +1176,7 @@ var pressDownArrow = function() {
 
   // highlight the next option
   highlightedEl.nextAll('li.option').first().addClass(CLASSES.highlightedOption);
+  adjustDropdownScroll();
 };
 
 var pressEscapeKey = function() {

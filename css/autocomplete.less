@@ -113,12 +113,15 @@ div.autocomplete_internal_container {
 
   ul.dropdown {
     border: 1px solid #ccc;
-    min-width: 100px;
-		z-index: 1;
-		position: absolute;
+    //min-width: 120px;
+    z-index: 1;
+    position: absolute;
     background: #f6f6f6;
-		padding: 0px;
+    padding: 0px;
     margin: 10px 0px 0px 0px;
+    overflow-x: visible;
+    overflow-y: auto;
+    max-height: 300px;
 
     li {
       list-style: none;

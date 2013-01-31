@@ -310,19 +310,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p><a href="#">matchProperties Example 2</a></p>
     </td>
   </tr>
-  <!--
-  <tr>
-    <td>NOT IMPLEMENTED YET<br />DO SCROLLABLE = TRUE/FALSE INSTEAD<code class="js plain">maxOptions</code></td>
-    <td>Number<br /><small>or</small><br /><code class="js keyword">false</code></td>
-    <td>no</td>
-    <td><code class="js keyword">false</code></td>
-    <td>
-      <p><code class="js plain">maxOptions</code> is the maximum number of options to display in a dropdown.</p>
-      <p>If <code class="js plain">maxOptions</code> is a number it must be an integer greater than 1.</p>
-      <p>Set <code class="js plain">maxOptions</code> to <code class="js keyword">false</code> to show all options available.</p>
-    </td>
-  </tr>
-  -->
   <tr>
     <td><code class="js plain">noResultsHTML</code></td>
     <td>String<br /><small>or</small><br />Function</td>
