@@ -307,11 +307,22 @@ var sanityChecks = function() {
     return false;
   }
 
+  // JSON must exist
+  if (window.hasOwnProperty('JSON') !== true
+      || typeof JSON.stringify !== 'function'
+      || typeof JSON.parse !== 'function') {
+    window.alert('AutoComplete Error 1003: JSON does not exist. Please include a JSON polyfill.\n\nExiting...');
+    return false;
+  }
 
-
-  // TODO: check that jQuery exists
-
-  // TODO: check that JSON exists
+  // check that jQuery exists
+  // NOTE: what else do I need to check here? what if they have put jQuery elsewhere - window.jQuery?
+  //       allow them to pass in their version of jquery into the constructor?
+  // TODO: what version of jQuery should I check against?
+  if (window.hasOwnProperty('$') !== true) {
+    window.alert('AutoComplete Error 1004: jQuery does not exist. Please include jQuery on the page.\n\nExiting...');
+    return false;
+  }
 
   return true;
 };
@@ -463,7 +474,7 @@ var expandConfig = function() {
   if (cfg.hasOwnProperty('initialValue') === true) {
     // check that the initialValue is valid
     if (validValue(cfg.initialValue) === true) {
-      // TODO: is deepCopy necessary here?
+      // NOTE: is deepCopy necessary here?
       TOKENS = deepCopy(expandValue(cfg.initialValue));
     }
     // else show an error
@@ -481,9 +492,22 @@ var expandConfig = function() {
   // expand lists
   for (var i in cfg.lists) {
     if (cfg.lists.hasOwnProperty(i) !== true) continue;
-    // TODO: need to validate the list object here first
-    //       do not add it if it's invalid and throw an error
-    cfg.lists[i] = expandListObject(cfg.lists[i]);
+
+    // check the list name
+    if (validListName(i) !== true) {
+      error(2642, 'You cannot use the empty string for a list name.');
+      delete cfg.lists[i];
+      continue;
+    }
+
+    // make sure the list is valid
+    if (validListObject(cfg.lists[i]) === true) {
+      cfg.lists[i] = expandListObject(cfg.lists[i]);
+    }
+    else {
+      error(2535, 'The list object for list "' + i + '" is invalid.', cfg.lists[i]);
+      delete cfg.lists[i];
+    }
   }
 };
 
@@ -679,8 +703,11 @@ var removeList = function(listName) {
 };
 
 var destroyWidget = function() {
+  // remove markup
   containerEl.html('');
-  // TODO: unbind event handlers on the container element?
+
+  // remove event handlers
+  containerEl.unbind();
 };
 
 // empty the input element, unhide it, put the focus on it
@@ -1075,8 +1102,7 @@ var matchOptionsSpecial = function(options, input) {
   return options2;
 };
 
-// TODO: this is an ugly function that needs to be refactored
-//       need to break this out into more functions
+// TODO: this needs to be refactored
 // investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
   var i, matchValue;
