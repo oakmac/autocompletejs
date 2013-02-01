@@ -77,6 +77,67 @@ var widget = {};
 // Util Functions
 //----------------------------------------------------------
 
+// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+var createId = function() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+var deepCopy = function(thing) {
+  return JSON.parse(JSON.stringify(thing));
+};
+
+// html escape
+var encode = function(str) {
+  str = str + '';
+  for (var i = 0; i < HTML_ENTITIES.length; i++) {
+    str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
+  }
+  return str;
+};
+
+// copied from modernizr
+var hasLocalStorage = function() {
+  var str = createId();
+  try {
+    localStorage.setItem(str, str);
+    localStorage.removeItem(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
+
+var isArray = Array.isArray || function(vArg) {
+  return Object.prototype.toString.call(vArg) === '[object Array]';
+};
+
+var isObject = function(thing) {
+  return (Object.prototype.toString.call(thing) === '[object Object]');
+};
+
+// returns the number of keys that an object has
+var numObjKeys = function(obj) {
+  var count = 0;
+  for (var i in obj) {
+    if (obj.hasOwnProperty(i) !== true) continue;
+    count++;
+  }
+  return count;
+};
+
+var objectKeysToArray = function(obj) {
+  var arr = [];
+  for (var i in obj) {
+    if (obj.hasOwnProperty(i) !== true) continue;
+    arr.push(i);
+  }
+  return arr;
+};
+
 // simple string replacement
 var tmpl = function(str, obj, htmlEscape) {
   if (htmlEscape !== true) {
@@ -98,57 +159,6 @@ var tmpl = function(str, obj, htmlEscape) {
   }
   return str;
 };
-
-// html escape
-var encode = function(str) {
-  str = str + '';
-  for (var i = 0; i < HTML_ENTITIES.length; i++) {
-    str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
-  }
-  return str;
-};
-
-var objectKeysToArray = function(obj) {
-  var arr = [];
-  for (var i in obj) {
-    if (obj.hasOwnProperty(i) !== true) continue;
-    arr.push(i);
-  }
-  return arr;
-};
-
-// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-var createId = function() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
-var isArray = Array.isArray || function(vArg) {
-  return Object.prototype.toString.call(vArg) === '[object Array]';
-};
-
-var isObject = function(thing) {
-  return (Object.prototype.toString.call(thing) === '[object Object]');
-};
-
-var deepCopy = function(thing) {
-  return JSON.parse(JSON.stringify(thing));
-};
-
-// copied from modernizr
-var hasLocalStorage = function() {
-  var str = createId();
-  try {
-    localStorage.setItem(str, str);
-    localStorage.removeItem(str);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
 
 //----------------------------------------------------------
 // Validation
@@ -1467,6 +1477,12 @@ var keydownInputElement = function(e) {
     e.preventDefault();
     e.stopPropagation();
     pressBackspaceOnEmptyInput();
+    return;
+  }
+
+  // left arrow
+  if (keyCode === KEYS.LEFT && inputValue === '') {
+    highlightLastTokenGroup();
     return;
   }
 
