@@ -15,6 +15,7 @@
 //       in their buildHTML functions
 // TODO: matchOptions should take a callback in the args - definitely!
 // TODO: allow children on the List Object to be a function
+// TODO: if there is only one list, you shouldn't have to specify an initialList
 
 
 ;(function() {
@@ -1120,6 +1121,11 @@ var adjustDropdownScroll = function() {
 
   var liTop = highlightedEl.position().top;
   var scrollTop = dropdownEl.scrollTop();
+
+
+  // TODO: if the first option is selected, scrollTop should be set to a negative number
+  //       there could be a group <li> above it that you should see
+
 
   // option is above the scroll window
   if (liTop < 0) {
