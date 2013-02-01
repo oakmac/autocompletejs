@@ -55,8 +55,9 @@ var containerEl, dropdownEl, inputEl, tokensEl;
 // CSS class names
 var CLASSES = {
   highlightedOption: 'highlighted',
+  removeTokenGroup: 'remove-token-group',
   selectedTokenGroup: 'selected',
-  tokenGroup: 'token-group'
+  tokenGroup: 'token-group',
 };
 
 // stateful
@@ -633,10 +634,6 @@ var buildTokenHTML = function(option, parentList) {
   return buildOptionHTML(option, parentList);
 };
 
-
-// TODO: add click event handler on .remove-token-group
-
-
 var buildTokens = function(tokens) {
   var html = '';
   for (var i = 0; i < tokens.length; i++) {
@@ -644,7 +641,7 @@ var buildTokens = function(tokens) {
 
     html += '<div class="' + CLASSES.tokenGroup + '"' +
     ' data-token-group-index="' + i + '">' +
-    '<span class="remove-token-group">&times;</span>';
+    '<span class="' + CLASSES.removeTokenGroup + '">&times;</span>';
 
     for (var j = 0; j < tokenGroup.length; j++) {
       html += '<span class="token">' +
@@ -1562,6 +1559,14 @@ var clickTokenGroup = function(e) {
   $(this).addClass(CLASSES.selectedTokenGroup);
 };
 
+var clickRemoveTokenGroup = function(e) {
+  e.stopPropagation();
+  stopInput();
+  clearTokenGroupHighlight();
+  $(this).parents('div.' + CLASSES.tokenGroup).addClass(CLASSES.selectedTokenGroup);
+  removeHighlightedTokenGroup();
+};
+
 // TODO this needs to be better; should run up the DOM from the e.target
 //      and check to see if the element is within containerEl
 //      right now this doesn't work with multiple widgets on the same page
@@ -1609,6 +1614,7 @@ var addEvents = function() {
   containerEl.on('click', 'li.option', clickOption);
   containerEl.on('mouseover', 'li.option', mouseoverOption);
   containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
+  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup, clickRemoveTokenGroup);
 
   // catch all clicks on the page
   $('html').on('click', clickPage);
