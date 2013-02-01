@@ -1155,10 +1155,12 @@ var adjustDropdownScroll = function() {
   var liTop = highlightedEl.position().top;
   var scrollTop = dropdownEl.scrollTop();
 
-
-  // TODO: if the first option is selected, scrollTop should be set to a negative number
-  //       there could be a group <li> above it that you should see
-
+  // if the first option is selected, set scrollTop to it's highest in case
+  // there is a group <li> above it
+  if (dropdownEl.find('li.option').filter(':first').hasClass(CLASSES.highlightedOption) === true) {
+    dropdownEl.scrollTop(-1);
+    return;
+  }
 
   // option is above the scroll window
   if (liTop < 0) {
@@ -1227,10 +1229,8 @@ var pressEscapeKey = function() {
 var moveTokenHighlightLeft = function() {
   var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
-  // NOTE: should never happen
-  if (selectedEl.length !== 1) {
-    return;
-  }
+  // exit if there is not a selected token
+  if (selectedEl.length !== 1) return;
 
   var prev = selectedEl.prev('div.' + CLASSES.tokenGroup);
   selectedEl.removeClass(CLASSES.selectedTokenGroup);
@@ -1246,10 +1246,8 @@ var moveTokenHighlightLeft = function() {
 var moveTokenHighlightRight = function() {
   var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
-  // NOTE: should never happen
-  if (selectedEl.length !== 1) {
-    return;
-  }
+  // exit if there is not a selected token
+  if (selectedEl.length !== 1) return;
 
   var next = selectedEl.next('div.' + CLASSES.tokenGroup);
   selectedEl.removeClass(CLASSES.selectedTokenGroup);
@@ -1563,7 +1561,8 @@ var clickRemoveTokenGroup = function(e) {
   e.stopPropagation();
   stopInput();
   clearTokenGroupHighlight();
-  $(this).parents('div.' + CLASSES.tokenGroup).addClass(CLASSES.selectedTokenGroup);
+  $(this).parents('div.' + CLASSES.tokenGroup)
+    .addClass(CLASSES.selectedTokenGroup);
   removeHighlightedTokenGroup();
 };
 
