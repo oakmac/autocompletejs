@@ -711,7 +711,7 @@ var destroyWidget = function() {
 var showInputEl = function() {
   inputEl.val('').css({
     visibility: '',
-    width: '10px'
+    width: '20px'
   }).focus();
 };
 

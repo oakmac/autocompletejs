@@ -11,4 +11,4 @@ var config = {
     reptiles: 'api/reptiles.php'
   }
 };
-var widget = new AutoComplete('example7', config);
+var widget = new AutoComplete('search_bar', config);

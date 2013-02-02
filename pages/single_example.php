@@ -12,7 +12,7 @@
 <body>
 <div class="container">
   
-<p><a href="examples">&larr; Back to all examples.</a></p>
+<p><a href="examples#<?php echo $example['number']; ?>">&larr; Back to all examples.</a></p>
 <p><a href="examples/<?php echo $example['number']; ?>.js">See the code for this example.</a></p>
 
 <!--- start example code --->
@@ -30,7 +30,7 @@ var init = function() {
 <?php echo $example['js'] . "\n"; ?>
 //--- end example code ---
 
-};
+}; // end init()
 $(document).ready(init);
 </script>
 </body>

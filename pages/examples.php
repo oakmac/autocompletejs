@@ -46,17 +46,28 @@ var showExample = function(number) {
 	$('#example_name').html(examples[number].name);
 	$('#example_single_page_link').attr('href', 'examples/' + number);
 	$('#example_html_container').html(examples[number].html);
-	examples[number].js();		
+	examples[number].js();
 };
 
 var clickExample = function() {
   var number = parseInt($(this).attr('data-example-number'), 10);
 	if (examples.hasOwnProperty(number) !== true)	return;
+	window.location.hash = number;
+	loadExampleFromHash();
+};
+
+var loadExampleFromHash = function() {
+  var number = parseInt(window.location.hash.replace('#', ''), 10);
+	if (number < 1000 || examples.hasOwnProperty(number) !== true) {
+    number = 1000;
+		window.location.hash = number;
+	}
 	showExample(number);
 };
 
 var init = function() {
   $('#examples_list_container').on('click', 'li', clickExample);
+	loadExampleFromHash();
 	
   // syntax highlighting
   //prettyPrint();

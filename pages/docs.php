@@ -2,8 +2,10 @@
 $page_title = 'Documentation';
 include(APP_PATH . 'pages/header.php');
 ?>
-<h1>Docs</h1>
 
+<div class="row">
+<div class="twelve columns">
+  
 <!--
 TODO: "how it works" walk-through explanation of how the widget functions
       including definitions of widget, tokens, lists, and options
@@ -11,7 +13,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
 
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
-<table class="table table-striped">
+<table>
 <thead>
   <tr>
     <th>Property</th>
@@ -166,11 +168,15 @@ TODO: "how it works" walk-through explanation of how the widget functions
 </table>
 
 <h2 id="list_object">List Object</h2>
+
+<div class="panel">
 <div class="etymology">
   <div class="word">list</div>
   <div class="part-of-speech">Noun</div>
   <div class="definition">A number of connected items or names written or printed consecutively, typically one below the other.</div>
 </div>
+</div>
+
 <p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
 <p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
 <p>You can define the list workflow using the <code class="js plain">children</code> property on List Objects.</p>
@@ -497,7 +503,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
-      <p><a href="#">addOption Example</a></p>
+      <p><a href="examples#7000">addOption Example</a></p>
     </td>
   </tr>
   <tr>
@@ -507,7 +513,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Remove focus from the widget.</p>
     </td>
     <td>
-      <p><a href="#">blur Example</a></p>
+      <p><a href="examples#7001">blur Example</a></p>
     </td>
   </tr>
   <tr>
@@ -518,7 +524,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Has the same effect as doing <code class="js plain">setValue([])</code></p>
     </td>
     <td>
-      <p><a href="#">clear Example</a></p>
+      <p><a href="examples#7002">clear Example</a></p>
     </td>
   </tr>
   <!--
@@ -540,7 +546,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Remove the widget from the DOM.</p>
     </td>
     <td>
-      <p><a href="#">destroy Example</a></p>
+      <p><a href="examples#7003">destroy Example</a></p>
     </td>
   </tr>
   <tr>
@@ -550,7 +556,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Puts the input focus on the widget.</p>
     </td>
     <td>
-      <p><a href="#">focus Example</a></p>
+      <p><a href="examples#7004">focus Example</a></p>
     </td>
   </tr>
   <tr>
@@ -563,7 +569,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns <code class="js keyword">false</code> if the list does not exist.</p>
     </td>
     <td>
-      <p><a href="#">getList Example</a></p>
+      <p><a href="examples#7005">getList Example</a></p>
     </td>
   </tr>
   <tr>
@@ -573,7 +579,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns an object of all the lists.</p>
     </td>
     <td>
-      <p><a href="#">getLists Example</a></p>
+      <p><a href="examples#7006">getLists Example</a></p>
     </td>
   </tr>
   <tr>
@@ -584,7 +590,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns an empty array if the widget has no token groups.</p>
     </td>
     <td>
-      <p><a href="#">getValue Example</a></p>
+      <p><a href="examples#7007">getValue Example</a></p>
     </td>
   </tr>
   <tr>
@@ -595,9 +601,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <td>
       <p>Alias of <code class="js plain">getList(name)</code></p>
     </td>
-    <td>
-      <p><a href="#">list Example 1</a></p>
-    </td>
+    <td></td>
   </tr>
   <tr>
     <td><code class="js plain">list(name, list)</code></td>
@@ -608,9 +612,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <td>
       <p>Alias of <code class="js plain">setList(name, list)</code></p>
     </td>
-    <td>
-      <p><a href="#">list Example 2</a></p>
-    </td>
+    <td></td>
   </tr>
   <tr>
     <td><code class="js plain">removeList(name)</code></td>
@@ -623,7 +625,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Note: you cannot remove the initialList.</p>
     </td>
     <td>
-      <p><a href="#">removeList Example</a></p>
+      <p><a href="examples#7008">removeList Example</a></p>
     </td>
   </tr>
   <tr>
@@ -637,7 +639,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
-      <p><a href="#">removeTokenGroup Example</a></p>
+      <p><a href="examples#7009">removeTokenGroup Example</a></p>
     </td>
   </tr>
   <!--
@@ -685,7 +687,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
-      <p><a href="#">setList Example</a></p>
+      <p><a href="examples#7010">setList Example</a></p>
     </td>
   </tr>
   <tr>
@@ -698,7 +700,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
       <p>Returns <code class="js keyword">false</code> otherwise.</p>
     </td>
     <td>
-      <p><a href="#">setValue Example</a></p>
+      <p><a href="examples#7011">setValue Example</a></p>
     </td>
   </tr>
   <tr>
@@ -707,9 +709,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <td>
       <p>Alias of <code class="js plain">getValue()</code></p>
     </td>
-    <td>
-      <p><a href="#">val Example 1</a></p>
-    </td>
+    <td></td>
   </tr>
   <tr>
     <td><code class="js plain">val(tokens)</code></td>
@@ -719,11 +719,12 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <td>
       <p>Alias of <code class="js plain">setValue(tokens)</code></p>
     </td>
-    <td>
-      <p><a href="#">val Example 2</a></p>
-    </td>
+    <td></td>
   </tr>
 </table>
+
+</div><!-- end .twelve.columns -->
+</div><!-- end div.row -->
 
 <?php
 include(APP_PATH . 'pages/footer.php');
