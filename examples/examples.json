@@ -79,8 +79,18 @@
 },
 {
   "group": "Initial Config",
-  "number": 3003,
-  "name": "showErrors"
+  "number": 3012,
+  "name": "showErrors console.log"
+},
+{
+  "group": "Initial Config",
+  "number": 3088,
+  "name": "showErrors alert"
+},
+{
+  "group": "Initial Config",
+  "number": 3031,
+  "name": "showErrors custom"
 },
 "-----------------------------------------------------",
 {

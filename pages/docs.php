@@ -159,7 +159,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
   </td>
   <td>
-    <p><a href="#">showErrors console example</a></p>
+    <p><a href="examples#3012">showErrors console example</a></p>
     <p><a href="#">showErrors alert example</a></p>
     <p><a href="#">showErrors custom function example</a></p>
   </td>

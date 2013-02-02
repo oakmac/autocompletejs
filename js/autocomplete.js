@@ -187,12 +187,7 @@ var validToken = function(token) {
     return true;
   }
 
-  // else it must be an object
-  if (isObject(token) !== true) {
-    return false;
-  }
-
-  // else must be an object with .value and .tokenHTML
+  // else it must be an object with .value and .tokenHTML
   // and .tokenHTML must be a string
   if (isObject(token) !== true ||
       token.hasOwnProperty('value') !== true ||
@@ -224,6 +219,17 @@ var validTokenGroup = function(tokenGroup) {
 };
 
 var validValue = function(value) {
+  // single token is ok
+  if (validToken(value) === true) {
+    return true;
+  }
+  
+  // single token group is ok
+  if (validTokenGroup(value) === true) {
+    return true;
+  }
+  
+  // else must be an array of token groups
   if (isArray(value) !== true) {
     return false;
   }
@@ -341,11 +347,27 @@ var expandTokenObject = function(token) {
   return token;
 };
 
+var expandTokenGroup = function(group) {
+  for (var i = 0; i < group.length; i++) {
+    group[i] = expandTokenObject(group[i]);
+  }
+  return group;
+};
+
 var expandValue = function(value) {
+  // single token
+  if (validToken(value) === true) {
+    return [[expandTokenObject(value)]];
+  }
+  
+  // single token group
+  if (validTokenGroup(value) === true) {
+    return [expandTokenGroup(value)];
+  }
+  
+  // else it's an array of token groups
   for (var i = 0; i < value.length; i++) {
-    for (var j = 0; j < value[i].length; j++) {
-      value[i][j] = expandTokenObject(value[i][j]);
-    }
+    value[i] = expandTokenGroup(value[i]);
   }
   return value;
 };
@@ -1769,7 +1791,7 @@ widget.setValue = function(value) {
     error(6823, 'Invalid value passed to setValue method.', value);
     return false;
   }
-  setValue(value);
+  setValue(expandValue(value));
   return true;
 };
 

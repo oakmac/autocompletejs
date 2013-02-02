@@ -16,6 +16,8 @@ $examples = AC::getExamples();
   <h3 id="example_name"></h3>
 	<p><a href="#" id="example_single_page_link" target="_blank">View example in new window.</a></p>
   <div id="example_html_container"></div>
+	<h4>Code</h4>
+	<div id="example_js_container"></div>
 </div>
 
 </div><!-- end div.row -->
@@ -37,10 +39,9 @@ foreach ($examples as $ex) {
 		echo '  group: '.json_encode($ex['group']).",\n";
 		echo '  html: '.json_encode($ex['html']).",\n";
 		echo '  name: '.json_encode($ex['name']).",\n";
-		echo '  js: function() {'."\n";
-		echo '// start example '.$ex['number']."\n";
+		echo '  jsStr: '.json_encode(htmlspecialchars($ex['js'])).",\n";
+		echo '  jsFn: function() {'."\n";
 		echo $ex['js']."\n";
-		echo '// end example '.$ex['number']."\n";
 		echo '  }'."\n";
 		echo '};'."\n\n";
 }
@@ -54,7 +55,9 @@ var showExample = function(number) {
 	$('#example_name').html(examples[number].name);
 	$('#example_single_page_link').attr('href', 'examples/' + number);
 	$('#example_html_container').html(examples[number].html);
-	examples[number].js();
+	$('#example_js_container').html('<pre class="prettyprint">' + examples[number].jsStr + '</pre>');
+	examples[number].jsFn();
+	prettyPrint();
 };
 
 var clickExample = function() {
@@ -76,9 +79,6 @@ var loadExampleFromHash = function() {
 var init = function() {
   $('#examples_list_container').on('click', 'li', clickExample);
 	loadExampleFromHash();
-	
-  // syntax highlighting
-  //prettyPrint();
 };
 $(document).ready(init);
 </script>
