@@ -27,17 +27,25 @@ $examples = AC::getExamples();
 // yo dawg, i heard you like code...
 var examples = {};
 <?php
-foreach ($examples as $example) {
-		echo 'examples["'.$example['number'].'"] = {'."\n";
-		echo '  group: '.json_encode($example['group']).",\n";
-		echo '  html: '.json_encode($example['html']).",\n";
-		echo '  name: '.json_encode($example['name']).",\n";
+foreach ($examples as $ex) {
+		
+		// temporary
+		if ($ex['js'] === '') continue;		
+		
+		echo "\n";
+		echo 'examples["'.$ex['number'].'"] = {'."\n";
+		echo '  group: '.json_encode($ex['group']).",\n";
+		echo '  html: '.json_encode($ex['html']).",\n";
+		echo '  name: '.json_encode($ex['name']).",\n";
 		echo '  js: function() {'."\n";
-		echo $example['js']."\n";
+		echo '// start example '.$ex['number']."\n";
+		echo $ex['js']."\n";
+		echo '// end example '.$ex['number']."\n";
 		echo '  }'."\n";
-		echo '};'."\n";
+		echo '};'."\n\n";
 }
 ?>
+// end examples{}
 
 var showExample = function(number) {
   $('div#examples_list_container li').removeClass('active');
@@ -50,7 +58,7 @@ var showExample = function(number) {
 };
 
 var clickExample = function() {
-  var number = parseInt($(this).attr('data-example-number'), 10);
+  var number = parseInt($(this).attr('id').replace('example_', ''), 10);
 	if (examples.hasOwnProperty(number) !== true)	return;
 	window.location.hash = number;
 	loadExampleFromHash();
@@ -58,7 +66,7 @@ var clickExample = function() {
 
 var loadExampleFromHash = function() {
   var number = parseInt(window.location.hash.replace('#', ''), 10);
-	if (number < 1000 || examples.hasOwnProperty(number) !== true) {
+	if (examples.hasOwnProperty(number) !== true) {
     number = 1000;
 		window.location.hash = number;
 	}
@@ -97,7 +105,7 @@ function buildExampleList($examples) {
 				$html .= '<h3>'.$currentGroup.'</h3>'."\n";
 				$html .= '<ul>'."\n";
 		}
-		$html .= '  <li data-example-number="'.$ex['number'].'" id="example_'.$ex['number'].'">'.$ex['name'].'</li>'."\n";
+		$html .= '  <li id="example_'.$ex['number'].'">'.$ex['name'].'</li>'."\n";
 	}
   $html .= '</ul>'."\n";
 	return $html;
