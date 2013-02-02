@@ -1,0 +1,23 @@
+[
+{
+  "name":"children",
+  "type":"String",
+  "req":false,
+  "desc":[
+    "If specified, <code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a>.",
+    "When the option is selected from the dropdown, children is the name of the next list to show.",
+    "This children property will supersede a children property on the parent List Object."
+  ]
+},
+{
+  "name":"group",
+  "type":"String",
+  "req":false,
+  "desc":[
+    "You can group options into sections using the {code}group{/code} property.",
+    "Options without groups get displayed first followed by options with groups.",
+    "You can control the sort order "
+  ],
+  "examples":1012
+}
+]

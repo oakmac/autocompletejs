@@ -6,12 +6,9 @@ var config = {
       { value: 'Meats', children: 'meats' },
       { value: 'Vegetables', children: 'vegetables' }
     ],
-
     fruits: ['Apple', 'Banana', 'Orange'],
-
     meats: ['Beef', 'Chicken', 'Pork'],
-
     vegetables: ['Carrot', 'Lettuce', 'Onion']
   }
 };
-var widget = new AutoComplete('nested_lists_example', config);
+var widget = new AutoComplete('search_bar', config);

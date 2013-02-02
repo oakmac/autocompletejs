@@ -432,6 +432,10 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>When the option is selected from the dropdown, <code class="js plain">children</code> is the name of the next list to show.</p>
     <p>Note: This <code class="js plain">children</code> property will supersede a <code class="js plain">children</code> property on the parent List Object.</p>
   </td>
+  <td>
+    <p><a href="examples#1002">Multiple Lists</a></p>
+    <p><a href="examples#1003">Nested Lists</a></p>
+  </td>
 </tr>
 <tr id="option_object:group">
   <td><code class="js plain">group</code></td>
@@ -442,6 +446,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>You can group options into sections using the <code class="js plain">group</code> property.</p>
     <p>Options without groups get displayed first, followed by options with groups.</p>
     <p>You can control the sort order of groups with the <code class="js plain">groupSort</code> property on the parent List Object.</p>
+  </td>
+  <td>
+    <p><a href="examples#1012">Grouped List</a></p>
   </td>
 </tr>
 <tr id="option_object:optionHTML">
@@ -454,6 +461,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>This <code class="js plain">optionHTML</code> property will supersede an <code class="js plain">optionHTML</code> function on the parent list.</p>
     <p>If there is no <code class="js plain">optionHTML</code> on the option and there is no <code class="js plain">optionHTML</code> on the parent list and <code class="js plain">value</code> is a string, then <code class="js plain">optionHTML</code> gets an HTML-escaped <code class="js plain">value</code>.</p>
   </td>
+  <td></td>
 </tr>
 <tr id="option_object:tokenHTML">
   <td><code class="js plain">tokenHTML</code></td>
@@ -465,6 +473,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>This <code class="js plain">tokenHTML</code> property will supersede a <code class="js plain">tokenHTML</code> property on the parent list.</p>
     <p>If there is no <code class="js plain">tokenHTML</code> on the option and there is no <code class="js plain">tokenHTML</code> on the parent <code class="js plain">tokenHTML</code> gets the value of <code class="js plain">optionHTML</code>.</p>
   </td>
+  <td></td>
 </tr>
 <tr id="option_object:value">
   <td><code class="js plain">value</code></td>
@@ -475,6 +484,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p><code class="js plain">value</code> is what gets saved when the user selects the option.</p>
     <p><code class="js plain">value</code> can be anything that is safe to call <code class="js plain">JSON.stringify()</code> on.</p>
   </td>
+  <td></td>
 </tr>
 </tbody>
 </table>
