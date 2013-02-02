@@ -25,7 +25,7 @@ var usersList = {
   ]
 };
 
-var widget = new AutoComplete('getvalue_example', {
+var widget = new AutoComplete('search_bar', {
   errors: 'console',
   initialList: 'users',
   lists: {
