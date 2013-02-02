@@ -13,4 +13,4 @@ var config = {
     fruits: ['Apple', 'Banana', 'Orange']
   }
 };
-var widget = new AutoComplete('onchange_event_example1', config);
+var widget = new AutoComplete('search_bar', config);

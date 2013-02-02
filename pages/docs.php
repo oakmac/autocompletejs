@@ -90,7 +90,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>Set <code class="js plain">maxTokenGroups</code> to <code class="js keyword">false</code> to allow unlimited token groups.</p>
   </td>
   <td>
-      <p><a href="example/maxtokengroups">maxTokenGroups Example</a></p>
+      <p><a href="examples#3001">maxTokenGroups</a></p>
   </td>
 </tr>
 <tr id="config_object:onChange">
@@ -104,8 +104,8 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If this function returns a valid widget value, then it becomes the new value.  If not, the new value stays the same.</p>
   </td>
   <td>
-      <p><a href="example/onchange_event1">onChange Example 1</a></p>
-      <p><a href="example/onchange_event2">onChange Example 2</a></p>
+      <p><a href="examples#6000">onChange - Basic Usage</a></p>
+      <p><a href="examples#6001">onChange - Modify Value</a></p>
   </td>
 </tr>
 <tr id="config_object:placeholderHTML">
