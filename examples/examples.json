@@ -30,6 +30,11 @@
   "number": 1005,
   "name": "Custom tokenHTML"
 },
+{
+  "group": "Basic Usage",
+  "number": 1045,
+  "name": "Multiple Widgets"
+},
 "-----------------------------------------------------",
 {
   "group": "AJAX",

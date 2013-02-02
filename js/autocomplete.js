@@ -1456,11 +1456,15 @@ var pressRegularKey = function() {
 // Browser Events
 //------------------------------------------------------------------------------
 
+var clickPage = function(e) {
+  // stop input if they clicked anywhere outside the container el
+  if ($(e.target).parents('#' + containerElId).length === 0) {
+    stopInput();
+  }
+};
+
 // click on the container
 var clickContainerElement = function(e) {
-  // prevent any clicks inside the container from bubbling up to the window
-  e.stopPropagation();
-
   // start input if it's not already happening
   if (INPUT_HAPPENING === false) {
     startInput();
@@ -1471,7 +1475,46 @@ var clickContainerElement = function(e) {
   }
 };
 
-// keydown on the input element
+var clickTokenGroup = function(e) {
+  // prevent clickContainerEl and clickPage
+  e.stopPropagation();
+  
+  stopInput();
+
+  // remove highlight from other token groups
+  clearTokenGroupHighlight();
+
+  // highlight this token group
+  $(this).addClass(CLASSES.selectedTokenGroup);
+};
+
+var clickRemoveTokenGroup = function(e) {
+  // prevent clickContainerEl and clickPage
+  e.stopPropagation();
+  
+  stopInput();
+  clearTokenGroupHighlight();
+  $(this).parents('div.' + CLASSES.tokenGroup)
+    .addClass(CLASSES.selectedTokenGroup);
+  removeHighlightedTokenGroup();
+};
+
+// user clicks a dropdown option
+var clickOption = function(e) {
+  // prevent clickContainerEl and clickPage
+  e.stopPropagation();
+  
+  // highlight it
+  highlightOption(this);
+
+  // add it
+  addHighlightedOption();
+};
+
+var mouseoverOption = function() {
+  highlightOption(this);
+};
+
 var keydownInputElement = function(e) {
   if (INPUT_HAPPENING !== true) return;
 
@@ -1527,48 +1570,9 @@ var keydownInputElement = function(e) {
   setTimeout(pressRegularKey, 5);
 };
 
-// user clicks a dropdown option
-var clickOption = function(e) {
-  // highlight it
-  highlightOption(this);
-
-  // add it
-  addHighlightedOption();
-};
-
-var mouseoverOption = function() {
-  highlightOption(this);
-};
-
-var clickTokenGroup = function(e) {
-  e.stopPropagation();
-  stopInput();
-
-  // remove highlight from other token groups
-  clearTokenGroupHighlight();
-
-  // highlight this token group
-  $(this).addClass(CLASSES.selectedTokenGroup);
-};
-
-var clickRemoveTokenGroup = function(e) {
-  e.stopPropagation();
-  stopInput();
-  clearTokenGroupHighlight();
-  $(this).parents('div.' + CLASSES.tokenGroup)
-    .addClass(CLASSES.selectedTokenGroup);
-  removeHighlightedTokenGroup();
-};
-
-// TODO this needs to be better; should run up the DOM from the e.target
-//      and check to see if the element is within containerEl
-//      right now this doesn't work with multiple widgets on the same page
-var clickPage = function(e) {
-  stopInput();
-};
-
 // keydown anywhere on the page
 var keydownWindow = function(e) {
+  // ignore if input is open or no token groups are highlighted
   if (INPUT_HAPPENING === true ||
       isTokenGroupHighlighted() !== true) {
     return;
