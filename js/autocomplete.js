@@ -22,11 +22,10 @@
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Module scope variables
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
-// constants
 var HTML_ENTITIES = [
   [/&/g, '&amp;'],
   [/</g, '&lt;'],
@@ -55,15 +54,14 @@ var containerEl, dropdownEl, inputEl, tokensEl;
 // CSS class names
 var CLASSES = {
   highlightedOption: 'highlighted',
+  option: 'option',
   removeTokenGroup: 'remove-token-group',
   selectedTokenGroup: 'selected',
-  tokenGroup: 'token-group',
+  tokenGroup: 'token-group'
 };
 
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-//var AJAX_BUFFER_LENGTH = 20;
-//var AJAX_BUFFER_TIMEOUT;
 var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
 var JQUERY_AJAX_OBJECT = {};
@@ -74,13 +72,13 @@ var VISIBLE_OPTIONS = {};
 // constructor return object
 var widget = {};
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Util Functions
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 var createId = function() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/x/g, function(c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
@@ -161,9 +159,9 @@ var tmpl = function(str, obj, htmlEscape) {
   return str;
 };
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Validation
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // list name must be a non-empty string
 var validListName = function(name) {
@@ -309,9 +307,9 @@ var sanityChecks = function() {
   }
 
   // JSON must exist
-  if (window.hasOwnProperty('JSON') !== true
-      || typeof JSON.stringify !== 'function'
-      || typeof JSON.parse !== 'function') {
+  if (window.hasOwnProperty('JSON') !== true ||
+      typeof JSON.stringify !== 'function' ||
+      typeof JSON.parse !== 'function') {
     window.alert('AutoComplete Error 1003: JSON does not exist. Please include a JSON polyfill.\n\nExiting...');
     return false;
   }
@@ -328,9 +326,9 @@ var sanityChecks = function() {
   return true;
 };
 
-//----------------------------------------------------------
-// Expand Shorthand / Set Default Options
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
+// Expand Data Structures / Set Default Options
+//------------------------------------------------------------------------------
 
 var expandTokenObject = function(token) {
   if (typeof token === 'string') {
@@ -417,12 +415,14 @@ var expandListObject = function(list) {
   }
 
   // noResultsHTML default
-  if (typeof list.noResultsHTML !== 'string' && typeof list.noResultsHTML !== 'function') {
+  if (typeof list.noResultsHTML !== 'string' &&
+      typeof list.noResultsHTML !== 'function') {
     list.noResultsHTML = 'No results found.';
   }
 
   // searchingHTML default
-  if (typeof list.searchingHTML !== 'string' && typeof list.searchingHTML !== 'function') {
+  if (typeof list.searchingHTML !== 'string' &&
+      typeof list.searchingHTML !== 'function') {
     list.searchingHTML = 'Searching';
   }
 
@@ -512,16 +512,16 @@ var expandConfig = function() {
   }
 };
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Markup Building Functions
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 var buildWidget = function() {
   var html = '' +
   '<div class="' + cfg.classPrefix + '_internal_container">' +
     '<div class="tokens"></div>' +
-    '<input type="text" class="autocomplete-input" style="visibility:hidden" />' +
-    '<div class="clearfix"></div>' +
+    '<input type="text" class="autocomplete-input" />' +
+    '<div style="clear:both"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
   '</div>';
 
@@ -563,7 +563,7 @@ var buildOption = function(option, parentList) {
 
   var childrenListName = getChildrenListName(option, parentList);
 
-  var html = '<li class="option" ' +
+  var html = '<li class="' + CLASSES.option + '" ' +
   'data-option-id="' + encode(optionId) + '">' +
   option.optionHTML;
 
@@ -688,39 +688,50 @@ var buildAjaxError = function() {
   return '<li class="ajax-error">AJAX Error!</li>';
 };
 
-//----------------------------------------------------------
-// Control Flow / DOM Manipulation
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
+// DOM Manipulation
+//------------------------------------------------------------------------------
 
-var removeList = function(listName) {
-  delete cfg.lists[listName];
-  if (CURRENT_LIST_NAME === listName) {
-    CURRENT_LIST_NAME = cfg.initialList;
+var moveTokenHighlightLeft = function() {
+  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
+
+  // exit if there is not a selected token
+  if (selectedEl.length !== 1) return;
+
+  var prev = selectedEl.prev('div.' + CLASSES.tokenGroup);
+  selectedEl.removeClass(CLASSES.selectedTokenGroup);
+  if (prev.length === 1) {
+    prev.addClass(CLASSES.selectedTokenGroup);
+  }
+  else {
+    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':last')
+      .addClass(CLASSES.selectedTokenGroup);
   }
 };
 
-var destroyWidget = function() {
-  // remove markup
-  containerEl.html('');
+var moveTokenHighlightRight = function() {
+  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
-  // remove event handlers
-  containerEl.unbind();
+  // exit if there is not a selected token
+  if (selectedEl.length !== 1) return;
+
+  var next = selectedEl.next('div.' + CLASSES.tokenGroup);
+  selectedEl.removeClass(CLASSES.selectedTokenGroup);
+  if (next.length === 1) {
+    next.addClass(CLASSES.selectedTokenGroup);
+  }
+  else {
+    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':first')
+      .addClass(CLASSES.selectedTokenGroup);
+  }
 };
 
-// empty the input element, unhide it, put the focus on it
 var showInputEl = function() {
-  inputEl.val('').css({
-    visibility: '',
-    width: '20px'
-  }).focus();
+  inputEl.val('').css('width', '20px').focus();
 };
 
-// hide the input element, empty it, blur focus
 var hideInputEl = function() {
-  inputEl.css({
-    visibility: 'hidden',
-    width: '0px'
-  }).val('').blur();
+  inputEl.val('').css('width', '1px').blur();
 };
 
 var positionDropdownEl = function() {
@@ -738,6 +749,97 @@ var hideDropdownEl = function() {
   dropdownEl.css('display', 'none').html('');
 };
 
+var highlightFirstOption = function() {
+  highlightOption(dropdownEl.find('li.' + CLASSES.option).filter(':first'));
+};
+
+var clearTokenGroupHighlight = function() {
+  tokensEl.find('div.' + CLASSES.tokenGroup).
+    removeClass(CLASSES.selectedTokenGroup);
+};
+
+var highlightLastTokenGroup = function() {
+  tokensEl.find('div.' + CLASSES.tokenGroup).
+    removeClass(CLASSES.selectedTokenGroup).
+    filter(':last').
+    addClass(CLASSES.selectedTokenGroup);
+};
+
+var updateTokens = function() {
+  tokensEl.html(buildTokens(TOKENS));
+};
+
+// TODO: revisit this and make it better for different font sizes, etc
+// http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
+var updateInputWidth = function(text) {
+  var width = (text.length + 1) * 10;
+  inputEl.css('width', width + 'px');
+};
+
+var highlightOption = function(optionEl) {
+  // remove highlighted from all values in the list
+  dropdownEl.find('li.' + CLASSES.option).
+    removeClass(CLASSES.highlightedOption);
+
+  // add highlight class to the value clicked
+  $(optionEl).addClass(CLASSES.highlightedOption);
+};
+
+var adjustDropdownScroll = function() {
+  // find the highlighted option
+  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+
+  // exit if we did not find one
+  if (highlightedEl.length !== 1) return;
+
+  var liTop = highlightedEl.position().top;
+  var scrollTop = dropdownEl.scrollTop();
+
+  // if the first option is selected, set scrollTop to it's highest in case
+  // there is a group <li> above it
+  if (dropdownEl.find('li.' + CLASSES.option).
+        filter(':first').
+        hasClass(CLASSES.highlightedOption) === true) {
+    dropdownEl.scrollTop(-1);
+    return;
+  }
+
+  // option is above the scroll window
+  if (liTop < 0) {
+    dropdownEl.scrollTop(scrollTop + liTop);
+    return;
+  }
+
+  var liHeight = highlightedEl.height();
+  var ddHeight = dropdownEl.height();
+
+  // option is below the scroll window
+  if ((liTop + liHeight) > ddHeight) {
+    // not sure why this doesn't work exactly, but seems
+    // to work better with the 6px fudge factor
+    dropdownEl.scrollTop(scrollTop + liTop + liHeight - ddHeight + 6);
+  }
+};
+
+//------------------------------------------------------------------------------
+// Control Flow / Data Manipulation
+//------------------------------------------------------------------------------
+
+var removeList = function(listName) {
+  delete cfg.lists[listName];
+  if (CURRENT_LIST_NAME === listName) {
+    CURRENT_LIST_NAME = cfg.initialList;
+  }
+};
+
+var destroyWidget = function() {
+  // remove markup
+  containerEl.html('');
+
+  // remove event handlers
+  containerEl.unbind();
+};
+
 // returns the current value of the widget
 var getValue = function() {
   return deepCopy(TOKENS);
@@ -748,11 +850,12 @@ var setValue = function(newValue) {
   var oldValue = getValue();
 
   if (typeof cfg.onChange === 'function') {
-    var potentialNewValue = cfg.onChange(newValue, oldValue);
+    var possibleNewValue = cfg.onChange(newValue, oldValue);
 
     // only change the value if their onChange function returned a valid value
-    if (validValue(potentialNewValue) === true) {
-      newValue = potentialNewValue;
+    // TODO: should throw an error if they return an array and it's invalid
+    if (validValue(possibleNewValue) === true) {
+      newValue = possibleNewValue;
     }
   }
 
@@ -801,27 +904,13 @@ var startInput = function() {
 };
 
 var stopInput = function() {
+  // kill any pending AJAX requests
   if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
     JQUERY_AJAX_OBJECT.abort();
   }
   hideInputEl();
   hideDropdownEl();
   INPUT_HAPPENING = false;
-};
-
-var highlightFirstOption = function() {
-  highlightOption(dropdownEl.find('li.option').filter(':first'));
-};
-
-var clearTokenGroupHighlight = function() {
-  tokensEl.find('div.' + CLASSES.tokenGroup).removeClass(CLASSES.selectedTokenGroup);
-};
-
-var highlightLastTokenGroup = function() {
-  tokensEl.find('div.' + CLASSES.tokenGroup).
-    removeClass(CLASSES.selectedTokenGroup).
-    filter(':last').
-    addClass(CLASSES.selectedTokenGroup);
 };
 
 // returns true if a tokenGroup is highlighted
@@ -901,8 +990,8 @@ var addHighlightedOption = function() {
 
   // close input if we did not find the object
   // NOTE: this should never happen, but it's here for a safeguard
-  if (! VISIBLE_OPTIONS[optionId]) {
-    // TODO: throw error
+  if (VISIBLE_OPTIONS.hasOwnProperty(optionId) !== true) {
+    // TODO: throw an error here
     stopInput();
     return;
   }
@@ -940,15 +1029,104 @@ var addHighlightedOption = function() {
   startInput();
 };
 
-var updateTokens = function() {
-  tokensEl.html(buildTokens(TOKENS));
+var sendAjaxRequest = function(list, inputValue) {
+
+  // TODO: allow full jQuery ajax config extend here
+  //       just not sure about how to handle scope with the
+  //       internal functions
+
+  var url;
+  if (typeof list.url === 'string') {
+    url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+  }
+  if (typeof list.url === 'function') {
+    url = list.url(inputValue, getValue());
+  }
+
+  // throw an error if url is not a string
+  if (typeof url !== 'string') {
+    error(8721, 'AJAX url must be a string.  Did your custom url function not return one?', url);
+    stopInput();
+    return;
+  }
+
+  var ajaxSuccess = function(data) {
+    // save the result in the cache
+    if (list.cacheAjax === true &&
+        LOCAL_STORAGE_AVAILABLE === true) {
+      localStorage.setItem(url, JSON.stringify(data));
+    }
+
+    if (INPUT_HAPPENING !== true) return;
+
+    // run their custom postProcess function
+    if (typeof list.postProcess === 'function') {
+      data = list.postProcess(data, getValue());
+    }
+
+    // expand the options and make sure they're valid
+    var options = [];
+    if (isArray(data) === true) {
+      for (var i = 0; i < data.length; i++) {
+        // skip any objects that are not valid Options
+        if (validOption(data[i]) !== true) continue;
+
+        options.push(expandOptionObject(data[i], list));
+      }
+    }
+
+    // no results :(
+    var html = '';
+    if (options.length === 0 && isOptionShowing() === false) {
+      html = buildNoResults(list.noResultsHTML, inputValue);
+    }
+
+    // new options
+    if (options.length > 0) {
+      html = buildOptions(options, list, true);
+    }
+
+    dropdownEl.find('li.searching').replaceWith(html);
+
+    // highlight the option if there are no others highlighted
+    if (isOptionHighlighted() === false) {
+      highlightFirstOption();
+    }
+  };
+
+  var ajaxError = function(xhr, errType, exceptionObject) {
+    //if (errType === 'abort') {
+    // TODO: write me
+    //}
+    if (errType === 'error') {
+      dropdownEl.find('li.searching').replaceWith(buildAjaxError());
+    }
+  };
+
+  // check the cache
+  if (list.cacheAjax === true &&
+      LOCAL_STORAGE_AVAILABLE === true &&
+      // would prefer to check for something more than just truthy here
+      localStorage.getItem(url)) {
+    ajaxSuccess(JSON.parse(localStorage.getItem(url)));
+  }
+  // else send the AJAX request
+  else {
+    JQUERY_AJAX_OBJECT = $.ajax({
+      dataType: 'json',
+      error: ajaxError,
+      success: ajaxSuccess,
+      type: 'GET',
+      url: url
+    });
+  }
 };
 
-// attempts to return all non-HTML characters from a string
-var findNonHTMLChars = function(str) {
-  var str2 = '';
+// calls fn() against every non-HTML character in str
+// NOTE: this is naive; I'm sure there are bugs here
+//       also it assumes valid HTML
+var mapNonHTMLChars = function(str, fn) {
   var chars = str.split('');
-
   var inATag = false;
   var inEscapeSequence = false;
 
@@ -972,57 +1150,45 @@ var findNonHTMLChars = function(str) {
 
     if (inATag === true || inEscapeSequence === true) continue;
 
-    str2 += chars[i];
+    fn(chars[i]);
   }
+};
 
+// attempts to return all non-HTML characters from a string
+var findNonHTMLChars = function(str) {
+  var str2 = '';
+  mapNonHTMLChars(str, function(c) {
+    str2 += c;
+  });
   return str2;
 };
 
-// it is doubtful that there are not bugs in this function
+// add <strong> tags around all non-HTML characters in optionHTML that exist in input
 var highlightMatchChars = function(optionHTML, input) {
-  var htmlChars = optionHTML.split('');
   var inputChars = input.split('');
-
-  var charsToHighlight = [];
+  var charsToHighlight = {};
   for (var i = 0; i < inputChars.length; i++) {
     // skip anything that is not alphanumeric
+    // TODO: is this necessary?
     if (inputChars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
 
-    charsToHighlight.push(inputChars[i].toLowerCase(), inputChars[i].toUpperCase());
+    charsToHighlight[inputChars[i].toLowerCase()] = 0;
+    charsToHighlight[inputChars[i].toUpperCase()] = 0;
   }
 
-  var inATag = false;
-  var inEscapeSequence = false;
+  charsToHighlight = objectKeysToArray(charsToHighlight);
 
-  for (var i = 0; i < htmlChars.length; i++) {
-    if (htmlChars[i] === '<') {
-      inATag = true;
-      continue;
-    }
-    if (inATag === true && htmlChars[i] === '>') {
-      inATag = false;
-      continue;
-    }
-    if (htmlChars[i] === '&') {
-      inEscapeSequence = true;
-      continue;
-    }
-    if (inEscapeSequence === true && htmlChars[i] === ';') {
-      inEscapeSequence = false;
-      continue;
-    }
-
-    if (inATag === true || inEscapeSequence === true) continue;
-
-    for (var j = 0; j < charsToHighlight.length; j++) {
-      if (htmlChars[i] === charsToHighlight[j]) {
-        htmlChars[i] = '<strong>' + htmlChars[i] + '</strong>';
-        break;
+  var optionHTML2 = '';
+  mapNonHTMLChars(optionHTML, function(c) {
+    for (var i = 0; i < charsToHighlight.length; i++) {
+      if (c === charsToHighlight[i]) {
+        optionHTML2 += '<strong>' + c + '</strong>';
+        return;
       }
     }
-  }
-
-  return htmlChars.join('');
+    optionHTML2 += c;
+  });
+  return optionHTML2;
 };
 
 // does input match the beginning of str?
@@ -1137,51 +1303,19 @@ var matchOptions = function(input, list) {
   return options2;
 };
 
-var highlightOption = function(optionEl) {
-  // remove highlighted from all values in the list
-  dropdownEl.find('li.option').removeClass(CLASSES.highlightedOption);
-
-  // add highlight class to the value clicked
-  $(optionEl).addClass(CLASSES.highlightedOption);
+// returns true if there is a valid option showing
+// false otherwise
+var isOptionShowing = function() {
+  return (dropdownEl.find('li.' + CLASSES.option).length > 0);
 };
 
-var adjustDropdownScroll = function() {
-  // find the highlighted option
-  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
-
-  // exit if we did not find one
-  if (highlightedEl.length !== 1) return;
-
-  var liTop = highlightedEl.position().top;
-  var scrollTop = dropdownEl.scrollTop();
-
-  // if the first option is selected, set scrollTop to it's highest in case
-  // there is a group <li> above it
-  if (dropdownEl.find('li.option').filter(':first').hasClass(CLASSES.highlightedOption) === true) {
-    dropdownEl.scrollTop(-1);
-    return;
-  }
-
-  // option is above the scroll window
-  if (liTop < 0) {
-    dropdownEl.scrollTop(scrollTop + liTop);
-    return;
-  }
-
-  var liHeight = highlightedEl.height();
-  var ddHeight = dropdownEl.height();
-
-  // option is below the scroll window
-  if ((liTop + liHeight) > ddHeight) {
-    // not sure why this doesn't work exactly, but seems
-    // to work better with the 6px fudge factor
-    dropdownEl.scrollTop(scrollTop + liTop + liHeight - ddHeight + 6);
-  }
+var isOptionHighlighted = function() {
+  return (dropdownEl.find('li.' + CLASSES.highlightedOption).length !== 0);
 };
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Input Keypresses
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 var pressUpArrow = function() {
   // get the highlighted element
@@ -1189,7 +1323,8 @@ var pressUpArrow = function() {
 
   // no row highlighted, highlight the last list element
   if (highlightedEl.length === 0) {
-    dropdownEl.find('li.option').last().addClass(CLASSES.highlightedOption);
+    dropdownEl.find('li.' + CLASSES.option).last().
+      addClass(CLASSES.highlightedOption);
     adjustDropdownScroll();
     return;
   }
@@ -1198,7 +1333,8 @@ var pressUpArrow = function() {
   highlightedEl.removeClass(CLASSES.highlightedOption);
 
   // highlight the previous option
-  highlightedEl.prevAll('li.option').first().addClass(CLASSES.highlightedOption);
+  highlightedEl.prevAll('li.' + CLASSES.option).first().
+    addClass(CLASSES.highlightedOption);
   adjustDropdownScroll();
 };
 
@@ -1208,7 +1344,8 @@ var pressDownArrow = function() {
 
   // no row highlighted, highlight the first option
   if (highlightedEl.length === 0) {
-    dropdownEl.find('li.option').first().addClass(CLASSES.highlightedOption);
+    dropdownEl.find('li.' + CLASSES.option).first().
+      addClass(CLASSES.highlightedOption);
     adjustDropdownScroll();
     return;
   }
@@ -1217,47 +1354,14 @@ var pressDownArrow = function() {
   highlightedEl.removeClass(CLASSES.highlightedOption);
 
   // highlight the next option
-  highlightedEl.nextAll('li.option').first().addClass(CLASSES.highlightedOption);
+  highlightedEl.nextAll('li.' + CLASSES.option).first().
+    addClass(CLASSES.highlightedOption);
   adjustDropdownScroll();
 };
 
 var pressEscapeKey = function() {
   stopInput();
   clearTokenGroupHighlight();
-};
-
-var moveTokenHighlightLeft = function() {
-  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
-
-  // exit if there is not a selected token
-  if (selectedEl.length !== 1) return;
-
-  var prev = selectedEl.prev('div.' + CLASSES.tokenGroup);
-  selectedEl.removeClass(CLASSES.selectedTokenGroup);
-  if (prev.length === 1) {
-    prev.addClass(CLASSES.selectedTokenGroup);
-  }
-  else {
-    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':last')
-      .addClass(CLASSES.selectedTokenGroup);
-  }
-};
-
-var moveTokenHighlightRight = function() {
-  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
-
-  // exit if there is not a selected token
-  if (selectedEl.length !== 1) return;
-
-  var next = selectedEl.next('div.' + CLASSES.tokenGroup);
-  selectedEl.removeClass(CLASSES.selectedTokenGroup);
-  if (next.length === 1) {
-    next.addClass(CLASSES.selectedTokenGroup);
-  }
-  else {
-    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':first')
-      .addClass(CLASSES.selectedTokenGroup);
-  }
 };
 
 var pressBackspaceOnEmptyInput = function() {
@@ -1271,116 +1375,6 @@ var pressBackspaceOnEmptyInput = function() {
 
 var pressEnterOrTab = function() {
   addHighlightedOption();
-};
-
-// returns true if there is a valid option showing
-// false otherwise
-var isOptionShowing = function() {
-  return (dropdownEl.find('li.option').length > 0);
-};
-
-var isOptionHighlighted = function() {
-  return (dropdownEl.find('li.' + CLASSES.highlightedOption).length !== 0);
-};
-
-// TODO: revisit this and make it better for different font sizes, etc
-// http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
-var updateInputWidth = function(text) {
-  var width = (text.length + 1) * 10;
-  inputEl.css('width', width + 'px');
-};
-
-var sendAjaxRequest = function(list, inputValue) {
-
-  // TODO: allow full jQuery ajax config extend here
-  //       just not sure about how to handle scope with the
-  //       internal functions
-
-  var url;
-  if (typeof list.url === 'string') {
-    url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
-  }
-  if (typeof list.url === 'function') {
-    url = list.url(inputValue, getValue());
-  }
-
-  // throw an error if url is not a string
-  if (typeof url !== 'string') {
-    error(8721, 'AJAX url must be a string.  Did your custom url function not return one?', url);
-    stopInput();
-    return;
-  }
-
-  var ajaxSuccess = function(data) {
-    // save the result in the cache
-    if (list.cacheAjax === true &&
-        LOCAL_STORAGE_AVAILABLE === true) {
-      localStorage.setItem(url, JSON.stringify(data));
-    }
-
-    if (INPUT_HAPPENING !== true) return;
-
-    // run their custom postProcess function
-    if (typeof list.postProcess === 'function') {
-      data = list.postProcess(data, getValue());
-    }
-
-    // expand the options and make sure they're valid
-    var options = [];
-    if (isArray(data) === true) {
-      for (var i = 0; i < data.length; i++) {
-        // skip any objects that are not valid Options
-        if (validOption(data[i]) !== true) continue;
-
-        options.push(expandOptionObject(data[i], list));
-      }
-    }
-
-    // no results :(
-    var html = '';
-    if (options.length === 0 && isOptionShowing() === false) {
-      html = buildNoResults(list.noResultsHTML, inputValue);
-    }
-
-    // new options
-    if (options.length > 0) {
-      html = buildOptions(options, list, true);
-    }
-
-    dropdownEl.find('li.searching').replaceWith(html);
-
-    // highlight the option if there are no others highlighted
-    if (isOptionHighlighted() === false) {
-      highlightFirstOption();
-    }
-  };
-
-  var ajaxError = function(xhr, errType, exceptionObject) {
-    //if (errType === 'abort') {
-    // TODO: write me
-    //}
-    if (errType === 'error') {
-      dropdownEl.find('li.searching').replaceWith(buildAjaxError());
-    }
-  };
-
-  // check the cache
-  if (list.cacheAjax === true &&
-      LOCAL_STORAGE_AVAILABLE === true &&
-      // would prefer to check for something more than just truthy here
-      localStorage.getItem(url)) {
-    ajaxSuccess(JSON.parse(localStorage.getItem(url)));
-  }
-  // else send the AJAX request
-  else {
-    JQUERY_AJAX_OBJECT = $.ajax({
-      dataType: 'json',
-      error: ajaxError,
-      success: ajaxSuccess,
-      type: 'GET',
-      url: url
-    });
-  }
 };
 
 var pressRegularKey = function() {
@@ -1458,13 +1452,13 @@ var pressRegularKey = function() {
   }
 };
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Browser Events
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // click on the container
 var clickContainerElement = function(e) {
-  // prevent any clicks inside the container from bubbling up to the html element
+  // prevent any clicks inside the container from bubbling up to the window
   e.stopPropagation();
 
   // start input if it's not already happening
@@ -1607,24 +1601,9 @@ var keydownWindow = function(e) {
   }
 };
 
-var addEvents = function() {
-  containerEl.on('click', clickContainerElement);
-  containerEl.on('keydown', 'input.autocomplete-input', keydownInputElement);
-  containerEl.on('click', 'li.option', clickOption);
-  containerEl.on('mouseover', 'li.option', mouseoverOption);
-  containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
-  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup, clickRemoveTokenGroup);
-
-  // catch all clicks on the page
-  $('html').on('click', clickPage);
-
-  // catch global keydown
-  $(window).on('keydown', keydownWindow);
-};
-
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Public Methods
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // returns true if adding the option was successful
 // false otherwise
@@ -1804,9 +1783,24 @@ widget.val = function(value) {
   return false;
 };
 
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
 // Initialization
-//----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+var addEvents = function() {
+  containerEl.on('click', clickContainerElement);
+  containerEl.on('keydown', 'input.autocomplete-input', keydownInputElement);
+  containerEl.on('click', 'li.' + CLASSES.option, clickOption);
+  containerEl.on('mouseover', 'li.' + CLASSES.option, mouseoverOption);
+  containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
+  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup, clickRemoveTokenGroup);
+
+  // catch all clicks on the page
+  $('html').on('click', clickPage);
+
+  // catch global keydown
+  $(window).on('keydown', keydownWindow);
+};
 
 var initDom = function() {
   // get the container element

@@ -5,7 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title><?php echo $example['name']; ?> Example</title>
   <base href="<?php echo BASE_URL; ?>" />
+  <!--
   <link rel="stylesheet" href="css/bootstrap-2.2.2.min.css" />
+  -->
   <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
   <script src="css/less-1.3.0.min.js"></script>
 </head>
