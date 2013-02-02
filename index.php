@@ -48,16 +48,16 @@ if ($URI[0] === 'themes') {
 }
 
 // examples
-if ($URI[0] === 'examples') {
+if ($URI[0] === 'examples' && $URI[1] === '') {
 	require(APP_PATH.'pages/examples.php');
 	die;
 }
 
 // single example
-if ($URI[0] === 'example' && $URI[1] !== '') {
+if ($URI[0] === 'examples' && $URI[1] !== '') {
 	$example = AC::getExample($URI[1]);
 	if ($example !== false) {
-		require(APP_PATH.'pages/example.php');
+		require(APP_PATH.'pages/single_example.php');
 		die;
 	}
 }

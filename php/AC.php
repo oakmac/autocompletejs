@@ -4,55 +4,45 @@ final class AC {
 
   // returns an array of all the examples
   public static function getExamples() {
-    $examples = array();
-    $jsFiles = glob(APP_PATH.'examples/*.js');
-    $count = 1;
-    foreach ($jsFiles as $jsFileName) {
-      $jsFileContent = trim(file_get_contents($jsFileName));
-      
-      $tmp = array_pop(explode('/', $jsFileName));
-      $slug = str_replace('.js', '', $tmp);
-      
-      // skip empty files
-      if ($jsFileContent === '') continue;
-      
-      $htmlFileName = str_replace('.js', '.html', $jsFileName);
-      $htmlFileContent = trim(file_get_contents($htmlFileName));
-      
-      array_push($examples, array(
-        'html' => $htmlFileContent,
-        'js'   => $jsFileContent,
-        'slug' => $slug,
-        'num'  => $count,
-      ));
-      
-      $count++;
+    $examples = self::getExamplesJSON();
+    for ($i = 0; $i < count($examples); $i++) {
+      $num = $examples[$i]['number'];
+      $examples[$i]['html'] = trim(file_get_contents(APP_PATH.'examples/'.$num.'.html'));
+      $examples[$i]['js']   = trim(file_get_contents(APP_PATH.'examples/'.$num.'.js'));
     }
-    
     return $examples;
   }
 
   // get the html and js file for an example
   // returns false if the example does not exist
-  public static function getExample($name) {
-    // be strict about filename for security
-    $name = AC::escapeFileName($name);
+  public static function getExample($number) {
+    // example should be an integer
+    $number = (int) $number;
     
-    if (file_exists(APP_PATH.'examples/'.$name.'.html') !== true) {
+    if (file_exists(APP_PATH.'examples/'.$number.'.html') !== true) {
       return false;
     }
     
     return array(
-      'html' => file_get_contents(APP_PATH.'examples/'.$name.'.html'),
-      'js' => file_get_contents(APP_PATH.'examples/'.$name.'.js'),
+      'html'   => file_get_contents(APP_PATH.'examples/'.$number.'.html'),
+      'js'     => file_get_contents(APP_PATH.'examples/'.$number.'.js'),
+      'number' => $number,
     );
   }
   
-  // our example files should only contain [a-z0-1_]
-  public static function escapeFileName($str) {
-    return preg_replace('/[^a-z0-9_]/', '', $str);
+  //---------------------------------------------------
+  // Private Functions
+  //---------------------------------------------------
+  private static function getExamplesJSON() {
+    $examples = json_decode(file_get_contents(APP_PATH.'examples/examples.json'), true);
+    $examples2 = array();
+    foreach ($examples as $e) {
+      if (is_array($e) !== true) continue;
+      array_push($examples2, $e);
+    }
+    return $examples2;
   }
-
+  
 }
 
 ?>

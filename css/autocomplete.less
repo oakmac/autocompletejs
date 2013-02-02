@@ -61,7 +61,17 @@
        -o-transition: @attribute @time @effect;
           transition: @attribute @time @effect;
 }
-
+.clearfix() {
+  *zoom: 1;
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+  }
+  &:after {
+    clear: both;
+  }
+}
 // end functions
 
 
@@ -73,6 +83,10 @@ div.autocomplete_internal_container {
   .rounded-corners(8px);
   border: 2px solid #ccc;
   padding: 4px;
+	
+	div.clearfix {
+		.clearfix();
+	}
 
   input.autocomplete-input {
     -webkit-box-shadow: none;
@@ -86,6 +100,7 @@ div.autocomplete_internal_container {
 		width: 120px;
     padding: 0px;
     padding-top: 8px;
+		height: 20px;
   }
 
 	div.token-group {
