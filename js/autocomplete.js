@@ -680,14 +680,14 @@ var buildTokens = function(tokens) {
   return html;
 };
 
-var buildNoResults = function(noResults, inputValue) {
+var buildNoResults = function(noResultsHTML, inputValue) {
   var html = '<li class="no-results">';
-  var type = typeof noResults;
+  var type = typeof noResultsHTML;
   if (type === 'string') {
-    html += noResults;
+    html += noResultsHTML;
   }
   if (type === 'function') {
-    html += noResults(getValue(), inputValue);
+    html += noResultsHTML(inputValue, getValue());
   }
   html += '</li>';
   return html;
@@ -700,7 +700,7 @@ var buildSearching = function(searchingHTML, inputValue) {
     html += searchingHTML;
   }
   if (type === 'function') {
-    html += searchingHTML(getValue(), inputValue);
+    html += searchingHTML(inputValue, getValue());
   }
   html += '</li>';
   return html;
