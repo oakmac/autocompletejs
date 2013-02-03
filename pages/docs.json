@@ -1,4 +1,6 @@
-[
+{
+"Option Object":[
+"------------------------------------------------------------------------------",
 {
   "name":"children",
   "type":"String",
@@ -9,6 +11,7 @@
     "This children property will supersede a children property on the parent List Object."
   ]
 },
+"------------------------------------------------------------------------------",
 {
   "name":"group",
   "type":"String",
@@ -19,5 +22,165 @@
     "You can control the sort order "
   ],
   "examples":1012
-}
+},
+"------------------------------------------------------------------------------"
+],
+
+
+
+"Methods":[
+"------------------------------------------------------------------------------",
+{
+  "name":"addOption(listName, option)",
+  "args":[
+    ["listName", "name of the list to add the option to"],
+    ["option", "option to add to the list"]
+  ],
+  "desc":[
+    "Add an option to a list.",
+    "Returns <code class='js keyword'>true</code> if adding the option was successful.",
+    "Returns <code class='js keyword'>false</code> otherwise."
+  ],
+  "examples":7000
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"blur()",
+  "desc":"Remove focus from the widget.",
+  "examples":7001
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"clear()",
+  "desc":[
+    "Clear the value of the widget.",
+    "Has the same effect as doing <code class='js plain'>setValue([])</code>"
+  ],
+  "examples":7002
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"destroy()",
+  "desc":"Remove the widget from the DOM.",
+  "examples":7003
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"focus()",
+  "desc":"Puts the input focus on the widget.",
+  "examples":7004
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"getList(name)",
+  "args":[
+    ["name", "name of the list to get"]
+  ],
+  "desc":[
+    "Returns the list object if it exists.",
+    "Returns <code class='js keyword'>false</code> if the list does not exist."
+  ],
+  "examples":7005
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"getLists()",
+  "desc":"Returns an object of all the lists.",
+  "examples":7006
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"getValue()",
+  "desc":[
+    "Returns the current value of the widget.",
+    "Returns an empty array if the widget has no token groups."
+  ],
+  "examples":7007
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"list(name)",
+  "args":[
+    ["name", "name of the list to get"]
+  ],
+  "desc":"Alias of <a href='docs#methods:getList'><code class='js plain'>getList(name)</code></a>"
+},
+"------------------------------------------------------------------------------",
+{
+  "noId":true,
+  "name":"list(name, list)",
+  "args":[
+    ["name", "name of the list to add or update"],
+    ["list", "list object"]
+  ],
+  "desc":"Alias of <a href='docs#methods:setList'><code class='js plain'>setList(name, list)</code></a>"
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"removeList(name)",
+  "args":[
+    ["name", "name of the list to remove"]
+  ],
+  "desc":[
+    "Returns <code class='js keyword'>true</code> if the list was removed.",
+    "Returns <code class='js keyword'>false</code> if not.",
+    "You cannot remove the initialList."
+  ],
+  "examples":7008
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"removeTokenGroup(index)",
+  "args":[
+    ["index", "zero-based index of the token group to remove"]
+  ],
+  "desc":[
+    "Remove a token group by array index.",
+    "Returns the updated value of the widget if successful.",
+    "Returns <code class='js keyword'>false</code> otherwise."
+  ],
+  "examples":7009
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"setList(name, list)",
+  "args":[
+    ["name", "name of the list to add or update"],
+    ["list", "list object"]
+  ],
+  "desc":[
+    "Adds a new list or updates an existing list.",
+    "Returns <code class='js keyword'>true</code> if adding the list was successful.",
+    "Returns <code class='js keyword'>false</code> otherwise."
+  ],
+  "examples":7010
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"setValue(value)",
+  "args":[
+    ["value", "value to set the widget to"]
+  ],
+  "desc":[
+    "Returns <code class='js keyword'>true</code> and updates the widget if <code class='js plain'>value</code> is valid.",
+    "Returns <code class='js keyword'>false</code> otherwise."
+  ],
+  "examples":7011
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"val()",
+  "desc":"Alias of <a href='docs#methods:getValue'><code class='js plain'>getValue()</code></a>"
+},
+"------------------------------------------------------------------------------",
+{
+  "noId":true,
+  "name":"val(value)",
+  "args":[
+    ["value", "value to set the widget to"]
+  ],
+  "desc":"Alias of <a href='docs#methods:setValue'><code class='js plain'>setValue(value)</code></a>"
+},
+"------------------------------------------------------------------------------"
 ]
+}

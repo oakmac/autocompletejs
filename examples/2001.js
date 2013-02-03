@@ -1,11 +1,13 @@
+var commonCities = ['Austin','Dallas','El Paso','Houston','San Antonio'];
 var config = {
-  initialList: 'states',
+  initialList: 'cities',
   lists: {
-    'states': {
-	  ajaxEnabled: true,
-	  url: 'api/states.php?q={value}',
-	  options: ['AAA','BBB','CCC']
-	}
+    cities: {
+      ajaxEnabled: true,
+      cacheAjax: false,
+      url: 'api/cities.php?state=TX&q={value}&includeCommon=false',
+      options: commonCities
+    }
   }
 };
-var widget = new AutoComplete('example28372', config);
+var widget = new AutoComplete('search_bar', config);

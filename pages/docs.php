@@ -1,6 +1,8 @@
 <?php
 $page_title = 'Documentation';
 include(APP_PATH . 'pages/header.php');
+$examples = AC::getExamples();
+$docs = AC::getDocs();
 ?>
 
 <div class="row">
@@ -501,42 +503,12 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </tr>
 </thead>
 <tbody>
-<tr id="methods:addOption">
-  <td><code class="js plain">addOption(listName, option)</code></td>
-  <td>
-    <p><code class="js plain">listName</code> - name of the list to add the option to</p>
-    <p><code class="js plain">option</code> - option to add to the list</p>
-  </td>
-  <td>
-    <p>Add an option to a list.</p>
-    <p>Returns <code class="js keyword">true</code> if adding the option was successful.</p>
-    <p>Returns <code class="js keyword">false</code> otherwise.</p>
-  </td>
-  <td>
-    <p><a href="examples#7000">addOption Example</a></p>
-  </td>
-</tr>
-<tr id="methods:blur">
-  <td><code class="js plain">blur()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Remove focus from the widget.</p>
-  </td>
-  <td>
-    <p><a href="examples#7001">blur Example</a></p>
-  </td>
-</tr>
-<tr id="methods:clear">
-  <td><code class="js plain">clear()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Clear the value of the widget.</p>
-    <p>Has the same effect as doing <code class="js plain">setValue([])</code></p>
-  </td>
-  <td>
-    <p><a href="examples#7002">clear Example</a></p>
-  </td>
-</tr>
+<?php
+foreach($docs['Methods'] as $method) {
+  if (is_array($method) !== true) continue;
+  echo buildMethodRow($method, $examples);
+}
+?>
 <!--
 <tr>
   <td><code class="js plain">config()</code></td>
@@ -548,111 +520,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p><a href="#">config() Example</a></p>
   </td>
 </tr>
--->
-<tr id="methods:destroy">
-  <td><code class="js plain">destroy()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Remove the widget from the DOM.</p>
-  </td>
-  <td>
-    <p><a href="examples#7003">destroy Example</a></p>
-  </td>
-</tr>
-<tr id="methods:focus">
-  <td><code class="js plain">focus()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Puts the input focus on the widget.</p>
-  </td>
-  <td>
-    <p><a href="examples#7004">focus Example</a></p>
-  </td>
-</tr>
-<tr id="methods:getList">
-  <td><code class="js plain">getList(name)</code></td>
-  <td>
-    <p><code class="js plain">name</code> - name of the list to get</p>
-  </td>
-  <td>
-    <p>Returns the list object if it exists.</p>
-    <p>Returns <code class="js keyword">false</code> if the list does not exist.</p>
-  </td>
-  <td>
-    <p><a href="examples#7005">getList Example</a></p>
-  </td>
-</tr>
-<tr id="methods:getLists">
-  <td><code class="js plain">getLists()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Returns an object of all the lists.</p>
-  </td>
-  <td>
-    <p><a href="examples#7006">getLists Example</a></p>
-  </td>
-</tr>
-<tr id="methods:getValue">
-  <td><code class="js plain">getValue()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Returns the current value of the widget.</p>
-    <p>Returns an empty array if the widget has no token groups.</p>
-  </td>
-  <td>
-    <p><a href="examples#7007">getValue Example</a></p>
-  </td>
-</tr>
-<tr id="methods:list">
-  <td><code class="js plain">list(name)</code></td>
-  <td>
-    <p><code class="js plain">name</code> - name of the list to get</p>
-  </td>
-  <td>
-    <p>Alias of <code class="js plain">getList(name)</code></p>
-  </td>
-  <td></td>
-</tr>
-<tr>
-  <td><code class="js plain">list(name, list)</code></td>
-  <td>
-    <p><code class="js plain">name</code> - name of the list to add or update</p>
-    <p><code class="js plain">list</code> - list object</p>
-  </td>
-  <td>
-    <p>Alias of <code class="js plain">setList(name, list)</code></p>
-  </td>
-  <td></td>
-</tr>
-<tr id="methods:removeList">
-  <td><code class="js plain">removeList(name)</code></td>
-  <td>
-    <p><code class="js plain">name</code> - name of the list to remove</p>
-  </td>
-  <td>
-    <p>Returns <code class="js keyword">true</code> if the list was removed.</p>
-    <p>Returns <code class="js keyword">false</code> if not.</p>
-    <p>Note: you cannot remove the initialList.</p>
-  </td>
-  <td>
-    <p><a href="examples#7008">removeList Example</a></p>
-  </td>
-</tr>
-<tr id="methods:removeTokenGroup">
-  <td><code class="js plain">removeTokenGroup(index)</code></td>
-  <td>
-    <p><code class="js plain">index</code> - zero-based index of the token group to remove</p>
-  </td>
-  <td>
-    <p>Remove a token group by array index.</p>
-    <p>Returns the updated value of the widget if successful.</p>
-    <p>Returns <code class="js keyword">false</code> otherwise.</p>
-  </td>
-  <td>
-    <p><a href="examples#7009">removeTokenGroup Example</a></p>
-  </td>
-</tr>
-<!--
 <tr>
   <td><code class="js plain">setConfig(config)</code></td>
   <td>
@@ -685,52 +552,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </td>
 </tr>
 -->
-<tr id="methods:setList">
-  <td><code class="js plain">setList(name, list)</code></td>
-  <td>
-    <p><code class="js plain">name</code> - name of the list to add or update</p>
-    <p><code class="js plain">list</code> - list object</p>
-  </td>
-  <td>
-    <p>Adds a new list or updates an existing list.</p>
-    <p>Returns <code class="js keyword">true</code> if adding the list was successful.</p>
-    <p>Returns <code class="js keyword">false</code> otherwise.</p>
-  </td>
-  <td>
-    <p><a href="examples#7010">setList Example</a></p>
-  </td>
-</tr>
-<tr id="methods:setValue">
-  <td><code class="js plain">setValue(tokens)</code></td>
-  <td>
-    <p><code class="js plain">tokens</code> - array of Token Objects</p>
-  </td>
-  <td>
-    <p>Returns <code class="js keyword">true</code> and updates the widget if <code class="js plain">tokens</code> is valid.</p>
-    <p>Returns <code class="js keyword">false</code> otherwise.</p>
-  </td>
-  <td>
-    <p><a href="examples#7011">setValue Example</a></p>
-  </td>
-</tr>
-<tr id="methods:val">
-  <td><code class="js plain">val()</code></td>
-  <td><small>n/a</small></td>
-  <td>
-    <p>Alias of <code class="js plain">getValue()</code></p>
-  </td>
-  <td></td>
-</tr>
-<tr>
-  <td><code class="js plain">val(tokens)</code></td>
-  <td>
-    <p><code class="js plain">tokens</code> - array of Token Objects</p>
-  </td>
-  <td>
-    <p>Alias of <code class="js plain">setValue(tokens)</code></p>
-  </td>
-  <td></td>
-</tr>
+</tbody>
 </table>
 
 </div><!-- end .twelve.columns -->
@@ -738,4 +560,81 @@ TODO: "how it works" walk-through explanation of how the widget functions
 
 <?php
 include(APP_PATH . 'pages/footer.php');
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
+function buildMethodRow($method, $examples) {
+  $nameNoParens = preg_replace('/\(.+$/', '', $method['name']);
+  
+  $html = '';
+  
+  // table row
+  if (array_key_exists('noId', $method) === true) {
+    $html .= "<tr>\n";
+  }
+  else {
+    $html .= '<tr id="methods:'.$nameNoParens.'">'."\n";
+  }
+  
+  // name
+  $html .= '  <td><code class="js plain">'.$method['name'].'</code></td>'."\n";
+  
+  // args
+  if (array_key_exists('args', $method) === true) {
+    $html .= '  <td>'."\n";
+    foreach ($method['args'] as $arg) {
+      $html .= '    <p><code class="js plain">'.$arg[0].'</code> - '.$arg[1].'</p>'."\n";
+    }
+    $html .= '  </td>'."\n";
+  }
+  else {
+    $html .= '  <td><small>n/a</small></td>'."\n";
+  }
+  
+  // description
+  $html .= '  <td>'."\n";
+  if (is_array($method['desc']) !== true) {
+    $method['desc'] = array($method['desc']);
+  }
+  foreach ($method['desc'] as $desc) {
+    $html .= '    <p>'.$desc.'</p>'."\n";
+  }
+  $html .= '  </td>'."\n";
+  
+  // examples
+  if (array_key_exists('examples', $method) === true) {
+    if (is_array($method['examples']) !== true) {
+      $method['examples'] = array($method['examples']);
+    }
+    $html .= '  <td>'."\n";
+    foreach ($method['examples'] as $exampleNum) {
+      $example = getExampleByNumber($exampleNum, $examples);
+      if ($example === false) continue;
+      
+      $html .= '    <p><a href="examples#'.$example['number'].'">'.$example['name'].'</a></p>'."\n";
+    }
+    $html .= '  </td>'."\n";
+  }
+  else {
+    $html .= '  <td></td>'."\n";
+  }
+  
+  $html .= "</tr>\n";
+  
+  return $html;
+}
+
+function getExampleByNumber($number, $examples) {
+  $number = (int) $number;
+  foreach ($examples as $ex) {
+    if (intval($ex['number'], 10) === $number &&
+        $ex['js'] !== '') {
+      return $ex;
+    }
+  }
+  
+  return false;
+}
 ?>

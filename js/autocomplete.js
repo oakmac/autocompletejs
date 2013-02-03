@@ -423,7 +423,7 @@ var expandListObject = function(list) {
   }
 
   // default for cacheAjax is true
-  if (typeof list.cacheAjax !== false) {
+  if (list.cacheAjax !== false) {
     list.cacheAjax = true;
   }
 
@@ -1093,7 +1093,14 @@ var sendAjaxRequest = function(list, inputValue) {
         // skip any objects that are not valid Options
         if (validOption(data[i]) !== true) continue;
 
-        options.push(expandOptionObject(data[i], list));
+        // expand option
+        data[i] = expandOptionObject(data[i], list);
+        
+        // highlight matching characters
+        data[i].optionHTML = highlightMatchChars(data[i].optionHTML, inputValue);
+        
+        // add the option
+        options.push(data[i]);
       }
     }
 
@@ -1108,9 +1115,10 @@ var sendAjaxRequest = function(list, inputValue) {
       html = buildOptions(options, list, true);
     }
 
+    // update the dropdown
     dropdownEl.find('li.searching').replaceWith(html);
 
-    // highlight the option if there are no others highlighted
+    // highlight the first option if there are no others highlighted
     if (isOptionHighlighted() === false) {
       highlightFirstOption();
     }
@@ -1124,7 +1132,7 @@ var sendAjaxRequest = function(list, inputValue) {
       dropdownEl.find('li.searching').replaceWith(buildAjaxError());
     }
   };
-
+  
   // check the cache
   if (list.cacheAjax === true &&
       LOCAL_STORAGE_AVAILABLE === true &&
@@ -1287,6 +1295,12 @@ var matchOptionsSpecial = function(options, input) {
   return options2;
 };
 
+
+// TODO: need to give them the ability to specify which matching they want
+//       ie: default is array of ['front','substring','any-char']
+//       but they should be able to change it
+
+
 // TODO: this needs to be refactored
 // investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
@@ -1325,12 +1339,12 @@ var matchOptions = function(input, list) {
   return options2;
 };
 
-// returns true if there is a valid option showing
-// false otherwise
+// returns true if there is an option showing in the dropdown
 var isOptionShowing = function() {
   return (dropdownEl.find('li.' + CLASSES.option).length > 0);
 };
 
+// returns true if an option is highlighted in the dropdown
 var isOptionHighlighted = function() {
   return (dropdownEl.find('li.' + CLASSES.highlightedOption).length !== 0);
 };

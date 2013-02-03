@@ -76,23 +76,26 @@ div.autocomplete_internal_container {
   .rounded-corners(8px);
   border: 2px solid #ccc;
   padding: 4px;
+	font-style: normal;
+	font-weight: normal;
 
   input.autocomplete-input {
-    -webkit-box-shadow: none;
+    background: transparent;
+		border: 0px;
+		-webkit-box-shadow: none;
        -moz-box-shadow: none;
 			      box-shadow: none;
-    outline: none;
-		border: 0px;
-    background: transparent;
-    float: left;
+    color: #000;
+		float: left;
+		font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 		font-size: 16px;
-		width: 120px;
-    padding: 0px;
-    padding-top: 8px;
 		height: 20px;
 		line-height: 20px;
+		margin: 0 0 10px 0;
+		outline: none;
+		padding: 8px 0 0 0;
 		vertical-align: middle;
-		margin: 0px 0px 10px 0px;
+		width: 120px;
   }
 
 	div.token-group {

@@ -30,6 +30,11 @@ final class AC {
     );
   }
   
+  public static function getDocs() {
+    $docs = json_decode(file_get_contents(APP_PATH.'pages/docs.json'), true);
+    return $docs;
+  }
+  
   //---------------------------------------------------
   // Private Functions
   //---------------------------------------------------
