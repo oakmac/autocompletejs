@@ -6,9 +6,9 @@ var config = {
       { value: 'Mammals', children: 'mammals' },
       { value: 'Reptiles', children: 'reptiles' }
     ],
-    birds: 'api/birds.php',
-    mammals: 'api/mammals.php',
-    reptiles: 'api/reptiles.php'
+    birds: 'api/birds.php?q={value}',
+    mammals: 'api/mammals.php?q={value}',
+    reptiles: 'api/reptiles.php?q={value}'
   }
 };
 var widget = new AutoComplete('search_bar', config);
