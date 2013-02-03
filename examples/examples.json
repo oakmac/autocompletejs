@@ -100,6 +100,16 @@
 },
 {
   "group": "List Config",
+  "number": 4011,
+  "name": "ajaxLoadingHTML string"
+},
+{
+  "group": "List Config",
+  "number": 4037,
+  "name": "ajaxLoadingHTML function"
+},
+{
+  "group": "List Config",
   "number": 4001,
   "name": "allowFreeform"
 },
@@ -147,11 +157,6 @@
   "group": "List Config",
   "number": 4010,
   "name": "postProcess"
-},
-{
-  "group": "List Config",
-  "number": 4011,
-  "name": "searchingHTML"
 },
 {
   "group": "List Config",

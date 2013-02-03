@@ -11,29 +11,40 @@
 
 
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
-// TODO: expose the htmlEncode and tmpl functions on the AutoComplete object so people can use them
-//       in their buildHTML functions
 // TODO: matchOptions should take a callback in the args - definitely!
 // TODO: allow children on the List Object to be a function
 // TODO: if there is only one list, you shouldn't have to specify an initialList
 
-
+// start anonymous scope
 ;(function() {
+  
+// http://yuiblog.com/sandbox/yui/3.3.0pr3/api/escape.js.html
+// https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
+var HTML_CHARS = [
+  [/&/g, '&amp;'],
+  [/</g, '&lt;'],
+  [/>/g, '&gt;'],
+  [/"/g, '&quot;'],
+  [/'/g, '&#x27;'],
+  [/\//g, '&#x2F;'],
+  [/\`/g, '&#x60;']
+];
+
+// html escape function
+var encode = function(str) {
+  str = str + '';
+  for (var i = 0; i < HTML_CHARS.length; i++) {
+    str = str.replace(HTML_CHARS[i][0], HTML_CHARS[i][1]);
+  }
+  return str;
+};
+  
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
 //------------------------------------------------------------------------------
 // Module scope variables
 //------------------------------------------------------------------------------
-
-var HTML_ENTITIES = [
-  [/&/g, '&amp;'],
-  [/</g, '&lt;'],
-  [/>/g, '&gt;'],
-  [/"/g, '&quot;'],
-  [/'/g, '&#39;'],
-  [/\//g, '&#x2F']
-];
 
 var KEYS = {
   BACKSPACE: 8,
@@ -53,6 +64,8 @@ var containerEl, dropdownEl, inputEl, tokensEl;
 
 // CSS class names
 var CLASSES = {
+  ajaxError: 'ajax-error',
+  ajaxLoading: 'ajax-loading',
   highlightedOption: 'highlighted',
   option: 'option',
   removeTokenGroup: 'remove-token-group',
@@ -86,15 +99,6 @@ var createId = function() {
 
 var deepCopy = function(thing) {
   return JSON.parse(JSON.stringify(thing));
-};
-
-// html escape
-var encode = function(str) {
-  str = str + '';
-  for (var i = 0; i < HTML_ENTITIES.length; i++) {
-    str = str.replace(HTML_ENTITIES[i][0], HTML_ENTITIES[i][1]);
-  }
-  return str;
 };
 
 // copied from modernizr
@@ -417,6 +421,18 @@ var expandListObject = function(list) {
     list.ajaxEnabled = false;
   }
 
+  // ajaxErrorHTML default
+  if (typeof list.ajaxErrorHTML !== 'string' &&
+      typeof list.ajaxErrorHTML !== 'function') {
+    list.ajaxErrorHTML = 'AJAX Error! Please refresh the page and try again.';
+  }
+  
+  // ajaxLoadingHTML default
+  if (typeof list.ajaxLoadingHTML !== 'string' &&
+      typeof list.ajaxLoadingHTML !== 'function') {
+    list.ajaxLoadingHTML = 'Searching&hellip;';
+  }
+  
   // default for allowFreeform is false
   if (list.allowFreeform !== true) {
     list.allowFreeform = false;
@@ -440,12 +456,6 @@ var expandListObject = function(list) {
   if (typeof list.noResultsHTML !== 'string' &&
       typeof list.noResultsHTML !== 'function') {
     list.noResultsHTML = 'No results found.';
-  }
-
-  // searchingHTML default
-  if (typeof list.searchingHTML !== 'string' &&
-      typeof list.searchingHTML !== 'function') {
-    list.searchingHTML = 'Searching';
   }
 
   // set options to an empty array if it does not exist
@@ -680,34 +690,33 @@ var buildTokens = function(tokens) {
   return html;
 };
 
+var buildStringOrFunction = function(cssClass, strOrFn, inputValue) {
+  var html = '<li class="' + cssClass + '">';
+  var type = typeof strOrFn;
+  if (type === 'string') {
+    html += strOrFn;
+  }
+  if (type === 'function') {
+    html += strOrFn(inputValue, getValue());
+    
+    // TODO: we should throw an error here if their custom function
+    //       does not return a string
+    
+  }
+  html += '</li>';
+  return html;
+};
+
 var buildNoResults = function(noResultsHTML, inputValue) {
-  var html = '<li class="no-results">';
-  var type = typeof noResultsHTML;
-  if (type === 'string') {
-    html += noResultsHTML;
-  }
-  if (type === 'function') {
-    html += noResultsHTML(inputValue, getValue());
-  }
-  html += '</li>';
-  return html;
+  return buildStringOrFunction('no-results', noResultsHTML, inputValue);
 };
 
-var buildSearching = function(searchingHTML, inputValue) {
-  var html = '<li class="searching">';
-  var type = typeof searchingHTML;
-  if (type === 'string') {
-    html += searchingHTML;
-  }
-  if (type === 'function') {
-    html += searchingHTML(inputValue, getValue());
-  }
-  html += '</li>';
-  return html;
+var buildLoading = function(ajaxLoadingHTML, inputValue) {
+  return buildStringOrFunction(CLASSES.ajaxLoading, ajaxLoadingHTML, inputValue);
 };
 
-var buildAjaxError = function() {
-  return '<li class="ajax-error">AJAX Error!</li>';
+var buildAjaxError = function(ajaxErrorHTML, inputValue) {
+  return buildStringOrFunction(CLASSES.ajaxError, ajaxErrorHTML, inputValue);
 };
 
 //------------------------------------------------------------------------------
@@ -1116,7 +1125,7 @@ var sendAjaxRequest = function(list, inputValue) {
     }
 
     // update the dropdown
-    dropdownEl.find('li.searching').replaceWith(html);
+    dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(html);
 
     // highlight the first option if there are no others highlighted
     if (isOptionHighlighted() === false) {
@@ -1129,7 +1138,7 @@ var sendAjaxRequest = function(list, inputValue) {
     // TODO: write me
     //}
     if (errType === 'error') {
-      dropdownEl.find('li.searching').replaceWith(buildAjaxError());
+      dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(buildAjaxError());
     }
   };
   
@@ -1469,7 +1478,7 @@ var pressRegularKey = function() {
 
   // add AJAX indicator
   if (list.ajaxEnabled === true) {
-    html += buildSearching(list.searchingHTML, inputValue);
+    html += buildLoading(list.ajaxLoadingHTML, inputValue);
   }
 
   // show the dropdown
@@ -1869,4 +1878,8 @@ init();
 return widget;
 
 }; // end window.AutoComplete
+
+// expose html encode function
+window.AutoComplete.htmlEncode = encode;
+
 })(); // end anonymous wrapper

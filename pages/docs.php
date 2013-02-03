@@ -206,7 +206,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
   <td></td>
 </tr>
 <tr id="list_object:ajaxErrorHTML">
-  <td>NOT IMPLEMENTED YET<br /><code class="js plain">ajaxErrorHTML</code></td>
+  <td><code class="js plain">ajaxErrorHTML</code></td>
   <td>String<br /><small>or</small><br />Function</td>
   <td>no</td>
   <td><code class="js string">'AJAX Error!'</code></td>
@@ -214,6 +214,21 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>An HTML string to display when an AJAX request has failed.</p>
     <p>If <code class="js plain">ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
     <p>The function should return an HTML string.</p>
+  </td>
+</tr>
+<tr id="list_object:ajaxLoadingHTML">
+  <td><code class="js plain">ajaxLoadingHTML</code></td>
+  <td>String<br /><small>or</small><br />Function</td>
+  <td>no</td>
+  <td><code class="js string">'Searching&amp;hellip;'</code></td>
+  <td>
+    <p>An HTML string to display when searching for options.</p>
+    <p>If <code class="js plain">ajaxLoadingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
+    <p>The function should return an HTML string.</p>
+  </td>
+  <td>
+    <p><a href="examples#4011">ajaxLoadingHTML string</a></p>
+    <p><a href="examples#4037">ajaxLoadingHTML function</a></p>
   </td>
 </tr>
 <!--
@@ -370,17 +385,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
   </td>
   <td>
     <p><a href="examples#2003">AJAX with preProcess function</a></p>
-  </td>
-</tr>
-<tr id="list_object:searchingHTML">
-  <td><code class="js plain">searchingHTML</code></td>
-  <td>String<br /><small>or</small><br />Function</td>
-  <td>no</td>
-  <td><code class="js string">'Searching'</code></td>
-  <td>
-    <p>An HTML string to display when searching for options.</p>
-    <p>If <code class="js plain">searchingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
-    <p>The function should return an HTML string.</p>
   </td>
 </tr>
 <tr id="list_object:url">

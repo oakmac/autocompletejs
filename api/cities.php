@@ -1,4 +1,5 @@
 <?php
+sleep(1);
 $texasCitiesJSON = file_get_contents('texas_cities.json');
 $texasCities = json_decode($texasCitiesJSON, true);
 

@@ -1,4 +1,9 @@
 <?php
+
+if ($_GET['slow'] === 'true') {
+	sleep(1);
+}
+
 $statesJSON = file_get_contents('us_states.json');
 $states = json_decode($statesJSON, true);
 
