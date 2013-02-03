@@ -1,4 +1,22 @@
 {
+"List Object":[
+"------------------------------------------------------------------------------",
+{
+  "name":"preProcess",
+  "type":"Function",
+  "req":false,
+  "desc":[
+    "<code class='js plain'>preProcess</code> is an optional function you can use to process data that is returned from the server.",
+    "The first argument is the data returned by the server and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an array of <a href='docs#option_object'>Option Objects</a>."
+  ],
+  "examples":2003
+},
+"------------------------------------------------------------------------------"
+],
+
+
+
 "Option Object":[
 "------------------------------------------------------------------------------",
 {
@@ -31,10 +49,10 @@
 "Methods":[
 "------------------------------------------------------------------------------",
 {
-  "name":"addOption(listName, option)",
+  "name":"addOption(name, option)",
   "args":[
-    ["listName", "name of the list to add the option to"],
-    ["option", "option to add to the list"]
+    ["name", "name of the list to add the option to"],
+    ["option", "<a href='docs#option_object'>Option Object</a> to add to the list"]
   ],
   "desc":[
     "Add an option to a list.",
@@ -111,7 +129,7 @@
   "name":"list(name, list)",
   "args":[
     ["name", "name of the list to add or update"],
-    ["list", "list object"]
+    ["list", "<a href='docs#list_object'>List Object</a>"]
   ],
   "desc":"Alias of <a href='docs#methods:setList'><code class='js plain'>setList(name, list)</code></a>"
 },
@@ -146,7 +164,7 @@
   "name":"setList(name, list)",
   "args":[
     ["name", "name of the list to add or update"],
-    ["list", "list object"]
+    ["list", "<a href='docs#list_object'>List Object</a>"]
   ],
   "desc":[
     "Adds a new list or updates an existing list.",

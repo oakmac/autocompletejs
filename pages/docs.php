@@ -358,15 +358,18 @@ TODO: "how it works" walk-through explanation of how the widget functions
        See the <code class="js plain">tokenHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
   </td>
 </tr>
-<tr id="list_object:postProcess">
-  <td><code class="js plain">postProcess</code></td>
+<tr id="list_object:preProcess">
+  <td><code class="js plain">preProcess</code></td>
   <td>Function</td>
   <td>no</td>
   <td><small>n/a</small></td>
   <td>
-    <p><code class="js plain">postProcess</code> is an optional function you can use to process data that is returned from the server.</p>
+    <p><code class="js plain">preProcess</code> is an optional function you can use to process data that is returned from the server.</p>
     <p>The first argument is the data returned by the server and the second argument is the current value of the AutoComplete widget.</p>
-    <p>The function should return an array of <a href="docs#option_objects">Option Objects</a>.</p>
+    <p>The function should return an array of <a href="docs#option_object">Option Objects</a>.</p>
+  </td>
+  <td>
+    <p><a href="examples#2003">AJAX with preProcess function</a></p>
   </td>
 </tr>
 <tr id="list_object:searchingHTML">
@@ -565,6 +568,9 @@ include(APP_PATH . 'pages/footer.php');
 // Functions
 //------------------------------------------------------------------------------
 
+// NOTE: I know the spaces and linebreaks here are annoying and unnecessary
+//       I'm optimizing for "View Source"
+
 function buildMethodRow($method, $examples) {
   $nameNoParens = preg_replace('/\(.+$/', '', $method['name']);
   
@@ -595,31 +601,13 @@ function buildMethodRow($method, $examples) {
   
   // description
   $html .= '  <td>'."\n";
-  if (is_array($method['desc']) !== true) {
-    $method['desc'] = array($method['desc']);
-  }
-  foreach ($method['desc'] as $desc) {
-    $html .= '    <p>'.$desc.'</p>'."\n";
-  }
+  $html .= buildDesc($method['desc']);
   $html .= '  </td>'."\n";
   
   // examples
-  if (array_key_exists('examples', $method) === true) {
-    if (is_array($method['examples']) !== true) {
-      $method['examples'] = array($method['examples']);
-    }
-    $html .= '  <td>'."\n";
-    foreach ($method['examples'] as $exampleNum) {
-      $example = getExampleByNumber($exampleNum, $examples);
-      if ($example === false) continue;
-      
-      $html .= '    <p><a href="examples#'.$example['number'].'">'.$example['name'].'</a></p>'."\n";
-    }
-    $html .= '  </td>'."\n";
-  }
-  else {
-    $html .= '  <td></td>'."\n";
-  }
+  $html .= '  <td>'."\n";
+  $html .= buildExample($method['examples'], $examples);
+  $html .= '  </td>'."\n";
   
   $html .= "</tr>\n";
   
@@ -637,4 +625,32 @@ function getExampleByNumber($number, $examples) {
   
   return false;
 }
+
+function buildDesc($desc) {
+  if (is_array($desc) !== true) {
+    $desc = array($desc);
+  }
+  $html = '';
+  foreach ($desc as $d) {
+    $html .= '    <p>'.$d.'</p>'."\n";
+  }
+  return $html;
+}
+
+function buildExample($ex, $allExamples) {
+  if (is_array($ex) !== true) {
+    $ex = array($ex);
+  }
+  
+  $html = '';
+  foreach ($ex as $exNum) {
+    $example = getExampleByNumber($exNum, $allExamples);
+    if ($example === false) continue;
+    
+    $html .= '    <p><a href="examples#'.$exNum.'">'.$example['name'].'</a></p>'."\n";
+  }
+  
+  return $html;
+}
+
 ?>

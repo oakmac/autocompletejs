@@ -1081,9 +1081,9 @@ var sendAjaxRequest = function(list, inputValue) {
 
     if (INPUT_HAPPENING !== true) return;
 
-    // run their custom postProcess function
-    if (typeof list.postProcess === 'function') {
-      data = list.postProcess(data, getValue());
+    // run their custom preProcess function
+    if (typeof list.preProcess === 'function') {
+      data = list.preProcess(data, getValue());
     }
 
     // expand the options and make sure they're valid
