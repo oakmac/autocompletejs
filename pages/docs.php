@@ -37,9 +37,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>It's value should be the name of a <a href="docs#list_object">List Object</a>.</p>
   </td>
   <td>
-      <p><a href="example/basic_list">Basic List</a></p>
-      <p><a href="example/nested_lists1">Nested Lists 1</a></p>
-      <p><a href="example/nested_lists2">Nested Lists 2</a></p>
   </td>
 </tr>
 <tr id="config_object:lists">
@@ -52,9 +49,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>See the <a href="docs#list_object">List Object</a> reference for more information on List Objects.</p>
   </td>
   <td>
-      <p><a href="example/basic_list">Basic List</a></p>
-      <p><a href="example/nested_lists1">Nested Lists 1</a></p>
-      <p><a href="example/nested_lists2">Nested Lists 2</a></p>
   </td>
 </tr>
 <tr id="config_object:clearBtnHTML">
@@ -66,7 +60,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>An HTML string used for the clear button.</p>
   </td>
   <td>
-    <p><a href="#">clearBtnHTML Example</a></p>
   </td>
 </tr>
 <tr id="config_object:initialValue">
@@ -78,8 +71,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>Set the initial value of the widget.</p>
   </td>
   <td>
-      <p><a href="example/initialvalue1">initialValue Example 1</a></p>
-      <p><a href="example/initialvalue2">initialValue Example 2</a></p>
   </td>
 </tr>
 <tr id="config_object:maxTokenGroups">
@@ -119,7 +110,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>placeholder text - how are we going to deal with placeholder behavior?</p>
   </td>
   <td>
-    <p><a href="#">Placeholder Example</a></p>
   </td>
 </tr>
 <tr id="config_object:removeTokenGroupHTML">
@@ -132,7 +122,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>Set <code class="js plain">removeTokenGroupHTML</code> to <code class="js keyword">false</code> to not show a clear button.</p>
   </td>
   <td>
-    <p><a href="#">removeTokenGroupHTML Example</a></p>
   </td>
 </tr>
 <tr id="config_object:showClearBtn">
@@ -144,7 +133,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>Toggle to show the clear button in the search bar.</p>
   </td>
   <td>
-    <p><a href="#">showClearBtn Example</a></p>
   </td>
 </tr>
 <tr id="config_object:showErrors">
@@ -161,9 +149,8 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If <code class="js plain">showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error.</p>
   </td>
   <td>
-    <p><a href="examples#3012">showErrors console example</a></p>
-    <p><a href="#">showErrors alert example</a></p>
-    <p><a href="#">showErrors custom function example</a></p>
+    <p><a href="examples#3012">showErrors console.log</a></p>
+    <p><a href="examples#3088">showErrors alert</a></p>
   </td>
 </tr>
 </tbody>
@@ -215,6 +202,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If <code class="js plain">ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
     <p>The function should return an HTML string.</p>
   </td>
+  <td>
+    
+  </td>
 </tr>
 <tr id="list_object:ajaxLoadingHTML">
   <td><code class="js plain">ajaxLoadingHTML</code></td>
@@ -253,7 +243,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>There can still be options when <code class="js plain">allowFreeform</code> is set to <code class="js keyword">true</code>, but the user does not have to select one.</p>
   </td>
   <td>
-    <p><a href="#">allowFreeform Example</a></p>
+    
   </td>
 </tr>
 <tr id="list_object:cacheAjax">
@@ -268,7 +258,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If you need to support browsers that do not have localStorage I recommend using a <a href="https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage">polyfill</a>.</p>
   </td>
   <td>
-    <p><a href="#">cacheAjax Example</a></p>
+    
   </td>
 </tr>
 <tr id="list_object:children">
@@ -283,7 +273,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
        See the <code class="js plain">children</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
   </td>
   <td>
-    <p><a href="#">children Example</a></p>
+    
   </td>
 </tr>
 <tr id="list_object:highlightMatches">
@@ -297,7 +287,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
        It tries to not replace letters that are inside HTML tags, but if you have complicated HTML markup in your <code class="js plain">optionHTML</code> it may break.</p>
   </td>
   <td>
-    <p><a href="#">highlightMatches Example</a></p>
+    
   </td>
 </tr>
 <tr id="list_object:matchOptions">
@@ -313,8 +303,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible.</p>
   </td>
   <td>
-    <p><a href="#">matchOptions Example 1</a></p>
-    <p><a href="#">matchOptions Example 2</a></p>
+
   </td>
 </tr>
 <tr id="list_object:matchProperties">
@@ -329,8 +318,6 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p><code class="js plain">matchProperties</code> gets ignored if you provide a custom <code class="js plain">matchOptions</code> function.</p>
   </td>
   <td>
-    <p><a href="#">matchProperties Example 1</a></p>
-    <p><a href="#">matchProperties Example 2</a></p>
   </td>
 </tr>
 <tr id="list_object:noResultsHTML">
@@ -343,6 +330,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If <code class="js plain">noResultsHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
     <p>The function should return an HTML string.</p>
     <p>Note: <code class="js plain">noResultsHTML</code> will never be shown when <code class="js plain">allowFreeform</code> is <code class="js keyword">true</code>.</p>
+  </td>
+  <td>
+    
   </td>
 </tr>
 <tr id="list_object:optionHTML">
@@ -357,7 +347,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If there is an <code class="js plain">optionHTML</code> property on the Option Object it will supersede this <code class="js plain">optionHTML</code> property.</p>
   </td>
   <td>
-    <p><a href="example/list_optionhtml1">optionHTML Example</a></p>
+    
   </td>
 </tr>
 <tr id="list_object:tokenHTML">
@@ -371,6 +361,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>The function should return an HTML string.</p>
     <p>Note: If there is a <code class="js plain">tokenHTML</code> property on the Option Object selected it will supersede this <code class="js plain">tokenHTML</code> property.
        See the <code class="js plain">tokenHTML</code> property in the <a href="docs#option_object">Option Object</a> reference.</p>
+  </td>
+  <td>
+    
   </td>
 </tr>
 <tr id="list_object:preProcess">
@@ -398,6 +391,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>If <code class="js plain">url</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.</p>
     <p>The function should return a url string.</p>
   </td>
+  <td>
+    
+  </td>
 </tr>
 <tr id="list_object:options">
   <td><code class="js plain">options</code></td>
@@ -407,6 +403,9 @@ TODO: "how it works" walk-through explanation of how the widget functions
   <td>
     <p><code class="js plain">options</code> is an array of Option Objects.</p>
     <p>See the <a href="docs#option_object">Option Objects</a> reference for more information.</p>
+  </td>
+  <td>
+    
   </td>
 </tr>
 </tbody>

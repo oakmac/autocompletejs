@@ -11,9 +11,6 @@
 
 
 // TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
-// TODO: matchOptions should take a callback in the args - definitely!
-// TODO: allow children on the List Object to be a function
-// TODO: if there is only one list, you shouldn't have to specify an initialList
 
 // start anonymous scope
 ;(function() {
