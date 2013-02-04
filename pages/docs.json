@@ -2,6 +2,158 @@
 "List Object":[
 "------------------------------------------------------------------------------",
 {
+  "name":"ajaxEnabled",
+  "type":"Boolean",
+  "req":false,
+  "default":"<code class='js keyword'>false</code>",
+  "desc":[
+    "If <code class='js keyword'>true</code>, will send an AJAX request when the user types in the input.",
+    "You can have local list options as well as requesting results from a server. See this example."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxErrorHTML",
+  "type":["String", "Function"],
+  "req":false,
+  "default":"<code class='js plain'>'AJAX Error'</code>",
+  "desc":[
+    "An HTML string to display when an AJAX request has failed.",
+    "If <code class='js plain'>ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an HTML string."
+  ],
+  "examples":[4011, 4037]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxLoadingHTML",
+  "type":["String", "Function"],
+  "req":false,
+  "default":"<code class='js string'>'Searching&amp;hellip;'</code>",
+  "desc":[
+    "An HTML string to display when searching for options.",
+    "If <code class='js plain'>ajaxLoadingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an HTML string."
+  ],
+  "examples":[4011,4037]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxOpts",
+  "type":["Object","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "TODO: write me..."
+  ],
+  "examples":2004
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"allowFreeform",
+  "type":"Boolean",
+  "req":false,
+  "default":"<code class='js keyword'>false</code>",
+  "desc":[
+    "If <code class='js keyword'>true</code>, allows the user to enter free-form text.",
+    "If <code class='js keyword'>false</code>, the user must select an option from the list.",
+    "There can still be options when <code class='js plain'>allowFreeform</code> is set to <code class='js keyword'>true</code>, but the user does not have to select one."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"cacheAjax",
+  "type":"Boolean",
+  "req":false,
+  "default":"<code class='js keyword'>true</code>",
+  "desc":[
+    "If specified, <code class='js plain'>children</code> should be the name of a List Object.",
+    "When any option from this list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the component.",
+    "If there is a <code class='js plain'>children</code> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property.",
+    "See the <code class='js plain'>children</code> property in the <a href='docs#option_object'>Option Object</a> reference."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"children",
+  "type":["String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.",
+    "If <code class='js keyword'>false</code>, it will not cache and send a new AJAX request every time.",
+    "If the browser does not support localStorage it will only cache results for the duration of the page.",
+    "If you need to support browsers that do not have localStorage I recommend using a <a href='https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage'>polyfill</a>."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"highlightMatches",
+  "type":"Boolean",
+  "req":false,
+  "default":"<code class='js keyword'>true</code>",
+  "desc":[
+    "If <code class='js keyword'>true</code>, will highlight letter matches between what the user has typed and which options have matched.",
+    "This option programmatically changes the <code class='js plain'>optionHTML</code> value by adding <code class='js plain'>&lt;strong&gt;</code> tags around matching characters.",
+    "It tries to not replace letters that are inside HTML tags, but if you have complicated HTML markup in your <code class='js plain'>optionHTML</code> it may break."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"matchOptions",
+  "type":"Function",
+  "req":false,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>matchOptions</code> is an optional function you can include to determine which options get shown in the dropdown when the user is typing.",
+    "The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.",
+    "The function should return an array of Option Objects.",
+    "You can return an array of <em>any</em> Option Objects from this function.  They do not have to come from the existing Option Objects in the list.",
+    "This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"noResultsHTML",
+  "type":["String","Function"],
+  "req":false,
+  "default":"<code class='js string'>'No results found.'</code>",
+  "desc":[
+    "An HTML string to display when there are no options to show.",
+    "If <code class='js plain'>noResultsHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an HTML string.",
+    "<code class='js plain'>noResultsHTML</code> will never be shown when <code class='js plain'>allowFreeform</code> is <code class='js keyword'>true</code>."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"optionHTML",
+  "type":["String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "If <code class='js plain'>optionHTML</code> is a string, strings inside curly braces will be replaced with HTML-escaped option values.",
+    "If <code class='js plain'>optionHTML</code> is a function the first argument is the option.",
+    "The function should return an HTML string.",
+    "If there is an <code class='js plain'>optionHTML</code> property on the Option Object it will supersede this <code class='js plain'>optionHTML</code> property."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"tokenHTML",
+  "type":["String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>tokenHTML</code> is an optional function used to build the token HTML in the search bar for every option in the list.",
+    "The first argument to the function is the option itself.",
+    "The function should return an HTML string.",
+    "If there is a <code class='js plain'>tokenHTML</code> property on the Option Object selected it will supersede this <code class='js plain'>tokenHTML</code> property.",
+    "See the <code class='js plain'>tokenHTML</code> property in the <a href='docs#option_object'>Option Object</a> reference."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
   "name":"preProcess",
   "type":"Function",
   "req":false,
@@ -12,7 +164,30 @@
   ],
   "examples":2003
 },
-"------------------------------------------------------------------------------"
+"------------------------------------------------------------------------------",
+{
+  "name":"url",
+  "type":["String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>url</code> is the URL to send an AJAX request to when <code class='js plain'>ajaxEnabled</code> is <code class='js keyword'>true</code>.",
+    "The string <code class='js string'>'{value}'</code> will be replaced with the text the user has typed.  The text will be escaped using <code class='js plain'>encodeURIComponent()</code>.",
+    "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
+    "The function should return a url string."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"options",
+  "type":"Array of Option Objects",
+  "req":false,
+  "default":"[]",
+  "desc":[
+    "<code class='js plain'>options</code> is an array of Option Objects.",
+    "See the <a href='docs#option_object'>Option Objects</a> reference for more information."
+  ]
+}
 ],
 
 

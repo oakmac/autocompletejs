@@ -9,9 +9,6 @@
  * Date: 25 Jan 2013
  */
 
-
-// TODO: "Much love to my PROS co-workers for inspiration, suggestions, and guinea-pigging."
-
 // start anonymous scope
 ;(function() {
   
