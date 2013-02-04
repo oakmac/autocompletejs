@@ -1,5 +1,4 @@
 var config = {
-  initialList: 'fruits',
   initialValue: [['Kiwi'], ['Apple']],
   lists: {
     fruits: ['Apple', 'Banana', 'Orange']

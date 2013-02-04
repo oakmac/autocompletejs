@@ -1,5 +1,4 @@
 var config = {
-  initialList: 'lists',
   showErrors: 'console',
   lists: {
     fruits: ['Apple', 'Banana', 'Orange']

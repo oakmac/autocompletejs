@@ -9,7 +9,7 @@ var usersList = {
     },
     {
       value: { id: 229, age: 27, name: "Grace Nathan", gender: "female" }
-    },    
+    },
     {
       value: { id: 226, age: 24, name: "Hailey Chesterton", gender: "female" }
     },
@@ -21,13 +21,12 @@ var usersList = {
     },
     {
       value: { id: 224, age: 29, name: "Ronald Gilmore", gender: "male" }
-    }    
+    }
   ]
 };
 
 var widget = new AutoComplete('search_bar', {
   errors: 'console',
-  initialList: 'users',
   lists: {
     users: usersList
   }

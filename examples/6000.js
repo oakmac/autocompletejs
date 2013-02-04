@@ -8,7 +8,6 @@ var onChange = function(newValue, oldValue) {
 
 var config = {
   onChange: onChange,
-  initialList: 'fruits',
   lists: {
     fruits: ['Apple', 'Banana', 'Orange']
   }

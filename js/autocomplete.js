@@ -458,7 +458,6 @@ var expandConfig = function() {
   // if cfg is an array or a string, then it is a single list object
   if (isArray(cfg) === true || typeof cfg === 'string') {
     cfg = {
-      initialList: 'default',
       lists: {
         'default': cfg
       }
