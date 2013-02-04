@@ -3,7 +3,7 @@ var config = {
   lists: {
     cities: {
       ajaxOpts: {
-        url: 'api/cities.php?state=TX&q={value}&includeCommon=false'
+        url: 'api/cities.php?state=TX&q={input}&includeCommon=false'
       },
       options: commonCities
     }

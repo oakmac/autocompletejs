@@ -26,7 +26,7 @@ var config = {
     countries: {
       ajaxOpts: {
         preProcess: createCountryOptions,
-        url: 'api/countries.php?q={value}'
+        url: 'api/countries.php?q={input}'
       },
       optionHTML: '{abbr} - {name}'
     }

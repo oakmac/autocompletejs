@@ -1142,7 +1142,7 @@ var sendAjaxRequest = function(list, inputValue) {
 
   // expand their url
   if (typeof ajaxOpts2.url === 'string') {
-    ajaxOpts2.url = ajaxOpts2.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+    ajaxOpts2.url = ajaxOpts2.url.replace(/\{input\}/g, encodeURIComponent(inputValue));
   }
   if (typeof ajaxOpts2.url === 'function') {
     ajaxOpts2.url = ajaxOpts2.url(inputValue, getValue());

@@ -13,7 +13,7 @@ var config = {
     states: {
       ajaxLoadingHTML: buildLoadingMsg,
       ajaxOpts: {
-        url: 'api/states.php?slow=true&q={value}'
+        url: 'api/states.php?slow=true&q={input}'
       }
     }
   }

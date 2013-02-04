@@ -3,7 +3,7 @@ var config = {
     states: {
       ajaxLoadingHTML: 'Loading states&hellip;',
       ajaxOpts: {
-        url: 'api/states.php?slow=true&q={value}'
+        url: 'api/states.php?slow=true&q={input}'
       }
     }
   }

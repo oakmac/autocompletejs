@@ -71,7 +71,7 @@
   "default":false,
   "desc":[
     "The url to send an AJAX request to.",
-    "The string <code class='js string'>'{value}'</code> will be replaced with the text the user has typed.",
+    "The string <code class='js string'>'{input}'</code> will be replaced with the text the user has typed.",
     "The text will be escaped using <code class='js plain'>encodeURIComponent()</code>.",
     "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget."
   ],
@@ -192,19 +192,6 @@
     "The function should return an array of <a href='docs#option_object'>Option Objects</a>."
   ],
   "examples":2003
-},
-"------------------------------------------------------------------------------",
-{
-  "name":"url",
-  "type":["String","Function"],
-  "req":false,
-  "default":false,
-  "desc":[
-    "<code class='js plain'>url</code> is the URL to send an AJAX request to when <code class='js plain'>ajaxEnabled</code> is <code class='js keyword'>true</code>.",
-    "The string <code class='js string'>'{value}'</code> will be replaced with the text the user has typed.  The text will be escaped using <code class='js plain'>encodeURIComponent()</code>.",
-    "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
-    "The function should return a url string."
-  ]
 },
 "------------------------------------------------------------------------------",
 {
