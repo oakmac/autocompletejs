@@ -71,6 +71,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
     <p>Set the initial value of the widget.</p>
   </td>
   <td>
+    <p><a href="examples#3000">initialValue</a></p>
   </td>
 </tr>
 <tr id="config_object:maxTokenGroups">
