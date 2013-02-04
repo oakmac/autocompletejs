@@ -1,10 +1,10 @@
 var config = {
-  initialList: 'states',
   lists: {
     states: {
       ajaxLoadingHTML: 'Loading states&hellip;',
-      cacheAjax: false,
-      url: 'api/states.php?slow=true&q={value}'
+      ajaxOpts: {
+        url: 'api/states.php?slow=true&q={value}'
+      }
     }
   }
 };
