@@ -16,7 +16,7 @@
   "name":"ajaxErrorHTML",
   "type":["String", "Function"],
   "req":false,
-  "default":"<code class='js plain'>'AJAX Error'</code>",
+  "default":"<code class='js string'>'AJAX Error'</code>",
   "desc":[
     "An HTML string to display when an AJAX request has failed.",
     "If <code class='js plain'>ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
@@ -44,9 +44,38 @@
   "req":false,
   "default":false,
   "desc":[
-    "TODO: write me..."
+    "Internally, AutoComplete uses the jQuery <a href='http://api.jquery.com/jQuery.ajax/' target='_blank'><code class='js plain'>$.ajax()</code></a> method to make AJAX requests.",
+    "If provided, <code class='js plain'>ajaxOpts</code> will be called with <a href='http://api.jquery.com/jQuery.extend/'><code class='js plain'>$.extend()</code></a> against the default settings.",
+    "You can override any <code class='js plain'>$.ajax()</code> parameter except: <code class='js plain'>async</code>, <code class='js plain'>complete</code>, <code class='js plain'>error</code>, <code class='js plain'>statusCode</code>, <code class='js plain'>success</code> (ie: parameters that influence control flow)"
   ],
-  "examples":2004
+  "examples":[2004,2003]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxOpts.preProcess",
+  "type":"Function",
+  "req":false,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>preProcess</code> is an optional function that will be called after the AJAX request has finished and before the options are shown.",
+    "The first argument is the data returned by the server, the second argument is the text that the user has entered, and the third argument is the current value of the AutoComplete widget.",
+    "The function should return an array of <a href='docs#option_object'>Option Objects</a>."
+  ],
+  "examples":2003
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxOpts.url",
+  "type":["String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "The url to send an AJAX request to.",
+    "The string <code class='js string'>'{value}'</code> will be replaced with the text the user has typed.",
+    "The text will be escaped using <code class='js plain'>encodeURIComponent()</code>.",
+    "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget."
+  ],
+  "examples":2001
 },
 "------------------------------------------------------------------------------",
 {
@@ -67,10 +96,10 @@
   "req":false,
   "default":"<code class='js keyword'>true</code>",
   "desc":[
-    "If specified, <code class='js plain'>children</code> should be the name of a List Object.",
-    "When any option from this list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the component.",
-    "If there is a <code class='js plain'>children</code> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property.",
-    "See the <code class='js plain'>children</code> property in the <a href='docs#option_object'>Option Object</a> reference."
+    "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.",
+    "If <code class='js keyword'>false</code>, it will not cache and send a new AJAX request every time.",
+    "If the browser does not support localStorage it will only cache results for the duration of the page.",
+    "If you need to support browsers that do not have localStorage I recommend using a <a href='https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage'>polyfill</a>."
   ]
 },
 "------------------------------------------------------------------------------",
@@ -80,10 +109,10 @@
   "req":false,
   "default":false,
   "desc":[
-    "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.",
-    "If <code class='js keyword'>false</code>, it will not cache and send a new AJAX request every time.",
-    "If the browser does not support localStorage it will only cache results for the duration of the page.",
-    "If you need to support browsers that do not have localStorage I recommend using a <a href='https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage'>polyfill</a>."
+    "If specified, <code class='js plain'>children</code> should be the name of a List Object.",
+    "When any option from this list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the component.",
+    "If there is a <code class='js plain'>children</code> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property.",
+    "See the <code class='js plain'>children</code> property in the <a href='docs#option_object'>Option Object</a> reference."
   ]
 },
 "------------------------------------------------------------------------------",

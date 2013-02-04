@@ -11,7 +11,7 @@
 
 // start anonymous scope
 ;(function() {
-  
+
 // http://yuiblog.com/sandbox/yui/3.3.0pr3/api/escape.js.html
 // https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
 var HTML_CHARS = [
@@ -32,7 +32,7 @@ var encode = function(str) {
   }
   return str;
 };
-  
+
 window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
 'use strict';
 
@@ -69,9 +69,9 @@ var CLASSES = {
 
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
+var AJAX_OBJECT = {};
 var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
-var JQUERY_AJAX_OBJECT = {};
 var LOCAL_STORAGE_AVAILABLE = false;
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
@@ -116,17 +116,8 @@ var isObject = function(thing) {
   return (Object.prototype.toString.call(thing) === '[object Object]');
 };
 
-// returns the number of keys that an object has
-var numObjKeys = function(obj) {
-  var count = 0;
-  for (var i in obj) {
-    if (obj.hasOwnProperty(i) !== true) continue;
-    count++;
-  }
-  return count;
-};
-
-var objectKeysToArray = function(obj) {
+// returns an array of object keys
+var keys = function(obj) {
   var arr = [];
   for (var i in obj) {
     if (obj.hasOwnProperty(i) !== true) continue;
@@ -221,12 +212,12 @@ var validValue = function(value) {
   if (validToken(value) === true) {
     return true;
   }
-  
+
   // single token group is ok
   if (validTokenGroup(value) === true) {
     return true;
   }
-  
+
   // else must be an array of token groups
   if (isArray(value) !== true) {
     return false;
@@ -357,12 +348,12 @@ var expandValue = function(value) {
   if (validToken(value) === true) {
     return [[expandTokenObject(value)]];
   }
-  
+
   // single token group
   if (validTokenGroup(value) === true) {
     return [expandTokenGroup(value)];
   }
-  
+
   // else it's an array of token groups
   for (var i = 0; i < value.length; i++) {
     value[i] = expandTokenGroup(value[i]);
@@ -401,40 +392,38 @@ var expandListObject = function(list) {
   // a string is shorthand for the AJAX url
   if (typeof list === 'string') {
     list = {
-      url: list
+      ajaxOpts : {
+        url: list
+      }
     };
   }
 
-  // if they have included a URL, ajax is turned on
-  if (typeof list.url === 'string' || typeof list.url === 'function') {
+  list.ajaxEnabled = false;
+  if (typeof list.ajaxOpts === 'function' ||
+      isObject(list.ajaxOpts) === true) {
     list.ajaxEnabled = true;
-  }
-
-  // default for ajaxEnabled is false
-  if (list.ajaxEnabled !== true) {
-    list.ajaxEnabled = false;
   }
 
   // ajaxErrorHTML default
   if (typeof list.ajaxErrorHTML !== 'string' &&
       typeof list.ajaxErrorHTML !== 'function') {
-    list.ajaxErrorHTML = 'AJAX Error! Please refresh the page and try again.';
+    list.ajaxErrorHTML = 'AJAX Error';
   }
-  
+
   // ajaxLoadingHTML default
   if (typeof list.ajaxLoadingHTML !== 'string' &&
       typeof list.ajaxLoadingHTML !== 'function') {
     list.ajaxLoadingHTML = 'Searching&hellip;';
   }
-  
+
   // default for allowFreeform is false
   if (list.allowFreeform !== true) {
     list.allowFreeform = false;
   }
 
-  // default for cacheAjax is true
-  if (list.cacheAjax !== false) {
-    list.cacheAjax = true;
+  // default for cacheAjax is false
+  if (list.cacheAjax !== true) {
+    list.cacheAjax = false;
   }
 
   // default for highlightMatches is true
@@ -442,9 +431,9 @@ var expandListObject = function(list) {
     list.highlightMatches = true;
   }
 
-  if (typeof list.matchProperties === 'string') {
-    list.matchProperties = [list.matchProperties];
-  }
+  //if (typeof list.matchProperties === 'string') {
+  //  list.matchProperties = [list.matchProperties];
+  //}
 
   // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' &&
@@ -535,6 +524,17 @@ var expandConfig = function() {
       error(2535, 'The list object for list "' + i + '" is invalid.', cfg.lists[i]);
       delete cfg.lists[i];
     }
+  }
+
+  // initialList
+  var listNames = keys(cfg.lists);
+  if (listNames.length === 1) {
+    cfg.initialList = listNames[0];
+  }
+
+  if (listExists(cfg.initialList) !== true) {
+    // TODO: throw error
+    // TODO: set initialList to the first list in lists
   }
 };
 
@@ -692,10 +692,10 @@ var buildStringOrFunction = function(cssClass, strOrFn, inputValue) {
   }
   if (type === 'function') {
     html += strOrFn(inputValue, getValue());
-    
+
     // TODO: we should throw an error here if their custom function
     //       does not return a string
-    
+
   }
   html += '</li>';
   return html;
@@ -899,7 +899,7 @@ var getGroups = function(options) {
       groups[options[i].group] = 0;
     }
   }
-  return objectKeysToArray(groups);
+  return keys(groups);
 };
 
 var listExists = function(listName) {
@@ -930,8 +930,8 @@ var startInput = function() {
 
 var stopInput = function() {
   // kill any pending AJAX requests
-  if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
-    JQUERY_AJAX_OBJECT.abort();
+  if (typeof AJAX_OBJECT.abort === 'function') {
+    AJAX_OBJECT.abort();
   }
   hideInputEl();
   hideDropdownEl();
@@ -1054,105 +1054,140 @@ var addHighlightedOption = function() {
   startInput();
 };
 
+var ajaxSuccess = function(data, list, url, inputValue, preProcess) {
+  // save the result in the cache
+  if (list.cacheAjax === true &&
+      LOCAL_STORAGE_AVAILABLE === true) {
+    localStorage.setItem(url, JSON.stringify(data));
+  }
+
+  if (INPUT_HAPPENING !== true) return;
+
+  // run their custom preProcess function
+  if (typeof preProcess === 'function') {
+    data = preProcess(data, inputValue, getValue());
+  }
+
+  // expand the options and make sure they're valid
+  var options = [];
+  if (isArray(data) === true) {
+    for (var i = 0; i < data.length; i++) {
+      // skip any objects that are not valid Options
+      if (validOption(data[i]) !== true) continue;
+
+      // expand option
+      data[i] = expandOptionObject(data[i], list);
+
+      // highlight matching characters
+      data[i].optionHTML = highlightMatchChars(data[i].optionHTML, inputValue);
+
+      // add the option
+      options.push(data[i]);
+    }
+  }
+
+  // no results :(
+  var html = '';
+  if (options.length === 0 && isOptionShowing() === false) {
+    html = buildNoResults(list.noResultsHTML, inputValue);
+  }
+
+  // new options
+  if (options.length > 0) {
+    html = buildOptions(options, list, true);
+  }
+
+  // update the dropdown
+  dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(html);
+
+  // highlight the first option if there are no others highlighted
+  if (isOptionHighlighted() === false) {
+    highlightFirstOption();
+  }
+};
+
+var ajaxError = function(errType, list, inputValue) {
+  //if (errType === 'abort') {
+  // TODO: write me
+  //}
+  if (errType === 'error') {
+    var errorMsg = buildAjaxError(list.ajaxErrorHTML, inputValue);
+    dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
+  }
+};
+
+// TODO: write me, use for caching
+//       use the url, method, and POST data
+var createAjaxKey = function(ajaxOpts) {
+
+};
+
 var sendAjaxRequest = function(list, inputValue) {
+  // default ajax options
+  var ajaxOpts = {
+    dataType: 'json',
+    preProcess: function(a) { return a; },
+    type: 'GET'
+  };
 
-  // TODO: allow full jQuery ajax config extend here
-  //       just not sure about how to handle scope with the
-  //       internal functions
-
-  var url;
-  if (typeof list.url === 'string') {
-    url = list.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+  var ajaxOpts2 = {};
+  // create their ajaxOpts with a function
+  if (typeof list.ajaxOpts === 'function') {
+    ajaxOpts2 = list.ajaxOpts(inputValue, getValue());
   }
-  if (typeof list.url === 'function') {
-    url = list.url(inputValue, getValue());
+  // else it's an object
+  else {
+    ajaxOpts2 = $.extend(true, {}, list.ajaxOpts);
   }
 
-  // throw an error if url is not a string
-  if (typeof url !== 'string') {
-    error(8721, 'AJAX url must be a string.  Did your custom url function not return one?', url);
+  // expand their url
+  if (typeof ajaxOpts2.url === 'string') {
+    ajaxOpts2.url = ajaxOpts2.url.replace(/\{value\}/g, encodeURIComponent(inputValue));
+  }
+  if (typeof ajaxOpts2.url === 'function') {
+    ajaxOpts2.url = ajaxOpts2.url(inputValue, getValue());
+  }
+
+  // do not allow them to override certain ajax options
+  var noShotGuy = ['async', 'complete', 'error', 'statusCode', 'success'];
+  for (var i = 0; i < noShotGuy.length; i++) {
+
+    // TODO: throw an error here if they have one of these
+
+    delete ajaxOpts[noShotGuy[i]];
+  }
+
+  // merge their options with the defaults
+  $.extend(ajaxOpts, ajaxOpts2);
+
+  // sanity check: throw an error if url is not a string
+  if (typeof ajaxOpts.url !== 'string') {
+    error(8721, 'AJAX url must be a string. Did you forget to include one on ajaxOpts?', ajaxOpts.url);
     stopInput();
     return;
   }
 
-  var ajaxSuccess = function(data) {
-    // save the result in the cache
-    if (list.cacheAjax === true &&
-        LOCAL_STORAGE_AVAILABLE === true) {
-      localStorage.setItem(url, JSON.stringify(data));
-    }
-
-    if (INPUT_HAPPENING !== true) return;
-
-    // run their custom preProcess function
-    if (typeof list.preProcess === 'function') {
-      data = list.preProcess(data, getValue());
-    }
-
-    // expand the options and make sure they're valid
-    var options = [];
-    if (isArray(data) === true) {
-      for (var i = 0; i < data.length; i++) {
-        // skip any objects that are not valid Options
-        if (validOption(data[i]) !== true) continue;
-
-        // expand option
-        data[i] = expandOptionObject(data[i], list);
-        
-        // highlight matching characters
-        data[i].optionHTML = highlightMatchChars(data[i].optionHTML, inputValue);
-        
-        // add the option
-        options.push(data[i]);
-      }
-    }
-
-    // no results :(
-    var html = '';
-    if (options.length === 0 && isOptionShowing() === false) {
-      html = buildNoResults(list.noResultsHTML, inputValue);
-    }
-
-    // new options
-    if (options.length > 0) {
-      html = buildOptions(options, list, true);
-    }
-
-    // update the dropdown
-    dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(html);
-
-    // highlight the first option if there are no others highlighted
-    if (isOptionHighlighted() === false) {
-      highlightFirstOption();
-    }
+  // create callbacks
+  ajaxOpts.error = function(xhr, errType, exceptionObj) {
+    ajaxError(errType, list, inputValue);
+  };
+  ajaxOpts.success = function(data) {
+    ajaxSuccess(data, list, ajaxOpts.url, inputValue, ajaxOpts.preProcess);
   };
 
-  var ajaxError = function(xhr, errType, exceptionObject) {
-    //if (errType === 'abort') {
-    // TODO: write me
-    //}
-    if (errType === 'error') {
-      dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(buildAjaxError());
-    }
-  };
-  
   // check the cache
+  // NOTE: would prefer to check for something mroe than just truthy
+  //       to see if the options exist in localStorage
   if (list.cacheAjax === true &&
       LOCAL_STORAGE_AVAILABLE === true &&
-      // would prefer to check for something more than just truthy here
-      localStorage.getItem(url)) {
-    ajaxSuccess(JSON.parse(localStorage.getItem(url)));
+      localStorage.getItem(ajaxOpts.url)) {
+    var data = JSON.parse(localStroage.getItem(ajaxOpts.url));
+    ajaxOpts.success(data);
+    return;
   }
-  // else send the AJAX request
-  else {
-    JQUERY_AJAX_OBJECT = $.ajax({
-      dataType: 'json',
-      error: ajaxError,
-      success: ajaxSuccess,
-      type: 'GET',
-      url: url
-    });
-  }
+
+  // send the request
+  AJAX_OBJECT = $.ajax(ajaxOpts);
 };
 
 // calls fn() against every non-HTML character in str
@@ -1209,7 +1244,7 @@ var highlightMatchChars = function(optionHTML, input) {
     charsToHighlight[inputChars[i].toUpperCase()] = 0;
   }
 
-  charsToHighlight = objectKeysToArray(charsToHighlight);
+  charsToHighlight = keys(charsToHighlight);
 
   var optionHTML2 = '';
   mapNonHTMLChars(optionHTML, function(c) {
@@ -1246,7 +1281,7 @@ var isCharMatch = function(input, str) {
 
     charsObj[chars[i].toLowerCase()] = 0;
   }
-  chars = objectKeysToArray(charsObj);
+  chars = keys(charsObj);
 
   str = str.toLowerCase();
 
@@ -1484,8 +1519,8 @@ var pressRegularKey = function() {
   //       because of localStorage caching
   if (list.ajaxEnabled === true) {
     // cancel any existing AJAX request
-    if (typeof JQUERY_AJAX_OBJECT.abort === 'function') {
-      JQUERY_AJAX_OBJECT.abort();
+    if (typeof AJAX_OBJECT.abort === 'function') {
+      AJAX_OBJECT.abort();
     }
     sendAjaxRequest(list, inputValue);
   }
@@ -1517,7 +1552,7 @@ var clickContainerElement = function(e) {
 var clickTokenGroup = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
-  
+
   stopInput();
 
   // remove highlight from other token groups
@@ -1530,7 +1565,7 @@ var clickTokenGroup = function(e) {
 var clickRemoveTokenGroup = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
-  
+
   stopInput();
   clearTokenGroupHighlight();
   $(this).parents('div.' + CLASSES.tokenGroup)
@@ -1542,7 +1577,7 @@ var clickRemoveTokenGroup = function(e) {
 var clickOption = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
-  
+
   // highlight it
   highlightOption(this);
 
