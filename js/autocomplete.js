@@ -317,7 +317,7 @@ var sanityChecks = function() {
     window.alert('AutoComplete Error 1004: jQuery does not exist. Please include jQuery on the page.\n\nExiting...');
     return false;
   }
-  
+
   // expand the config
   return expandConfig();
 };
@@ -498,7 +498,7 @@ var expandConfig = function() {
       error(6447, 'Invalid value passed to initialValue', cfg.initialValue);
     }
   }
-  
+
   // placeholderHTML
   if (typeof cfg.placeholderHTML !== 'string') {
     cfg.placeholderHTML = '';
@@ -533,7 +533,7 @@ var expandConfig = function() {
 
   // initialList
   var listNames = keys(cfg.lists);
-  
+
   // throw an error if they did not specify any lists
   // NOTE: this is more of a sanityCheck() thing, but we need to expand
   //       the rest of the config before we can check this
@@ -541,18 +541,18 @@ var expandConfig = function() {
     window.alert('AutoComplete Error 1005: You must include some list objects.\n\nExiting...');
     return false;
   }
-  
+
   if (listNames.length === 1) {
     cfg.initialList = listNames[0];
   }
 
   if (listExists(cfg.initialList) !== true) {
     error(2728, 'initialList "' + cfg.initialList + '" does not exist on the lists object');
-    
+
     // set initialList to the first list in lists
     cfg.initialList = listNames[0];
   }
-  
+
   return true;
 };
 
@@ -593,9 +593,11 @@ var buildOptionHTML = function(option, parentList) {
     return encode(option.value);
   }
 
-  // I guess I could iterate through the option.values
-  // and just return the first thing that is a String?
-  // Think I'd rather just throw an error.
+  // TODO: I should iterate through the .value here and
+  //       return the first thing that is a String
+  //       but also throw an error
+  // TODO: list validation should ensure that this never
+  //       happens though
 
   // NOTE: this should never happen
   error(5783, 'Unable to create HTML string for optionHTML.', option);
@@ -792,7 +794,7 @@ var positionDropdownEl = function() {
 
   // put the dropdown directly beneath the input element
   dropdownEl.css({
-    top: (height + pos.top),
+    top: (height + pos.top + 8),
     left: pos.left
   });
 };
@@ -943,7 +945,7 @@ var listExists = function(listName) {
 
 var startInput = function() {
   hidePlaceholder();
-  
+
   // have we hit max token groups?
   if (typeof cfg.maxTokenGroups === 'number' &&
       TOKENS.length >= cfg.maxTokenGroups &&
@@ -971,11 +973,11 @@ var stopInput = function() {
   }
   hideInputEl();
   hideDropdownEl();
-  
+
   if (JSON.stringify(TOKENS) === '[]') {
     showPlaceholder();
   }
-  
+
   INPUT_HAPPENING = false;
 };
 
@@ -1231,48 +1233,65 @@ var sendAjaxRequest = function(list, inputValue) {
   AJAX_OBJECT = $.ajax(ajaxOpts);
 };
 
-// calls fn() against every non-HTML character in str
+// returns an array of all characters in str
+// with a flag to determine if it's an HTML character or not
 // NOTE: this is naive; I'm sure there are bugs here
 //       also it assumes valid HTML
-var mapNonHTMLChars = function(str, fn) {
+// TODO: refactor this
+var findHTMLChars = function(str) {
   var chars = str.split('');
+  var result = [];
+  
   var inATag = false;
   var inEscapeSequence = false;
 
   for (var i = 0; i < chars.length; i++) {
     if (chars[i] === '<') {
       inATag = true;
+      result.push({c:'<',html:true});
       continue;
     }
     if (inATag === true && chars[i] === '>') {
       inATag = false;
+      result.push({c:'>',html:true});
       continue;
     }
     if (chars[i] === '&') {
       inEscapeSequence = true;
+      result.push({c:'&',html:true});
       continue;
     }
     if (inEscapeSequence === true && chars[i] === ';') {
       inEscapeSequence = false;
+      result.push({c:';',html:true});
       continue;
     }
 
-    if (inATag === true || inEscapeSequence === true) continue;
-
-    fn(chars[i]);
+    if (inATag === true || inEscapeSequence === true) {
+      result.push({c:chars[i],html:true});
+    }
+    else {
+      result.push({c:chars[i],html:false});
+    }
   }
+
+  return result;
 };
 
 // attempts to return all non-HTML characters from a string
 var findNonHTMLChars = function(str) {
+  var chars = findHTMLChars(str);
   var str2 = '';
-  mapNonHTMLChars(str, function(c) {
-    str2 += c;
-  });
+  for (var i = 0; i < chars.length; i++) {
+    if (chars[i].html === false) {
+      str2 += chars[i];
+    }
+  }
   return str2;
 };
 
 // add <strong> tags around all non-HTML characters in optionHTML that exist in input
+// TODO: refactor this
 var highlightMatchChars = function(optionHTML, input) {
   var inputChars = input.split('');
   var charsToHighlight = {};
@@ -1287,22 +1306,29 @@ var highlightMatchChars = function(optionHTML, input) {
 
   charsToHighlight = keys(charsToHighlight);
 
+  var arr = findHTMLChars(optionHTML);
   var optionHTML2 = '';
-  mapNonHTMLChars(optionHTML, function(c) {
-    for (var i = 0; i < charsToHighlight.length; i++) {
-      if (c === charsToHighlight[i]) {
-        optionHTML2 += '<strong>' + c + '</strong>';
-        return;
-      }
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].html === true) {
+      optionHTML2 += arr[i].c;
     }
-    optionHTML2 += c;
-  });
+    else {
+      var tmp = arr[i].c;
+      for (var j = 0; j < charsToHighlight.length; j++) {
+        if (tmp === charsToHighlight[j]) {
+          tmp = '<strong>' + tmp + '</strong>';
+        }
+      }
+      optionHTML2 += tmp;
+    }
+  }
+
   return optionHTML2;
 };
 
 // does input match the beginning of str?
 var isFrontMatch = function(input, str) {
-  return input === str.toLowerCase().substring(0, input.length);
+  return input.toLowerCase() === str.toLowerCase().substring(0, input.length);
 };
 
 // is input a substring inside str?
@@ -1335,7 +1361,8 @@ var isCharMatch = function(input, str) {
 };
 
 // returns an array of options that match against ._matchValue
-var matchOptionsSpecial = function(options, input) {
+// also adds a freeform option if that's enabled
+var matchOptionsSpecial = function(options, input, list) {
   var options2 = [],
       i,
       len = options.length;
@@ -1348,6 +1375,15 @@ var matchOptionsSpecial = function(options, input) {
       options2.push(options[i]);
       options[i] = false;
     }
+  }
+
+  // optionally add the freeform option
+  if (list.allowFreeform === true) {
+    options2.push(expandOptionObject({
+      optionHTML: encode('"' + input + '"'),
+      tokenHTML: encode(input),
+      value: input
+    }, list));
   }
 
   // then a substring match
@@ -1384,7 +1420,6 @@ var matchOptionsSpecial = function(options, input) {
 // investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
   var i, matchValue;
-  input = input.toLowerCase();
 
   // return all the options with no user input
   if (input === '') {
@@ -1405,14 +1440,14 @@ var matchOptions = function(input, list) {
     // set ._matchValue
     for (var i = 0; i < options.length; i++) {
       if (typeof options[i].value === 'string') {
-        options[i]._matchValue = options[i].value.toLowerCase();
+        options[i]._matchValue = options[i].value;
       }
       else {
-        options[i]._matchValue = findNonHTMLChars(options[i].optionHTML.toLowerCase());
+        options[i]._matchValue = findNonHTMLChars(options[i].optionHTML);
       }
     }
 
-    options2 = matchOptionsSpecial(options, input);
+    options2 = matchOptionsSpecial(options, input, list);
   }
 
   return options2;
@@ -1510,12 +1545,6 @@ var pressRegularKey = function() {
   // else default to mine
   else {
     options = matchOptions(inputValue, list);
-  }
-
-  // add freeform as an option if that's allowed
-  if (options.length === 0 && inputValue !== '' &&
-      list.allowFreeform === true) {
-    options.push(expandOptionObject(inputValue, list));
   }
 
   // no input, no options, no freeform, and no ajax
@@ -1661,12 +1690,16 @@ var keydownInputElement = function(e) {
 
   // down arrow
   if (keyCode === KEYS.DOWN) {
+    // prevent the cursor from going to the end of the input element
+    e.preventDefault();
     pressDownArrow();
     return;
   }
 
   // up arrow
   if (keyCode === KEYS.UP) {
+    // prevent the cursor from going to the front of the input element
+    e.preventDefault();
     pressUpArrow();
     return;
   }
@@ -1934,7 +1967,7 @@ var initDom = function() {
   dropdownEl = containerEl.find('ul.dropdown');
   placeholderEl = containerEl.find('div.placeholder');
   tokensEl = containerEl.find('div.tokens');
-  
+
   // set the placeholder
   placeholderEl.html(cfg.placeholderHTML);
 };

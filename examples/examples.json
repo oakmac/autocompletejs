@@ -110,8 +110,13 @@
 },
 {
   "group": "List Config",
+  "number": 4014,
+  "name": "Basic allowFreeform"
+},
+{
+  "group": "List Config",
   "number": 4001,
-  "name": "allowFreeform"
+  "name": "allowFreeform Multiple Lists"
 },
 {
   "group": "List Config",

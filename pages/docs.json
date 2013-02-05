@@ -57,7 +57,7 @@
   "desc":[
     "Function to execute when the value of the widget changes.",
     "The first argument to the function is the new value of the widget, the second argument is the old value of the widget.",
-    "If this function returns a valid widget value, then it becomes the new value.  If not, the new value stays the same."
+    "If this function returns a valid widget value, then that value becomes the value of the widget.  If not, the original new value becomes the value of the widget."
   ],
   "examples":[6000,6001]
 },
@@ -80,7 +80,7 @@
   "default":false,
   "desc":[
     "<code class='js plain'>showErrors</code> is an optional parameter to control how AutoComplete reports errors.",
-    "Every error in AutoComplete has a unique code to help diagnose problems and search for answers.",
+    "Every error in AutoComplete has a unique code to help diagnose problems and search for solutions.",
     "If <code class='js plain'>showErrors</code> is <code class='js keyword'>false</code> then errors will be ignored.",
     "If <code class='js plain'>showErrors</code> is <code class='js string'>'console'</code> then errors will be sent to <code class='js plain'>console.log()</code>.",
     "If <code class='js plain'>showErrors</code> is <code class='js string'>'alert'</code> then errors will annoyingly be sent to <code class='js plain'>window.alert()</code>.",
@@ -128,7 +128,9 @@
   "desc":[
     "Internally, AutoComplete uses the jQuery <a href='http://api.jquery.com/jQuery.ajax/' target='_blank'><code class='js plain'>$.ajax()</code></a> method to make AJAX requests.",
     "If provided, <code class='js plain'>ajaxOpts</code> will be called with <a href='http://api.jquery.com/jQuery.extend/'><code class='js plain'>$.extend()</code></a> against the default settings.",
-    "You can override any <code class='js plain'>$.ajax()</code> parameter except: <code class='js plain'>async</code>, <code class='js plain'>complete</code>, <code class='js plain'>error</code>, <code class='js plain'>statusCode</code>, <code class='js plain'>success</code> (ie: parameters that influence control flow)"
+    "You can override any <code class='js plain'>$.ajax()</code> parameter except: <code class='js plain'>async</code>, <code class='js plain'>complete</code>, <code class='js plain'>error</code>, <code class='js plain'>statusCode</code>, <code class='js plain'>success</code> (ie: parameters that influence control flow)",
+    "If <code class='js plain'>ajaxOpts</code> is a function the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an object to pass to <code class='js plain'>$.ajax()</code>."
   ],
   "examples":[2004,2003]
 },
@@ -141,7 +143,8 @@
   "desc":[
     "<code class='js plain'>preProcess</code> is an optional function that will be called after the AJAX request has finished and before the options are shown.",
     "The first argument is the data returned by the server, the second argument is the text that the user has entered, and the third argument is the current value of the AutoComplete widget.",
-    "The function should return an array of <a href='docs#option_object'>Option Objects</a>."
+    "The function should return an array of <a href='docs#option_object'>Option Objects</a>.",
+    "<code class='js plain'>preProcess</code> is independent of the jQuery <code class='js plain'>$.ajax()</code> method."
   ],
   "examples":2003
 },
@@ -155,7 +158,8 @@
     "The url to send an AJAX request to.",
     "The string <code class='js string'>'{input}'</code> will be replaced with the text the user has typed.",
     "The text will be escaped using <code class='js plain'>encodeURIComponent()</code>.",
-    "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget."
+    "If <code class='js plain'>url</code> is a function, the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget.",
+    "The function should return a url string."
   ],
   "examples":2001
 },
@@ -169,7 +173,8 @@
     "If <code class='js keyword'>true</code>, allows the user to enter free-form text.",
     "If <code class='js keyword'>false</code>, the user must select an option from the list.",
     "There can still be options when <code class='js plain'>allowFreeform</code> is set to <code class='js keyword'>true</code>, but the user does not have to select one."
-  ]
+  ],
+  "examples":[4014, 4001]
 },
 "------------------------------------------------------------------------------",
 {

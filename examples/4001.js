@@ -22,4 +22,4 @@ var config = {
     }
   }
 };
-var widget = new AutoComplete('example5', config);
+var widget = new AutoComplete('search_bar', config);
