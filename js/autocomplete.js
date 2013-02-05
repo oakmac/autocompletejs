@@ -317,8 +317,9 @@ var sanityChecks = function() {
     window.alert('AutoComplete Error 1004: jQuery does not exist. Please include jQuery on the page.\n\nExiting...');
     return false;
   }
-
-  return true;
+  
+  // expand the config
+  return expandConfig();
 };
 
 //------------------------------------------------------------------------------
@@ -392,7 +393,7 @@ var expandListObject = function(list) {
   // a string is shorthand for the AJAX url
   if (typeof list === 'string') {
     list = {
-      ajaxOpts : {
+      ajaxOpts: {
         url: list
       }
     };
@@ -527,14 +528,27 @@ var expandConfig = function() {
 
   // initialList
   var listNames = keys(cfg.lists);
+  
+  // throw an error if they did not specify any lists
+  // NOTE: this is more of a sanityCheck() thing, but we need to expand
+  //       the rest of the config before we can check this
+  if (listNames.length === 0) {
+    window.alert('AutoComplete Error 1005: You must include some list objects.\n\nExiting...');
+    return false;
+  }
+  
   if (listNames.length === 1) {
     cfg.initialList = listNames[0];
   }
 
   if (listExists(cfg.initialList) !== true) {
-    // TODO: throw error
-    // TODO: set initialList to the first list in lists
+    error(2728, 'initialList "' + cfg.initialList + '" does not exist on the lists object');
+    
+    // set initialList to the first list in lists
+    cfg.initialList = listNames[0];
   }
+  
+  return true;
 };
 
 //------------------------------------------------------------------------------
@@ -1639,7 +1653,7 @@ var keydownInputElement = function(e) {
   // NOTE: took this from jquery-tokeninput
   //       you let the keydown event finish so the input element
   //       gets updated, then you grab the value
-  //       otherwise you're re-writing the logic behind <input type="text"> elements
+  //       otherwise you're re-writing the logic behind <input type="text">
   setTimeout(pressRegularKey, 5);
 };
 
@@ -1870,7 +1884,8 @@ var addEvents = function() {
   containerEl.on('click', 'li.' + CLASSES.option, clickOption);
   containerEl.on('mouseover', 'li.' + CLASSES.option, mouseoverOption);
   containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
-  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup, clickRemoveTokenGroup);
+  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' +
+    CLASSES.removeTokenGroup, clickRemoveTokenGroup);
 
   // catch all clicks on the page
   $('html').on('click', clickPage);
@@ -1895,7 +1910,6 @@ var initDom = function() {
 var init = function() {
   if (sanityChecks() !== true) return;
 
-  expandConfig();
   initDom();
   addEvents();
   updateTokens();
