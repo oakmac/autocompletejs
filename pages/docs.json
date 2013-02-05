@@ -1,16 +1,109 @@
 {
-"List Object":[
+"Config Object":[
 "------------------------------------------------------------------------------",
 {
-  "name":"ajaxEnabled",
-  "type":"Boolean",
+  "name":"initialList",
+  "type":"String",
+  "req":"sometimes",
+  "default":false,
+  "desc":[
+    "The <code class='js plain'>initialList</code> property is the first list started when the user clicks on the AutoComplete widget.",
+    "It's value should be the name of a <a href='docs#list_object'>List Object</a>.",
+    "<code class='js plain'>initialList</code> is required when there are more than one List Objects on <a href='docs#config_object:lists'><code class='js plain'>lists</code></a>."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"ajaxLoadingHTML",
+  "type":["String", "Function"],
+  "req":false,
+  "default":"<code class='js string'>'Searching&amp;hellip;'</code>",
+  "desc":[
+    "An HTML string to display when searching for options.",
+    "If <code class='js plain'>ajaxLoadingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
+    "The function should return an HTML string."
+  ],
+  "examples":[4011,4037]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"lists",
+  "type":"Object of <a href='docs#list_object'>List Objects</a>",
+  "req":true,
+  "default":false,
+  "desc":[
+    "The <code class='js plain'>lists</code> property contains all of the lists used to power the dropdown options.",
+    "See the <a href='docs#list_object'>List Object</a> reference for more information on List Objects."
+  ],
+  "examples":[1002,1003]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"initialValue",
+  "type":"Array of Token Groups",
+  "req":false,
+  "default":false,
+  "desc":[
+    "If provided, sets the initial value of the AutoComplete widget."
+  ],
+  "examples":[3000]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"maxTokenGroups",
+  "type":["Number","<code class='js keyword'>false</code>"],
   "req":false,
   "default":"<code class='js keyword'>false</code>",
   "desc":[
-    "If <code class='js keyword'>true</code>, will send an AJAX request when the user types in the input.",
-    "You can have local list options as well as requesting results from a server. See this example."
+    "The maximum number of token groups allowed in the search bar.",
+    "Set <code class='js plain'>maxTokenGroups</code> to <code class='js keyword'>false</code> to allow unlimited token groups."
+  ],
+  "examples":[3001]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"onChange",
+  "type":"Function",
+  "req":false,
+  "default":false,
+  "desc":[
+    "Function to execute when the value of the widget changes.",
+    "The first argument to the function is the new value of the widget, the second argument is the old value of the widget.",
+    "If this function returns a valid widget value, then it becomes the new value.  If not, the new value stays the same."
+  ],
+  "examples":[6000,6001]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"placeholderHTML",
+  "type":"String",
+  "req":false,
+  "default":false,
+  "desc":[
+    "TODO: write me"
   ]
 },
+"------------------------------------------------------------------------------",
+{
+  "name":"showErrors",
+  "type":["<code class='js keyword'>false</code>","String","Function"],
+  "req":false,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>showErrors</code> is an optional parameter to control how AutoComplete reports errors.",
+    "Every error in AutoComplete has a unique code to help diagnose problems and search for answers.",
+    "If <code class='js plain'>showErrors</code> is <code class='js keyword'>false</code> then errors will be ignored.",
+    "If <code class='js plain'>showErrors</code> is <code class='js string'>'console'</code> then errors will be sent to <code class='js plain'>console.log()</code>.",
+    "If <code class='js plain'>showErrors</code> is <code class='js string'>'alert'</code> then errors will annoyingly be sent to <code class='js plain'>window.alert()</code>.",
+    "If <code class='js plain'>showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error."
+  ],
+  "examples":[3012,3088]
+}
+],
+
+
+
+"List Object":[
 "------------------------------------------------------------------------------",
 {
   "name":"ajaxErrorHTML",
@@ -94,7 +187,7 @@
   "name":"cacheAjax",
   "type":"Boolean",
   "req":false,
-  "default":"<code class='js keyword'>true</code>",
+  "default":"<code class='js keyword'>false</code>",
   "desc":[
     "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.",
     "If <code class='js keyword'>false</code>, it will not cache and send a new AJAX request every time.",
@@ -109,10 +202,11 @@
   "req":false,
   "default":false,
   "desc":[
-    "If specified, <code class='js plain'>children</code> should be the name of a List Object.",
-    "When any option from this list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the component.",
+    "If a string, <code class='js plain'>children</code> should be the name of a List Object.",
+    "When any option from the list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the dropdown.",
+    "If <code class='js plain'>children</code> is a function, the first argument is the text that the user has typed, the second argument is the option the user selected, the third argument is the name of the list that option came from, and the fourth argument is the current value of the AutoComplete widget.",
     "If there is a <code class='js plain'>children</code> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property.",
-    "See the <code class='js plain'>children</code> property in the <a href='docs#option_object'>Option Object</a> reference."
+    "See the <a href='docs#option_object:children'><code class='js plain'>children</code></a> property in the Option Object reference."
   ]
 },
 "------------------------------------------------------------------------------",
@@ -124,7 +218,7 @@
   "desc":[
     "If <code class='js keyword'>true</code>, will highlight letter matches between what the user has typed and which options have matched.",
     "This option programmatically changes the <code class='js plain'>optionHTML</code> value by adding <code class='js plain'>&lt;strong&gt;</code> tags around matching characters.",
-    "It tries to not replace letters that are inside HTML tags, but if you have complicated HTML markup in your <code class='js plain'>optionHTML</code> it may break."
+    "It tries to not replace letters that are inside HTML tags or special HTML characters, but if you have complicated or invalid HTML markup in your <code class='js plain'>optionHTML</code> it may break."
   ]
 },
 "------------------------------------------------------------------------------",
@@ -161,10 +255,10 @@
   "req":false,
   "default":false,
   "desc":[
-    "If <code class='js plain'>optionHTML</code> is a string, strings inside curly braces will be replaced with HTML-escaped option values.",
+    "If <code class='js plain'>optionHTML</code> is a string, option value properties inside curly braces will be replaced with HTML-escaped values.",
     "If <code class='js plain'>optionHTML</code> is a function the first argument is the option.",
     "The function should return an HTML string.",
-    "If there is an <code class='js plain'>optionHTML</code> property on the Option Object it will supersede this <code class='js plain'>optionHTML</code> property."
+    "If there is an <code class='js plain'>optionHTML</code> property on the option selected it will supersede this <code class='js plain'>optionHTML</code> property. See <a href='docs#option_object:optionHTML'><code class='js plain'>optionHTML</code></a> on the Option Object."
   ]
 },
 "------------------------------------------------------------------------------",
@@ -174,24 +268,11 @@
   "req":false,
   "default":false,
   "desc":[
-    "<code class='js plain'>tokenHTML</code> is an optional function used to build the token HTML in the search bar for every option in the list.",
-    "The first argument to the function is the option itself.",
+    "If <code class='js plain'>tokenHTML</code> is a string, option value properties inside curly braces will be replaced with HTML-escaped values.",
+    "If <code class='js plain'>tokenHTML</code> is a function the first argument is the option.",
     "The function should return an HTML string.",
-    "If there is a <code class='js plain'>tokenHTML</code> property on the Option Object selected it will supersede this <code class='js plain'>tokenHTML</code> property.",
-    "See the <code class='js plain'>tokenHTML</code> property in the <a href='docs#option_object'>Option Object</a> reference."
+    "If there is a <code class='js plain'>tokenHTML</code> property on the option selected it will supersede this <code class='js plain'>tokenHTML</code> property. See <a href='docs#option_object:tokenHTML'><code class='js plain'>tokenHTML</code></a> on the Option Object."
   ]
-},
-"------------------------------------------------------------------------------",
-{
-  "name":"preProcess",
-  "type":"Function",
-  "req":false,
-  "desc":[
-    "<code class='js plain'>preProcess</code> is an optional function you can use to process data that is returned from the server.",
-    "The first argument is the data returned by the server and the second argument is the current value of the AutoComplete widget.",
-    "The function should return an array of <a href='docs#option_object'>Option Objects</a>."
-  ],
-  "examples":2003
 },
 "------------------------------------------------------------------------------",
 {
@@ -200,8 +281,8 @@
   "req":false,
   "default":"[]",
   "desc":[
-    "<code class='js plain'>options</code> is an array of Option Objects.",
-    "See the <a href='docs#option_object'>Option Objects</a> reference for more information."
+    "<code class='js plain'>options</code> is an array of Option Objects that determine which options to show in the dropdown for this list.",
+    "See the <a href='docs#option_object'>Option Objects</a> reference."
   ]
 }
 ],
@@ -214,6 +295,7 @@
   "name":"children",
   "type":"String",
   "req":false,
+  "default":false,
   "desc":[
     "If specified, <code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a>.",
     "When the option is selected from the dropdown, children is the name of the next list to show.",
@@ -225,12 +307,48 @@
   "name":"group",
   "type":"String",
   "req":false,
+  "default":false,
   "desc":[
     "You can group options into sections using the {code}group{/code} property.",
     "Options without groups get displayed first followed by options with groups.",
     "You can control the sort order "
   ],
   "examples":1012
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"optionHTML",
+  "type":"String",
+  "req":false,
+  "default":false,
+  "desc":[
+    "An HTML string to show inside the dropdown.",
+    "This <code class='js plain'>optionHTML</code> property will supersede an <code class='js plain'>optionHTML</code> function on the parent list.",
+    "If there is no <code class='js plain'>optionHTML</code> on the option and there is no <code class='js plain'>optionHTML</code> on the parent list and <code class='js plain'>value</code> is a string, then <code class='js plain'>optionHTML</code> gets an HTML-escaped <code class='js plain'>value</code>."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"tokenHTML",
+  "type":"String",
+  "req":false,
+  "default":false,
+  "desc":[
+    "An HTML string to show inside the search bar.",
+    "This <code class='js plain'>tokenHTML</code> property will supersede a <code class='js plain'>tokenHTML</code> property on the parent list.",
+    "If there is no <code class='js plain'>tokenHTML</code> on the option and there is no <code class='js plain'>tokenHTML</code> on the parent <code class='js plain'>tokenHTML</code> gets the value of <code class='js plain'>optionHTML</code>."
+  ]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"value",
+  "type":["String","Number","Array","Object"],
+  "req":true,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>value</code> is what gets saved in the AutoComplete value when the user selects the option.",
+    "<code class='js plain'>value</code> can be anything that is safe to call <code class='js plain'>JSON.stringify()</code> on."
+  ]
 },
 "------------------------------------------------------------------------------"
 ],
