@@ -10,30 +10,6 @@
     "The <code class='js plain'>initialList</code> property is the first list started when the user clicks on the AutoComplete widget.",
     "It's value should be the name of a <a href='docs#list_object'>List Object</a>.",
     "<code class='js plain'>initialList</code> is required when there are more than one List Objects on <a href='docs#config_object:lists'><code class='js plain'>lists</code></a>."
-  ]
-},
-"------------------------------------------------------------------------------",
-{
-  "name":"ajaxLoadingHTML",
-  "type":["String", "Function"],
-  "req":false,
-  "default":"<code class='js string'>'Searching&amp;hellip;'</code>",
-  "desc":[
-    "An HTML string to display when searching for options.",
-    "If <code class='js plain'>ajaxLoadingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
-    "The function should return an HTML string."
-  ],
-  "examples":[4011,4037]
-},
-"------------------------------------------------------------------------------",
-{
-  "name":"lists",
-  "type":"Object of <a href='docs#list_object'>List Objects</a>",
-  "req":true,
-  "default":false,
-  "desc":[
-    "The <code class='js plain'>lists</code> property contains all of the lists used to power the dropdown options.",
-    "See the <a href='docs#list_object'>List Object</a> reference for more information on List Objects."
   ],
   "examples":[1002,1003]
 },
@@ -47,6 +23,18 @@
     "If provided, sets the initial value of the AutoComplete widget."
   ],
   "examples":[3000]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"lists",
+  "type":"Object of <a href='docs#list_object'>List Objects</a>",
+  "req":true,
+  "default":false,
+  "desc":[
+    "The <code class='js plain'>lists</code> property contains all of the lists used to power the dropdown options.",
+    "See the <a href='docs#list_object'>List Object</a> reference for more information on List Objects."
+  ],
+  "examples":[1002,1003]
 },
 "------------------------------------------------------------------------------",
 {
@@ -78,10 +66,11 @@
   "name":"placeholderHTML",
   "type":"String",
   "req":false,
-  "default":false,
+  "default":"<code class='js string'>''</code>",
   "desc":[
-    "TODO: write me"
-  ]
+    "A placeholder to show in the AutoComplete widget when there are no token groups."
+  ],
+  "examples":3005
 },
 "------------------------------------------------------------------------------",
 {
@@ -115,7 +104,7 @@
     "If <code class='js plain'>ajaxErrorHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
     "The function should return an HTML string."
   ],
-  "examples":[4011, 4037]
+  "examples":[]
 },
 "------------------------------------------------------------------------------",
 {
@@ -300,7 +289,8 @@
     "If specified, <code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a>.",
     "When the option is selected from the dropdown, children is the name of the next list to show.",
     "This children property will supersede a children property on the parent List Object."
-  ]
+  ],
+  "examples":[1002]
 },
 "------------------------------------------------------------------------------",
 {
@@ -309,9 +299,8 @@
   "req":false,
   "default":false,
   "desc":[
-    "You can group options into sections using the {code}group{/code} property.",
-    "Options without groups get displayed first followed by options with groups.",
-    "You can control the sort order "
+    "You can group options into sections using the <code class='js plain'>group</code> property.",
+    "Options without groups get displayed first followed by options with groups."
   ],
   "examples":1012
 },

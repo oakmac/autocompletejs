@@ -54,7 +54,7 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, dropdownEl, inputEl, tokensEl;
+var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl;
 
 // CSS class names
 var CLASSES = {
@@ -498,6 +498,11 @@ var expandConfig = function() {
       error(6447, 'Invalid value passed to initialValue', cfg.initialValue);
     }
   }
+  
+  // placeholderHTML
+  if (typeof cfg.placeholderHTML !== 'string') {
+    cfg.placeholderHTML = '';
+  }
 
   // default for showErrors is false
   if (cfg.showErrors !== 'console' && cfg.showErrors !== 'alert' &&
@@ -558,6 +563,7 @@ var expandConfig = function() {
 var buildWidget = function() {
   var html = '' +
   '<div class="' + cfg.classPrefix + '_internal_container">' +
+    '<div class="placeholder"></div>' +
     '<div class="tokens"></div>' +
     '<input type="text" class="autocomplete-input" />' +
     '<div style="clear:both"></div>' +
@@ -730,6 +736,14 @@ var buildAjaxError = function(ajaxErrorHTML, inputValue) {
 // DOM Manipulation
 //------------------------------------------------------------------------------
 
+var hidePlaceholder = function() {
+  placeholderEl.css('display', 'none');
+};
+
+var showPlaceholder = function() {
+  placeholderEl.css('display', '');
+};
+
 var moveTokenHighlightLeft = function() {
   var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
 
@@ -804,7 +818,14 @@ var highlightLastTokenGroup = function() {
 };
 
 var updateTokens = function() {
-  tokensEl.html(buildTokens(TOKENS));
+  var tokenHTML = buildTokens(TOKENS);
+  tokensEl.html(tokenHTML);
+  if (tokenHTML === '') {
+    showPlaceholder();
+  }
+  else {
+    hidePlaceholder();
+  }
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
@@ -921,6 +942,8 @@ var listExists = function(listName) {
 };
 
 var startInput = function() {
+  hidePlaceholder();
+  
   // have we hit max token groups?
   if (typeof cfg.maxTokenGroups === 'number' &&
       TOKENS.length >= cfg.maxTokenGroups &&
@@ -948,6 +971,11 @@ var stopInput = function() {
   }
   hideInputEl();
   hideDropdownEl();
+  
+  if (JSON.stringify(TOKENS) === '[]') {
+    showPlaceholder();
+  }
+  
   INPUT_HAPPENING = false;
 };
 
@@ -1904,7 +1932,11 @@ var initDom = function() {
   // grab elements in memory
   inputEl = containerEl.find('input.autocomplete-input');
   dropdownEl = containerEl.find('ul.dropdown');
+  placeholderEl = containerEl.find('div.placeholder');
   tokensEl = containerEl.find('div.tokens');
+  
+  // set the placeholder
+  placeholderEl.html(cfg.placeholderHTML);
 };
 
 var init = function() {
