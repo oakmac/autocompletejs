@@ -13,12 +13,17 @@
 {
   "group": "Basic Usage",
   "number": 1002,
-  "name": "Multiple Lists"
+  "name": "Nested Lists 1"
+},
+{
+  "group": "Basic Usage",
+  "number": 1007,
+  "name": "Nested Lists 2"
 },
 {
   "group": "Basic Usage",
   "number": 1003,
-  "name": "Nested Lists"
+  "name": "Nested Lists 3"
 },
 {
   "group": "Basic Usage",
@@ -126,7 +131,7 @@
 {
   "group": "List Config",
   "number": 4003,
-  "name": "children"
+  "name": "children on List"
 },
 {
   "group": "List Config",
@@ -174,6 +179,11 @@
   "name": "options"
 },
 "-----------------------------------------------------",
+{
+  "group": "Option Config",
+  "number": 5022,
+  "name": "children override on option"
+},
 {
   "group": "Option Config",
   "number": 5000,

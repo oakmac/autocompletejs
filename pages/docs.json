@@ -192,16 +192,16 @@
 "------------------------------------------------------------------------------",
 {
   "name":"children",
-  "type":["String","Function"],
+  "type":"String",
   "req":false,
   "default":false,
   "desc":[
-    "If a string, <code class='js plain'>children</code> should be the name of a List Object.",
+    "<code class='js plain'>children</code> should be the name of a List Object.",
     "When any option from the list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show up in the dropdown.",
-    "If <code class='js plain'>children</code> is a function, the first argument is the text that the user has typed, the second argument is the option the user selected, the third argument is the name of the list that option came from, and the fourth argument is the current value of the AutoComplete widget.",
     "If there is a <code class='js plain'>children</code> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property.",
     "See the <a href='docs#option_object:children'><code class='js plain'>children</code></a> property in the Option Object reference."
-  ]
+  ],
+  "examples":[4003,1007,5022]
 },
 "------------------------------------------------------------------------------",
 {
@@ -287,15 +287,16 @@
 "------------------------------------------------------------------------------",
 {
   "name":"children",
-  "type":"String",
+  "type":["String","<code class='js keyword'>false</code>"],
   "req":false,
   "default":false,
   "desc":[
-    "If specified, <code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a>.",
-    "When the option is selected from the dropdown, children is the name of the next list to show.",
+    "If <code class='js plain'>children</code> is a string, it should be the name of a <a href='docs#list_object'>List Object</a>.",
+    "When the option is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show.",
+    "If <code class='js plain'>children</code> is <code class='js keyword'>false</code>, then the list workflow stops when the option is selected.",
     "This children property will supersede a children property on the parent List Object."
   ],
-  "examples":[1002]
+  "examples":[1002,1007,5022]
 },
 "------------------------------------------------------------------------------",
 {

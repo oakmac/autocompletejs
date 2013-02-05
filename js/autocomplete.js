@@ -1033,6 +1033,10 @@ var createTokenFromOption = function(option) {
 
 // returns false if the option has no children
 var getChildrenListName = function(option, parentList) {
+  if (option.children === false) {
+    return false;
+  }
+
   if (typeof option.children === 'string' &&
       listExists(option.children) === true) {
     return option.children;
@@ -1241,7 +1245,7 @@ var sendAjaxRequest = function(list, inputValue) {
 var findHTMLChars = function(str) {
   var chars = str.split('');
   var result = [];
-  
+
   var inATag = false;
   var inEscapeSequence = false;
 
