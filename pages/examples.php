@@ -1,5 +1,6 @@
 <?php
 $page_title = 'Examples';
+$active_nav_tab = 'Examples';
 include(APP_PATH . 'pages/header.php');
 $examples = AC::getExamples();
 ?>

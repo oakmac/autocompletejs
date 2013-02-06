@@ -22,7 +22,7 @@ if ($URI[0] === 'autocompletejs') {
 $URI[count($URI)-1] = preg_replace('/\?.+$/', '', $URI[count($URI)-1]);
 
 // fill in the URI array with blanks so we don't get any array index errors
-for ($i = 0; $i < 20; $i++) {
+for ($i = 0; $i < 10; $i++) {
   if (isset($URI[$i]) === false) {
     $URI[$i] = '';
   }
@@ -41,12 +41,6 @@ if ($URI[0] === 'docs') {
   die;
 }
 
-// themes
-if ($URI[0] === 'themes') {
-  require(APP_PATH.'pages/themes.php');
-  die;
-}
-
 // examples
 if ($URI[0] === 'examples' && $URI[1] === '') {
   require(APP_PATH.'pages/examples.php');
@@ -62,6 +56,20 @@ if ($URI[0] === 'examples' && $URI[1] !== '') {
   }
 }
 
+// themes
+if ($URI[0] === 'themes') {
+  require(APP_PATH.'pages/themes.php');
+  die;
+}
+
+// download
+if ($URI[0] === 'download') {
+  require(APP_PATH.'pages/download.php');
+  die;
+}
+
+/*
+TODO: create these
 // markup
 if ($URI[0] === 'markup') {
   require(APP_PATH.'pages/markup.php');
@@ -73,6 +81,7 @@ if ($URI[0] === 'license') {
   require(APP_PATH.'pages/license.php');
   die;
 }
+*/
 
 // anything else 404's
 header('HTTP/1.1 404 Not Found');

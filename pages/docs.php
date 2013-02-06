@@ -1,5 +1,6 @@
 <?php
 $page_title = 'Documentation';
+$active_nav_tab = 'Docs';
 include(APP_PATH . 'pages/header.php');
 $examples = AC::getExamples();
 $docs = AC::getDocs();

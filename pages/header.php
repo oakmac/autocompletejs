@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>AutoCompleteJS<?php if (isset($page_title)) echo ' &raquo; ' . $page_title; ?></title>
+  <title>AutoCompleteJS<?php if (isset($page_title)) echo ' &raquo; '.$page_title; ?></title>
   <base href="<?php echo BASE_URL; ?>" />
   <meta name="viewport" content="width=device-width">
 
@@ -14,3 +14,6 @@
   <script src="css/less-1.3.0.min.js"></script>
 </head>
 <body>
+<?php
+echo AC::buildHeader($active_nav_tab);
+?>
