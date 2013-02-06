@@ -260,7 +260,8 @@ var error = function(code, msg, obj) {
     return;
   }
 
-  // TODO: we should check that console.log is defined if they set showErrors to "console"
+  // TODO: we should check that console.log is defined if they set showErrors
+  //       to "console"
   //       do this check on the config init though
 
   var errorText = 'AutoComplete Error ' + code + ': ' + msg;
@@ -291,13 +292,17 @@ var error = function(code, msg, obj) {
 var sanityChecks = function() {
   // container ID must be a string
   if (typeof containerElId !== 'string' || containerElId === '') {
-    window.alert('AutoComplete Error 1001: The first argument to AutoComplete() must be a non-empty string.\n\nExiting...');
+    window.alert('AutoComplete Error 1001: ' +
+      'The first argument to AutoComplete() must be a non-empty string.' +
+      '\n\nExiting...');
     return false;
   }
 
   // make sure the container element exists in the DOM
   if (! document.getElementById(containerElId)) {
-    window.alert('AutoComplete Error 1002: Element with id "' + containerElId + '" does not exist in the DOM.\n\nExiting...');
+    window.alert('AutoComplete Error 1002: ' +
+      'Element with id "' + containerElId + '" does not exist in the DOM.' +
+      '\n\nExiting...');
     return false;
   }
 
@@ -305,16 +310,19 @@ var sanityChecks = function() {
   if (window.hasOwnProperty('JSON') !== true ||
       typeof JSON.stringify !== 'function' ||
       typeof JSON.parse !== 'function') {
-    window.alert('AutoComplete Error 1003: JSON does not exist. Please include a JSON polyfill.\n\nExiting...');
+    window.alert('AutoComplete Error 1003: JSON does not exist. ' +
+      'Please include a JSON polyfill.\n\nExiting...');
     return false;
   }
 
   // check that jQuery exists
-  // NOTE: what else do I need to check here? what if they have put jQuery elsewhere - window.jQuery?
+  // NOTE: what else do I need to check here?
+  //       what if they have put jQuery elsewhere - window.jQuery?
   //       allow them to pass in their version of jquery into the constructor?
   // TODO: what version of jQuery should I check against?
   if (window.hasOwnProperty('$') !== true) {
-    window.alert('AutoComplete Error 1004: jQuery does not exist. Please include jQuery on the page.\n\nExiting...');
+    window.alert('AutoComplete Error 1004: jQuery does not exist. ' +
+      'Please include jQuery on the page.\n\nExiting...');
     return false;
   }
 
@@ -526,7 +534,8 @@ var expandConfig = function() {
       cfg.lists[i] = expandListObject(cfg.lists[i]);
     }
     else {
-      error(2535, 'The list object for list "' + i + '" is invalid.', cfg.lists[i]);
+      error(2535, 'The list object for list "' + i + '" is invalid.',
+        cfg.lists[i]);
       delete cfg.lists[i];
     }
   }
@@ -538,7 +547,8 @@ var expandConfig = function() {
   // NOTE: this is more of a sanityCheck() thing, but we need to expand
   //       the rest of the config before we can check this
   if (listNames.length === 0) {
-    window.alert('AutoComplete Error 1005: You must include some list objects.\n\nExiting...');
+    window.alert('AutoComplete Error 1005: ' +
+      'You must include some list objects.\n\nExiting...');
     return false;
   }
 
@@ -547,7 +557,8 @@ var expandConfig = function() {
   }
 
   if (listExists(cfg.initialList) !== true) {
-    error(2728, 'initialList "' + cfg.initialList + '" does not exist on the lists object');
+    error(2728, 'initialList "' + cfg.initialList + '" does not exist ' +
+      'on the lists object');
 
     // set initialList to the first list in lists
     cfg.initialList = listNames[0];
@@ -1063,7 +1074,7 @@ var addHighlightedOption = function() {
   // close input if we did not find the object
   // NOTE: this should never happen, but it's here for a safeguard
   if (VISIBLE_OPTIONS.hasOwnProperty(optionId) !== true) {
-    // TODO: throw an error here
+    error(8292, 'Could not find optionID "' + optionId + '".');
     stopInput();
     return;
   }
@@ -1154,9 +1165,7 @@ var ajaxSuccess = function(data, list, url, inputValue, preProcess) {
 };
 
 var ajaxError = function(errType, list, inputValue) {
-  //if (errType === 'abort') {
-  // TODO: write me
-  //}
+  // NOTE: what to do about other errType's?
   if (errType === 'error') {
     var errorMsg = buildAjaxError(list.ajaxErrorHTML, inputValue);
     dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
@@ -1173,23 +1182,23 @@ var sendAjaxRequest = function(list, inputValue) {
   // default ajax options
   var ajaxOpts = {
     dataType: 'json',
-    preProcess: function(a) { return a; },
+    preProcess: false,
     type: 'GET'
   };
 
+  // create their ajaxOpts
   var ajaxOpts2 = {};
-  // create their ajaxOpts with a function
   if (typeof list.ajaxOpts === 'function') {
     ajaxOpts2 = list.ajaxOpts(inputValue, getValue());
   }
-  // else it's an object
-  else {
+  if (isObject(list.ajaxOpts) === true) {
     ajaxOpts2 = $.extend(true, {}, list.ajaxOpts);
   }
 
   // expand their url
   if (typeof ajaxOpts2.url === 'string') {
-    ajaxOpts2.url = ajaxOpts2.url.replace(/\{input\}/g, encodeURIComponent(inputValue));
+    ajaxOpts2.url = ajaxOpts2.url.replace(/\{input\}/g,
+      encodeURIComponent(inputValue));
   }
   if (typeof ajaxOpts2.url === 'function') {
     ajaxOpts2.url = ajaxOpts2.url(inputValue, getValue());
@@ -1198,8 +1207,12 @@ var sendAjaxRequest = function(list, inputValue) {
   // do not allow them to override certain ajax options
   var noShotGuy = ['async', 'complete', 'error', 'statusCode', 'success'];
   for (var i = 0; i < noShotGuy.length; i++) {
-
-    // TODO: throw an error here if they have one of these
+    // throw an error if they have included an illegal property
+    if (ajaxOpts2.hasOwnProperty(noShotGuy[i]) === true) {
+      error(1273,
+        'You cannot include properties that effect control flow on ajaxOpts: ' +
+        '"async", "complete", "error", "statusCode", "success"', noShotGuy[i]);
+    }
 
     delete ajaxOpts[noShotGuy[i]];
   }
@@ -1209,7 +1222,9 @@ var sendAjaxRequest = function(list, inputValue) {
 
   // sanity check: throw an error if url is not a string
   if (typeof ajaxOpts.url !== 'string') {
-    error(8721, 'AJAX url must be a string. Did you forget to include one on ajaxOpts?', ajaxOpts.url);
+    error(8721,
+      'AJAX url must be a string. Did you forget to include one on ajaxOpts?',
+      ajaxOpts.url);
     stopInput();
     return;
   }
@@ -1238,45 +1253,43 @@ var sendAjaxRequest = function(list, inputValue) {
 };
 
 // returns an array of all characters in str
-// with a flag to determine if it's an HTML character or not
+// with a flag indicating if the character is an HTML character
 // NOTE: this is naive; I'm sure there are bugs here
 //       also it assumes valid HTML
-// TODO: refactor this
 var findHTMLChars = function(str) {
   var chars = str.split('');
   var result = [];
 
   var inATag = false;
   var inEscapeSequence = false;
-
   for (var i = 0; i < chars.length; i++) {
     if (chars[i] === '<') {
       inATag = true;
-      result.push({c:'<',html:true});
+      result.push({c: '<', html: true});
       continue;
     }
     if (inATag === true && chars[i] === '>') {
       inATag = false;
-      result.push({c:'>',html:true});
+      result.push({c: '>', html: true});
       continue;
     }
     if (chars[i] === '&') {
       inEscapeSequence = true;
-      result.push({c:'&',html:true});
+      result.push({c: '&', html: true});
       continue;
     }
     if (inEscapeSequence === true && chars[i] === ';') {
       inEscapeSequence = false;
-      result.push({c:';',html:true});
+      result.push({c: ';', html: true});
       continue;
     }
 
     if (inATag === true || inEscapeSequence === true) {
-      result.push({c:chars[i],html:true});
+      result.push({c: chars[i], html: true});
+      continue;
     }
-    else {
-      result.push({c:chars[i],html:false});
-    }
+
+    result.push({c: chars[i], html: false});
   }
 
   return result;
@@ -1294,8 +1307,9 @@ var findNonHTMLChars = function(str) {
   return str2;
 };
 
-// add <strong> tags around all non-HTML characters in optionHTML that exist in input
-// TODO: refactor this
+// add <strong> tags around all non-HTML characters in optionHTML that exist
+// in input
+// NOTE: refactor this
 var highlightMatchChars = function(optionHTML, input) {
   var inputChars = input.split('');
   var charsToHighlight = {};
@@ -1304,8 +1318,8 @@ var highlightMatchChars = function(optionHTML, input) {
     // TODO: is this necessary?
     if (inputChars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
 
-    charsToHighlight[inputChars[i].toLowerCase()] = 0;
-    charsToHighlight[inputChars[i].toUpperCase()] = 0;
+    charsToHighlight[inputChars[i].toLowerCase()] = true;
+    charsToHighlight[inputChars[i].toUpperCase()] = true;
   }
 
   charsToHighlight = keys(charsToHighlight);
@@ -1321,6 +1335,7 @@ var highlightMatchChars = function(optionHTML, input) {
       for (var j = 0; j < charsToHighlight.length; j++) {
         if (tmp === charsToHighlight[j]) {
           tmp = '<strong>' + tmp + '</strong>';
+          break;
         }
       }
       optionHTML2 += tmp;
@@ -1367,9 +1382,9 @@ var isCharMatch = function(input, str) {
 // returns an array of options that match against ._matchValue
 // also adds a freeform option if that's enabled
 var matchOptionsSpecial = function(options, input, list) {
-  var options2 = [],
-      i,
-      len = options.length;
+  var i,
+      len = options.length,
+      options2 = [];
 
   options = deepCopy(options); // necessary?
 
@@ -1423,9 +1438,7 @@ var matchOptionsSpecial = function(options, input, list) {
 // TODO: this needs to be refactored
 // investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
-  var i, matchValue;
-
-  // return all the options with no user input
+  // show all the options if they haven't typed anything
   if (input === '') {
     return list.options;
   }
@@ -1569,7 +1582,7 @@ var pressRegularKey = function() {
     return;
   }
 
-  // highlight matches
+  // highlight matched characters
   if (list.highlightMatches === true) {
     for (var i = 0; i < options.length; i++) {
       options[i].optionHTML = highlightMatchChars(options[i].optionHTML, inputValue);
@@ -1766,13 +1779,15 @@ var keydownWindow = function(e) {
 widget.addOption = function(listName, option) {
   // list name must be valid
   if (validListName(listName) !== true) {
-    error(8366, 'The first argument to the addOption method must be a non-empty string.');
+    error(8366,
+      'The first argument to the addOption method must be a non-empty string.');
     return false;
   }
 
   // list must exist
   if (listExists(listName) !== true) {
-    error(5732, 'Error in addOption method. List "' + listName + '" does not exist.');
+    error(5732,
+      'Error in addOption method. List "' + listName + '" does not exist.');
     return false;
   }
 
@@ -1818,7 +1833,8 @@ widget.focus = function() {
 // returns false if the list does not exist
 widget.getList = function(name) {
   if (validListName(name) !== true) {
-    error(2789, 'The first argument to the getList method must be a non-empty string.');
+    error(2789,
+      'The first argument to the getList method must be a non-empty string.');
     return false;
   }
 
@@ -1864,19 +1880,22 @@ widget.reload = function(config) {
 widget.removeList = function(name) {
   // name must be valid
   if (validListName(name) !== true) {
-    error(2231, 'The first argument to the removeList method must be a non-empty string.');
+    error(2231,
+      'The first argument to the removeList method must be a non-empty string.');
     return false;
   }
 
   // return false if the list does not exist
   if (listExists(name) !== true) {
-    error(1328, 'Error in removeList method. List "' + name + '" does not exist.');
+    error(1328,
+      'Error in removeList method. List "' + name + '" does not exist.');
     return false;
   }
 
   // they cannot remove the initialList
   if (name === cfg.initialList) {
-    error(1424, 'Error in removeList method. You cannot remove the initialList "' + name + '"');
+    error(1424,
+      'Error in removeList method. You cannot remove the initialList "' + name + '"');
     return false;
   }
 
@@ -1888,7 +1907,9 @@ widget.removeList = function(name) {
 // returns the new value of the widget otherwise
 widget.removeTokenGroup = function(tokenGroupIndex) {
   if (validTokenGroupIndex(tokenGroupIndex) !== true) {
-    error(4823, 'Error in removeTokenGroup method. Token group index "' + tokenGroupIndex + '" does not exist.');
+    error(4823,
+      'Error in removeTokenGroup method. ' +
+      'Token group index "' + tokenGroupIndex + '" does not exist.');
     return false;
   }
 
