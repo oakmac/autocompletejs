@@ -33,7 +33,8 @@ var encode = function(str) {
   return str;
 };
 
-window['AutoComplete'] = window['AutoComplete'] || function(containerElId, cfg) {
+window['AutoComplete'] = window['AutoComplete'] ||
+  function(containerElId, cfg) {
 'use strict';
 
 //------------------------------------------------------------------------------
@@ -738,7 +739,8 @@ var buildNoResults = function(noResultsHTML, inputValue) {
 };
 
 var buildLoading = function(ajaxLoadingHTML, inputValue) {
-  return buildStringOrFunction(CLASSES.ajaxLoading, ajaxLoadingHTML, inputValue);
+  return buildStringOrFunction(CLASSES.ajaxLoading, ajaxLoadingHTML,
+                               inputValue);
 };
 
 //------------------------------------------------------------------------------
@@ -1163,7 +1165,7 @@ var ajaxSuccess = function(data, list, url, inputValue, preProcess) {
 var ajaxError = function(errType, list, inputValue) {
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
-  
+
   var errorMsg = '<li class="' + CLASSES.ajaxError + '">';
   if (typeof list.ajaxErrorHTML === 'string') {
     errorMsg += list.ajaxErrorHTML;
@@ -1439,7 +1441,8 @@ var matchOptionsSpecial = function(options, input, list) {
 
 
 // TODO: this needs to be refactored
-// investigate: http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
+// investigate:
+// http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
   // show all the options if they haven't typed anything
   if (input === '') {
@@ -1588,7 +1591,8 @@ var pressRegularKey = function() {
   // highlight matched characters
   if (list.highlightMatches === true) {
     for (var i = 0; i < options.length; i++) {
-      options[i].optionHTML = highlightMatchChars(options[i].optionHTML, inputValue);
+      options[i].optionHTML = highlightMatchChars(options[i].optionHTML,
+                                                  inputValue);
     }
   }
 
@@ -1884,7 +1888,8 @@ widget.removeList = function(name) {
   // name must be valid
   if (validListName(name) !== true) {
     error(2231,
-      'The first argument to the removeList method must be a non-empty string.');
+      'The first argument to the removeList method ' +
+      'must be a non-empty string.');
     return false;
   }
 
@@ -1898,7 +1903,8 @@ widget.removeList = function(name) {
   // they cannot remove the initialList
   if (name === cfg.initialList) {
     error(1424,
-      'Error in removeList method. You cannot remove the initialList "' + name + '"');
+      'Error in removeList method. You cannot remove the initialList ' +
+      '"' + name + '"');
     return false;
   }
 
@@ -1925,7 +1931,8 @@ widget.removeTokenGroup = function(tokenGroupIndex) {
 widget.setList = function(name, list) {
   // name must be valid
   if (validListName(name) !== true) {
-    error(7283, 'The first argument to the setList method must be a non-empty string.');
+    error(7283,
+      'The first argument to the setList method must be a non-empty string.');
     return false;
   }
 
