@@ -16,7 +16,7 @@ TODO: "how it works" walk-through explanation of how the widget functions
 
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
-<table>
+<table cellspacing="0">
 <thead>
   <tr>
     <th>Property</th>
@@ -75,7 +75,7 @@ foreach($docs['Config Object'] as $prop) {
 <p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
 <p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
 <p>You can define the list workflow using the <code class='js plain'>children</code> property on List Objects.</p>
-<table class="table table-striped">
+<table cellspacing="0">
 <thead>
 <tr>
   <th>Property</th>
@@ -104,7 +104,7 @@ foreach($docs['List Object'] as $prop) {
 </div>
 <p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type.</p>
 <p>You can define the list workflow using the <code class='js plain'>children</code> property on Option Objects.</p>
-<table class="table table-striped">
+<table cellspacing="0">
 <thead>
   <tr>
     <th>Property</th>
@@ -127,7 +127,7 @@ foreach($docs['List Object'] as $prop) {
 
 <h2 id="methods">AutoComplete Methods</h2>
 <p>Each AutoComplete object has methods you can use to interact with the widget.</p>
-<table class="table table-striped">
+<table cellspacing="0">
 <thead>
 <tr>
   <th>Method</th>
