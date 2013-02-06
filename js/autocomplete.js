@@ -548,7 +548,7 @@ var expandConfig = function() {
   //       the rest of the config before we can check this
   if (listNames.length === 0) {
     window.alert('AutoComplete Error 1005: ' +
-      'You must include some list objects.\n\nExiting...');
+      'You must include at least one List Object on lists.\n\nExiting...');
     return false;
   }
 
@@ -739,10 +739,6 @@ var buildNoResults = function(noResultsHTML, inputValue) {
 
 var buildLoading = function(ajaxLoadingHTML, inputValue) {
   return buildStringOrFunction(CLASSES.ajaxLoading, ajaxLoadingHTML, inputValue);
-};
-
-var buildAjaxError = function(ajaxErrorHTML, inputValue) {
-  return buildStringOrFunction(CLASSES.ajaxError, ajaxErrorHTML, inputValue);
 };
 
 //------------------------------------------------------------------------------
@@ -1165,11 +1161,18 @@ var ajaxSuccess = function(data, list, url, inputValue, preProcess) {
 };
 
 var ajaxError = function(errType, list, inputValue) {
-  // NOTE: what to do about other errType's?
-  if (errType === 'error') {
-    var errorMsg = buildAjaxError(list.ajaxErrorHTML, inputValue);
-    dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
+  // ignore aborts, they are handled elsewhere and are expected behavior
+  if (errType === 'abort') return;
+  
+  var errorMsg = '<li class="' + CLASSES.ajaxError + '">';
+  if (typeof list.ajaxErrorHTML === 'string') {
+    errorMsg += list.ajaxErrorHTML;
   }
+  if (typeof list.ajaxErrorHTML === 'function') {
+    errorMsg += list.ajaxErrorHTML(errType, inputValue, getValue());
+  }
+  errorMsg += '</li>';
+  dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
 };
 
 // TODO: write me, use for caching

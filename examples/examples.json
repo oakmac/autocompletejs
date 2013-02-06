@@ -100,8 +100,13 @@
 "-----------------------------------------------------",
 {
   "group": "List Config",
-  "number": 4000,
-  "name": "ajaxErrorHTML"
+  "number": 4055,
+  "name": "ajaxErrorHTML string"
+},
+{
+  "group": "List Config",
+  "number": 4072,
+  "name": "ajaxErrorHTML function"
 },
 {
   "group": "List Config",
