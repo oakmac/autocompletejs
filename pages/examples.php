@@ -14,7 +14,7 @@ $examples = AC::getExamples();
 </div><!-- end .three.columns -->
 
 <div class="nine columns">
-  <h3 id="example_name"></h3>
+  <h2 id="example_name"></h2>
   <p><a href="#" id="example_single_page_link" target="_blank">View example in new window.</a></p>
   <div id="example_html_container"></div>
   <h4>Code</h4>
@@ -103,7 +103,7 @@ function buildExampleList($examples) {
         $html .= '</ul>'."\n";
       }
       $currentGroup = $ex['group'];
-      $html .= '<h3>'.$currentGroup.'</h3>'."\n";
+      $html .= '<h4>'.$currentGroup.'</h4>'."\n";
       $html .= '<ul>'."\n";
     }
 

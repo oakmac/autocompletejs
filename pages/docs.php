@@ -149,6 +149,38 @@ foreach($docs['Methods'] as $method) {
 </div><!-- end .twelve.columns -->
 </div><!-- end div.row -->
 
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/jquery.color.min.js"></script>
+<script>
+var flashRow = function(id) {
+  var el = $(document.getElementById(id));
+  var bgColor = el.css('background-color');
+  el.css('background-color', '#ffff99')
+    .animate({backgroundColor: bgColor}, 2000);
+};
+
+var isRow = function(id) {
+  return id.search(/\:/) !== -1;
+};
+
+var clickAnchor = function(e) {
+  var id = $(this).attr('href').replace(/docs#/, '');
+  if (isRow(id) === true) {
+    flashRow(id);
+  }
+};
+
+var init = function() {
+  $('body').on('click', 'a', clickAnchor);
+
+  if (isRow(window.location.hash) === true) {
+    flashRow(window.location.hash.replace('#', ''));
+  }
+};
+
+$(document).ready(init);
+</script>
+
 <?php
 include(APP_PATH . 'pages/footer.php');
 

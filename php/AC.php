@@ -2,7 +2,7 @@
 
 final class AC {
 
-public static function buildHeader($active_tab) {
+public static function buildTopBar($active_tab) {
   $tabs = array(
     '' => 'Home',
     'docs' => 'Docs',

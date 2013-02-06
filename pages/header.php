@@ -8,12 +8,13 @@
   <meta name="viewport" content="width=device-width">
 
   <link rel="stylesheet" href="css/foundation-3.2.5.min.css" />
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/prettify.css" />
-  <link type="text/css" rel="stylesheet/less" href="css/main.less" />
+  <link type="text/css" rel="stylesheet/less" href="css/site.less" />
   <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
   <script src="css/less-1.3.0.min.js"></script>
 </head>
 <body>
 <?php
-echo AC::buildHeader($active_nav_tab);
+echo AC::buildTopBar($active_nav_tab);
 ?>
