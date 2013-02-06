@@ -6,7 +6,7 @@ final class AC {
   public static function getExamples() {
     $examples = self::getExamplesJSON();
     for ($i = 0; $i < count($examples); $i++) {
-      $num = $examples[$i]['number'];
+      $num = (int) $examples[$i]['number'];
       $examples[$i]['html'] = trim(file_get_contents(APP_PATH.'examples/'.$num.'.html'));
       $examples[$i]['js']   = trim(file_get_contents(APP_PATH.'examples/'.$num.'.js'));
     }
@@ -24,15 +24,14 @@ final class AC {
     }
     
     return array(
-      'html'   => file_get_contents(APP_PATH.'examples/'.$number.'.html'),
-      'js'     => file_get_contents(APP_PATH.'examples/'.$number.'.js'),
+      'html'   => trim(file_get_contents(APP_PATH.'examples/'.$number.'.html')),
+      'js'     => trim(file_get_contents(APP_PATH.'examples/'.$number.'.js')),
       'number' => $number,
     );
   }
   
   public static function getDocs() {
-    $docs = json_decode(file_get_contents(APP_PATH.'pages/docs.json'), true);
-    return $docs;
+    return json_decode(file_get_contents(APP_PATH.'pages/docs.json'), true);
   }
   
   //---------------------------------------------------
