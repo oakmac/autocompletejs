@@ -16,6 +16,7 @@
 <?php echo $example['html'] . "\n"; ?>
 <!--- end example code --->
 
+<script src="js/json3.min.js"></script>
 <script src="js/jquery-1.8.2.min.js"></script>
 <script src="js/autocomplete.js"></script>
 <script>

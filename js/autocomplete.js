@@ -308,7 +308,7 @@ var sanityChecks = function() {
   }
 
   // JSON must exist
-  if (window.hasOwnProperty('JSON') !== true ||
+  if (! window.JSON ||
       typeof JSON.stringify !== 'function' ||
       typeof JSON.parse !== 'function') {
     window.alert('AutoComplete Error 1003: JSON does not exist. ' +
@@ -321,7 +321,7 @@ var sanityChecks = function() {
   //       what if they have put jQuery elsewhere - window.jQuery?
   //       allow them to pass in their version of jquery into the constructor?
   // TODO: what version of jQuery should I check against?
-  if (window.hasOwnProperty('$') !== true) {
+  if (! window.$) {
     window.alert('AutoComplete Error 1004: jQuery does not exist. ' +
       'Please include jQuery on the page.\n\nExiting...');
     return false;

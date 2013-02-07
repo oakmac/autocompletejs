@@ -136,7 +136,7 @@
 {
   "group": "List Config",
   "number": 4003,
-  "name": "children on List"
+  "name": "children on List Object"
 },
 {
   "group": "List Config",
@@ -187,7 +187,7 @@
 {
   "group": "Option Config",
   "number": 5022,
-  "name": "children override on option"
+  "name": "children override on Option Object"
 },
 {
   "group": "Option Config",

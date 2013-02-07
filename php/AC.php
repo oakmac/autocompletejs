@@ -64,20 +64,38 @@ public static function getExample($number) {
 }
 
 public static function getDocs() {
-  return json_decode(file_get_contents(APP_PATH.'pages/docs.json'), true);
+  $docs = self::getJSON('pages/docs.json');
+  // TODO: strip the "----------------"
+  return $docs;
 }
 
 //---------------------------------------------------
 // Private Functions
 //---------------------------------------------------
+
+// TODO: combine this with getJSON below
 private static function getExamplesJSON() {
   $examples = json_decode(file_get_contents(APP_PATH.'examples/examples.json'), true);
+  if (is_array($examples) !== true) {
+    echo 'examples.json is not valid JSON';
+    die;
+  }
   $examples2 = array();
   foreach ($examples as $e) {
     if (is_array($e) !== true) continue;
     array_push($examples2, $e);
   }
   return $examples2;
+}
+
+// this is mostly for my sanity when I'm editing the JSON and forget a comma
+private static function getJSON($filename) {
+  $data = json_decode(file_get_contents(APP_PATH.$filename), true);
+  if (is_array($data) !== true) {
+    echo $filename.' is not valid JSON';
+    die;
+  }
+  return $data;
 }
 
 } // end class AC

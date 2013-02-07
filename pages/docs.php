@@ -166,7 +166,7 @@ var init = function() {
     if (isRow(window.location.hash) === true) {
       flashRow(window.location.hash.replace('#', ''));
     }
-  }, 200);
+  }, 150);
 };
 
 $(document).ready(init);
