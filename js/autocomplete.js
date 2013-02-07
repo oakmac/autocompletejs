@@ -261,12 +261,10 @@ var error = function(code, msg, obj) {
     return;
   }
 
-  // TODO: we should check that console.log is defined if they set showErrors
-  //       to "console"
-  //       do this check on the config init though
-
   var errorText = 'AutoComplete Error ' + code + ': ' + msg;
-  if (cfg.showErrors === 'console') {
+  if (cfg.showErrors === 'console' &&
+      typeof console === 'object' &&
+      typeof console.log === 'function') {
     console.log(errorText);
     if (arguments.length >= 2) {
       console.log(obj);
