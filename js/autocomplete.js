@@ -114,7 +114,7 @@ var isArray = Array.isArray || function(vArg) {
 };
 
 var isObject = function(thing) {
-  return (Object.prototype.toString.call(thing) === '[object Object]');
+  return $.isPlainObject(thing);
 };
 
 // returns an array of object keys
@@ -408,9 +408,11 @@ var expandListObject = function(list) {
     };
   }
 
+  // ajaxEnabled
   list.ajaxEnabled = false;
-  if (typeof list.ajaxOpts === 'function' ||
-      isObject(list.ajaxOpts) === true) {
+  if (list.hasOwnProperty('ajaxOpts') === true &&
+      (typeof list.ajaxOpts === 'function' ||
+       isObject(list.ajaxOpts) === true)) {
     list.ajaxEnabled = true;
   }
 
@@ -843,6 +845,9 @@ var updateTokens = function() {
 // http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
 var updateInputWidth = function(text) {
   var width = (text.length + 1) * 10;
+  if (width < 20) {
+    width = 20;
+  }
   inputEl.css('width', width + 'px');
 };
 
@@ -1646,7 +1651,6 @@ var clickContainerElement = function(e) {
 var clickTokenGroup = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
-
   stopInput();
 
   // remove highlight from other token groups
