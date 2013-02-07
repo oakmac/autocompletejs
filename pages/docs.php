@@ -9,23 +9,17 @@ $docs = AC::getDocs();
 <div class="row">
 <div class="twelve columns">
 
-<!--
-TODO: "how it works" walk-through explanation of how the widget functions
-      including definitions of widget, tokens, lists, and options
--->
-
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
 <table cellspacing="0">
 <thead>
-  <tr>
-    <th>Property</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Default</th>
-    <th>Description</th>
-    <th>Example</th>
-  </tr>
+<tr>
+  <th>Property / Type</th>
+  <th>Required</th>
+  <th>Default</th>
+  <th>Description</th>
+  <th>Example</th>
+</tr>
 </thead>
 <tbody>
 <?php
@@ -63,23 +57,18 @@ foreach($docs['Config Object'] as $prop) {
 </table>
 
 <h2 id="list_object">List Object</h2>
-
-<div class="panel">
-<div class="etymology">
+<div class="panel etymology">
   <div class="word">list</div>
   <div class="part-of-speech">Noun</div>
   <div class="definition">A number of connected items or names written or printed consecutively, typically one below the other.</div>
 </div>
-</div>
-
 <p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
 <p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
 <p>You can define the list workflow using the <code class='js plain'>children</code> property on List Objects.</p>
 <table cellspacing="0">
 <thead>
 <tr>
-  <th>Property</th>
-  <th>Type</th>
+  <th>Property / Type</th>
   <th>Required</th>
   <th>Default</th>
   <th>Description</th>
@@ -97,7 +86,7 @@ foreach($docs['List Object'] as $prop) {
 </table>
 
 <h2 id="option_object">Option Object</h2>
-<div class="etymology">
+<div class="panel etymology">
   <div class="word">option</div>
   <div class="part-of-speech">Noun</div>
   <div class="definition">A thing that is or may be chosen.</div>
@@ -106,14 +95,13 @@ foreach($docs['List Object'] as $prop) {
 <p>You can define the list workflow using the <code class='js plain'>children</code> property on Option Objects.</p>
 <table cellspacing="0">
 <thead>
-  <tr>
-    <th>Property</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Default</th>
-    <th>Description</th>
-    <th>Example</th>
-  </tr>
+<tr>
+  <th>Property / Type</th>
+  <th>Required</th>
+  <th>Default</th>
+  <th>Description</th>
+  <th>Example</th>
+</tr>
 </thead>
 <tbody>
 <?php
@@ -173,9 +161,12 @@ var clickAnchor = function(e) {
 var init = function() {
   $('body').on('click', 'a', clickAnchor);
 
-  if (isRow(window.location.hash) === true) {
-    flashRow(window.location.hash.replace('#', ''));
-  }
+  // give it just a smidge more time to load
+  setTimeout(function() {
+    if (isRow(window.location.hash) === true) {
+      flashRow(window.location.hash.replace('#', ''));
+    }
+  }, 200);
 };
 
 $(document).ready(init);
@@ -197,17 +188,21 @@ function buildPropRow($propType, $prop, $examples) {
   // table row
   $html .= '<tr id="'.$propType.':'.$prop['name'].'">'."\n";
 
-  // name
-  $html .= '  <td><code class="js plain">'.$prop['name'].'</code></td>'."\n";
-
-  // type
-  $html .= '  <td>'.buildType($prop['type']).'</td>'."\n";
+  // property and type
+  $html .= '  <td>'."\n";
+  $html .= buildPropertyAndType($prop['name'], $prop['type']);
+  $html .= '  </td>'."\n";
 
   // required
-  $html .= '  <td>'.buildReq($prop['req']).'</td>'."\n";
+  $html .= '  <td class="center">'.buildReq($prop['req']).'</td>'."\n";
 
   // default
-  $html .= '  <td>'.buildDefault($prop['default']).'</td>'."\n";
+  if (array_key_exists('leftAlignDefault', $prop) === true) {
+    $html .= '  <td>'.buildDefault($prop['default']).'</td>'."\n";
+  }
+  else {
+    $html .= '  <td class="center">'.buildDefault($prop['default']).'</td>'."\n";
+  }
 
   // description
   $html .= '  <td>'."\n";
@@ -249,7 +244,7 @@ function buildMethodRow($method, $examples) {
     $html .= '  </td>'."\n";
   }
   else {
-    $html .= '  <td><small>n/a</small></td>'."\n";
+    $html .= '  <td><small>none</small></td>'."\n";
   }
 
   // description
@@ -278,6 +273,12 @@ function getExampleByNumber($number, $examples) {
   return false;
 }
 
+function buildPropertyAndType($name, $type) {
+  $html  = '    <p><code class="js plain">'.$name.'</code></p>'."\n";
+  $html .= '    <p>'.buildType($type).'</p>'."\n";
+  return $html;
+}
+
 function buildType($type) {
   if (is_array($type) !== true) {
     $type = array($type);
@@ -286,7 +287,7 @@ function buildType($type) {
   $html = '';
   for ($i = 0; $i < count($type); $i++) {
     if ($i !== 0) {
-      $html .= '<br /><small>or</small><br />';
+      $html .= ' <small>or</small><br />';
     }
     $html .= $type[$i];
   }

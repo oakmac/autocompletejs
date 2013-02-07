@@ -109,6 +109,7 @@
   "type":["String", "Function"],
   "req":false,
   "default":"<code class='js string'>'AJAX Error'</code>",
+  "leftAlignDefault":true,
   "desc":[
     "An HTML string to display when an AJAX request has failed.",
     "If <code class='js plain'>ajaxErrorHTML</code> is a function, the first argument is the type of error that has occured, the second argument is the text that the user has entered, and the third argument is the current value of the AutoComplete widget.",
@@ -122,7 +123,8 @@
   "name":"ajaxLoadingHTML",
   "type":["String", "Function"],
   "req":false,
-  "default":"<code class='js string'>'Searching&amp;hellip;'</code>",
+  "default":"<code class='js string'>'Searching<br />&amp;hellip;'</code>",
+  "leftAlignDefault":true,
   "desc":[
     "An HTML string to display when searching for options.",
     "If <code class='js plain'>ajaxLoadingHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
@@ -222,8 +224,8 @@
   "default":"<code class='js keyword'>true</code>",
   "desc":[
     "If <code class='js keyword'>true</code>, will highlight letter matches between what the user has typed and which options have matched.",
-    "This option programmatically changes the <code class='js plain'>optionHTML</code> value by adding <code class='js plain'>&lt;strong&gt;</code> tags around matching characters.",
-    "It tries to not replace letters that are inside HTML tags or special HTML characters, but if you have complicated or invalid HTML markup in your <code class='js plain'>optionHTML</code> it may break."
+    "This option programmatically changes the <code class='js plain'>optionHTML</code> value by adding <code class='html'>&lt;strong&gt;</code> tags around matching characters.",
+    "It tries to not replace letters that are inside HTML tags or special HTML characters, but if you have complicated or invalid HTML markup in your <code class='js plain'>optionHTML</code> it may not highlight correctly."
   ]
 },
 "------------------------------------------------------------------------------",
@@ -246,6 +248,7 @@
   "type":["String","Function"],
   "req":false,
   "default":"<code class='js string'>'No results found.'</code>",
+  "leftAlignDefault":true,
   "desc":[
     "An HTML string to display when there are no options to show.",
     "If <code class='js plain'>noResultsHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
@@ -282,9 +285,9 @@
 "------------------------------------------------------------------------------",
 {
   "name":"options",
-  "type":"Array of Option Objects",
+  "type":"Array of <a href='docs#option_object'>Option Objects</a>",
   "req":false,
-  "default":"[]",
+  "default":"<code class='js plain'>[]</code>",
   "desc":[
     "<code class='js plain'>options</code> is an array of Option Objects that determine which options to show in the dropdown for this list.",
     "See the <a href='docs#option_object'>Option Objects</a> reference."
