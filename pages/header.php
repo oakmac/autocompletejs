@@ -18,3 +18,5 @@
 <?php
 echo AC::buildTopBar($active_nav_tab);
 ?>
+<div class="row" id="body_container">
+<div class="twelve columns">

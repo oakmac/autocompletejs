@@ -5,11 +5,11 @@ final class AC {
 public static function buildTopBar($active_tab) {
   $tabs = array(
     '' => 'Home',
-    'docs' => 'Docs',
     'examples' => 'Examples',
+    'docs' => 'Docs',
     'themes' => 'Themes',
     'download' => 'Download',
-    'https://github.com/oakmac/autocompletejs' => 'GitHub',
+    //'https://github.com/oakmac/autocompletejs' => 'GitHub',
   );
 
   $html  = '<div class="contain-to-grid">'."\n";

@@ -6,9 +6,7 @@ $examples = AC::getExamples();
 $docs = AC::getDocs();
 ?>
 
-<div class="row">
-<div class="twelve columns">
-
+<div class="section">
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
 <table cellspacing="0">
@@ -55,7 +53,11 @@ foreach($docs['Config Object'] as $prop) {
 -->
 </tbody>
 </table>
+</div><!-- end div.section -->
 
+<hr class="divider" />
+
+<div class="section">
 <h2 id="list_object">List Object</h2>
 <div class="panel etymology">
   <div class="word">list</div>
@@ -84,7 +86,11 @@ foreach($docs['List Object'] as $prop) {
 ?>
 </tbody>
 </table>
+</div><!-- end div.section -->
 
+<hr class="divider" />
+
+<div class="section">
 <h2 id="option_object">Option Object</h2>
 <div class="panel etymology">
   <div class="word">option</div>
@@ -112,7 +118,11 @@ foreach($docs['List Object'] as $prop) {
 ?>
 </tbody>
 </table>
+</div><!-- end div.section -->
 
+<hr class="divider" />
+
+<div class="section">
 <h2 id="methods">AutoComplete Methods</h2>
 <p>Each AutoComplete object has methods you can use to interact with the widget.</p>
 <table cellspacing="0">
@@ -133,9 +143,7 @@ foreach($docs['Methods'] as $method) {
 ?>
 </tbody>
 </table>
-
-</div><!-- end .twelve.columns -->
-</div><!-- end div.row -->
+</div><!-- end div.section -->
 
 <script src="js/jquery-1.8.2.min.js"></script>
 <script src="js/jquery.color.min.js"></script>
