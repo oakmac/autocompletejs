@@ -152,22 +152,43 @@ var tmpl = function(str, obj, htmlEscape) {
   return str;
 };
 
-var storeInCache = function(key, data) {
+// returns the current time in seconds
+var now = function() {
+  return parseInt(Date.now() / 1000, 10);
+};
+
+var storeInCache = function(key, data, duration) {
   data = JSON.stringify(data);
   if (LOCAL_STORAGE_AVAILABLE === true) {
     localStorage.setItem(key, data);
+
+    var expires = 'never';
+    if (typeof duration === 'number') {
+      expires = now() + duration;
+    }
+    localStorage.setItem(key + ' expires', expires);
   }
   else {
     SESSION_CACHE[key] = data;
   }
 };
 
+// TODO: need to wrap a try/catch around every call to localStorage
+//       in the case that it's full and the operation fails
+
 // returns the data or false if it does not exist
+// TODO: refactor this...
 var getFromCache = function(key) {
   if (LOCAL_STORAGE_AVAILABLE === true) {
     var data = localStorage.getItem(key);
-    if (typeof data === 'string') {
-      return JSON.parse(data);
+
+    // check the expiration date
+    var expires = localStorage.getItem(key + ' expires');
+    if (expires === 'never' ||
+        parseInt(expires, 10) > now()) {
+      if (typeof data === 'string') {
+        return JSON.parse(data);
+      }
     }
   }
   else if (SESSION_CACHE.hasOwnProperty(key) === true &&
@@ -462,6 +483,16 @@ var expandListObject = function(list) {
   // default for cacheAjax is false
   if (list.cacheAjax !== true) {
     list.cacheAjax = false;
+  }
+
+  // default for cacheAjaxSeconds is 2 weeks
+  if (list.cacheAjaxSeconds !== false &&
+      typeof list.cacheAjaxSeconds !== 'number') {
+    list.cacheAjaxSeconds = 1209600;
+  }
+  // should be an integer
+  if (typeof list.cacheAjaxSeconds === 'number') {
+    list.cacheAjaxSeconds = parseInt(list.cacheAjaxSeconds, 10);
   }
 
   // default for highlightMatches is true
@@ -1141,12 +1172,7 @@ var addHighlightedOption = function() {
   startInput();
 };
 
-var ajaxSuccess = function(data, list, cacheKey, inputValue, preProcess) {
-  // save the result in the cache
-  if (list.cacheAjax === true && cacheKey !== false) {
-    storeInCache(cacheKey, data);
-  }
-
+var ajaxSuccess = function(data, list, inputValue, preProcess) {
   if (INPUT_HAPPENING !== true) return;
 
   // run their custom preProcess function
@@ -1259,9 +1285,9 @@ var sendAjaxRequest = function(list, inputValue) {
   }
 
   // create the cache key
-  // NOTE: we're only cacheing GET requests
+  // NOTE: we're only caching GET requests
   //       if I could come up with a way to JSON.stringify and guarantee order, then
-  //       I think it would make sense to cache POST requests too
+  //       I think it would make sense to cache other types too
   var cacheKey = false;
   if (ajaxOpts.type.toUpperCase() === 'GET') {
     cacheKey = ajaxOpts.type.toUpperCase() + ' ' + ajaxOpts.url;
@@ -1272,14 +1298,19 @@ var sendAjaxRequest = function(list, inputValue) {
     ajaxError(errType, list, inputValue);
   };
   ajaxOpts.success = function(data) {
-    ajaxSuccess(data, list, cacheKey, inputValue, ajaxOpts.preProcess);
+    // save the result in the cache
+    if (list.cacheAjax === true && cacheKey !== false) {
+      storeInCache(cacheKey, data, list.cacheAjaxSeconds);
+    }
+
+    ajaxSuccess(data, list, inputValue, ajaxOpts.preProcess);
   };
 
   // check the cache
   if (list.cacheAjax === true && cacheKey !== false) {
     var data = getFromCache(cacheKey);
     if (data !== false) {
-      ajaxOpts.success(data);
+      ajaxSuccess(data, list, inputValue, ajaxOpts.preProcess)
       return;
     }
   }
@@ -1626,8 +1657,8 @@ var pressRegularKey = function() {
   // highlight matched characters
   if (list.highlightMatches === true) {
     for (var i = 0; i < options.length; i++) {
-      options[i].optionHTML = highlightMatchChars(options[i].optionHTML,
-                                                  inputValue);
+      options[i].optionHTML =
+        highlightMatchChars(options[i].optionHTML, inputValue);
     }
   }
 

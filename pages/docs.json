@@ -206,6 +206,19 @@
 },
 "------------------------------------------------------------------------------",
 {
+  "name":"cacheAjaxSeconds",
+  "type":["Number","<code class='js keyword'>false</code>"],
+  "req":false,
+  "default":"<code class='js number'>1209600</code><br />(2 weeks)",
+  "desc":[
+    "Length of time in seconds to keep results in the cache.",
+    "Set <code class='js plain'>cacheAjaxSeconds</code> to <code class='js keyword'>false</code> to cache results indefinitely.",
+    "<code class='js plain'>cacheAjaxSeconds</code> has no effect if <a href='docs#list_object:cacheAjax'><code class='js plain'>cacheAjax</code></a> is <code class='js keyword'>false</code>."
+  ],
+  "examples":2021
+},
+"------------------------------------------------------------------------------",
+{
   "name":"children",
   "type":"String",
   "req":false,
