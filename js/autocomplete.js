@@ -96,6 +96,11 @@ var deepCopy = function(thing) {
   return JSON.parse(JSON.stringify(thing));
 };
 
+// http://yuiblog.com/sandbox/yui/3.3.0pr3/api/escape.js.html
+var regexEscape = function(str) {
+  return (str + '').replace(/[\-#$\^*()+\[\]{}|\\,.?\s]/g, '\\$&');
+};
+
 // copied from modernizr
 var hasLocalStorage = function() {
   var str = createId();
@@ -113,9 +118,7 @@ var isArray = Array.isArray || function(vArg) {
   return Object.prototype.toString.call(vArg) === '[object Array]';
 };
 
-var isObject = function(thing) {
-  return $.isPlainObject(thing);
-};
+var isObject = $.isPlainObject;
 
 // returns an array of object keys
 var keys = function(obj) {
@@ -134,17 +137,16 @@ var tmpl = function(str, obj, htmlEscape) {
   }
 
   for (var i in obj) {
-    // TODO: what to do about things that are not strings here?
-    //       like numbers?
-    if (obj.hasOwnProperty(i) !== true || typeof obj[i] !== 'string') {
-      continue;
-    }
-    var value = obj[i];
+    if (obj.hasOwnProperty(i) !== true) continue;
+    
+    // convert to string
+    var value = obj[i] + '';
+    
     if (htmlEscape === true) {
       value = encode(value);
     }
-
-    str = str.replace(new RegExp('{' + i + '}', 'g'), value);
+    
+    str = str.replace(new RegExp('{' + regexEscape(i) + '}', 'g'), value);
   }
   return str;
 };
