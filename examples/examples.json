@@ -160,8 +160,13 @@
 },
 {
   "group": "List Config",
-  "number": 4008,
-  "name": "optionHTML"
+  "number": 4033,
+  "name": "optionHTML string"
+},
+{
+  "group": "List Config",
+  "number": 4034,
+  "name": "optionHTML function"
 },
 {
   "group": "List Config",

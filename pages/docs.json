@@ -267,7 +267,8 @@
     "If <code class='js plain'>optionHTML</code> is a function the first argument is the option.",
     "The function should return an HTML string.",
     "If there is an <a href='docs#option_object:optionHTML'><code class='js plain'>optionHTML</code></a> property on the Option Object selected it will supersede this <code class='js plain'>optionHTML</code> property."
-  ]
+  ],
+  "examples":[4033,4034]
 },
 "------------------------------------------------------------------------------",
 {

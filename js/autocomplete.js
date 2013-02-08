@@ -1309,7 +1309,7 @@ var findNonHTMLChars = function(str) {
   var str2 = '';
   for (var i = 0; i < chars.length; i++) {
     if (chars[i].html === false) {
-      str2 += chars[i];
+      str2 += chars[i].c;
     }
   }
   return str2;
@@ -1455,6 +1455,7 @@ var matchOptions = function(input, list) {
   var options = deepCopy(list.options);
   var options2 = [];
 
+  /*
   // do they have a list of properties to match against?
   //if (isArray(list.matchProperties) === true) {
   if (false) {
@@ -1462,6 +1463,7 @@ var matchOptions = function(input, list) {
   }
   // else try to match against the value or optionHTML
   else {
+  */
 
     // set ._matchValue
     for (var i = 0; i < options.length; i++) {
@@ -1474,7 +1476,9 @@ var matchOptions = function(input, list) {
     }
 
     options2 = matchOptionsSpecial(options, input, list);
-  }
+    
+    
+  //}
 
   return options2;
 };
