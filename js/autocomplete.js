@@ -74,6 +74,7 @@ var AJAX_OBJECT = {};
 var CURRENT_LIST_NAME = false;
 var INPUT_HAPPENING = false;
 var LOCAL_STORAGE_AVAILABLE = false;
+var SESSION_CACHE = {};
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
@@ -138,17 +139,42 @@ var tmpl = function(str, obj, htmlEscape) {
 
   for (var i in obj) {
     if (obj.hasOwnProperty(i) !== true) continue;
-    
+
     // convert to string
     var value = obj[i] + '';
-    
+
     if (htmlEscape === true) {
       value = encode(value);
     }
-    
+
     str = str.replace(new RegExp('{' + regexEscape(i) + '}', 'g'), value);
   }
   return str;
+};
+
+var storeInCache = function(key, data) {
+  data = JSON.stringify(data);
+  if (LOCAL_STORAGE_AVAILABLE === true) {
+    localStorage.setItem(key, data);
+  }
+  else {
+    SESSION_CACHE[key] = data;
+  }
+};
+
+// returns the data or false if it does not exist
+var getFromCache = function(key) {
+  if (LOCAL_STORAGE_AVAILABLE === true) {
+    var data = localStorage.getItem(key);
+    if (typeof data === 'string') {
+      return JSON.parse(data);
+    }
+  }
+  else if (SESSION_CACHE.hasOwnProperty(key) === true &&
+           typeof SESSION_CACHE[key] === 'string') {
+    return JSON.parse(SESSION_CACHE[key]);
+  }
+  return false;
 };
 
 //------------------------------------------------------------------------------
@@ -1115,11 +1141,10 @@ var addHighlightedOption = function() {
   startInput();
 };
 
-var ajaxSuccess = function(data, list, url, inputValue, preProcess) {
+var ajaxSuccess = function(data, list, cacheKey, inputValue, preProcess) {
   // save the result in the cache
-  if (list.cacheAjax === true &&
-      LOCAL_STORAGE_AVAILABLE === true) {
-    localStorage.setItem(url, JSON.stringify(data));
+  if (list.cacheAjax === true && cacheKey !== false) {
+    storeInCache(cacheKey, data);
   }
 
   if (INPUT_HAPPENING !== true) return;
@@ -1182,12 +1207,6 @@ var ajaxError = function(errType, list, inputValue) {
   dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
 };
 
-// TODO: write me, use for caching
-//       use the url, method, and POST data
-var createAjaxKey = function(ajaxOpts) {
-
-};
-
 var sendAjaxRequest = function(list, inputValue) {
   // default ajax options
   var ajaxOpts = {
@@ -1239,23 +1258,30 @@ var sendAjaxRequest = function(list, inputValue) {
     return;
   }
 
+  // create the cache key
+  // NOTE: we're only cacheing GET requests
+  //       if I could come up with a way to JSON.stringify and guarantee order, then
+  //       I think it would make sense to cache POST requests too
+  var cacheKey = false;
+  if (ajaxOpts.type.toUpperCase() === 'GET') {
+    cacheKey = ajaxOpts.type.toUpperCase() + ' ' + ajaxOpts.url;
+  }
+
   // create callbacks
   ajaxOpts.error = function(xhr, errType, exceptionObj) {
     ajaxError(errType, list, inputValue);
   };
   ajaxOpts.success = function(data) {
-    ajaxSuccess(data, list, ajaxOpts.url, inputValue, ajaxOpts.preProcess);
+    ajaxSuccess(data, list, cacheKey, inputValue, ajaxOpts.preProcess);
   };
 
   // check the cache
-  // NOTE: would prefer to check for something mroe than just truthy
-  //       to see if the options exist in localStorage
-  if (list.cacheAjax === true &&
-      LOCAL_STORAGE_AVAILABLE === true &&
-      localStorage.getItem(ajaxOpts.url)) {
-    var data = JSON.parse(localStroage.getItem(ajaxOpts.url));
-    ajaxOpts.success(data);
-    return;
+  if (list.cacheAjax === true && cacheKey !== false) {
+    var data = getFromCache(cacheKey);
+    if (data !== false) {
+      ajaxOpts.success(data);
+      return;
+    }
   }
 
   // send the request
@@ -1478,8 +1504,8 @@ var matchOptions = function(input, list) {
     }
 
     options2 = matchOptionsSpecial(options, input, list);
-    
-    
+
+
   //}
 
   return options2;

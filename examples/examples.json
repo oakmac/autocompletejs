@@ -56,6 +56,11 @@
   "number": 2004,
   "name": "AJAX using POST"
 },
+{
+  "group": "AJAX",
+  "number": 2020,
+  "name": "cache AJAX"
+},
 "-----------------------------------------------------",
 {
   "group": "Initial Config",

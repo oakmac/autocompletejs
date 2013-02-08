@@ -196,11 +196,13 @@
   "req":false,
   "default":"<code class='js keyword'>false</code>",
   "desc":[
-    "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the HTTP method and url as the key.",
+    "If <code class='js keyword'>true</code>, AutoComplete will cache the results of AJAX calls to localStorage using the url as the key.",
     "If <code class='js keyword'>false</code>, it will not cache and send a new AJAX request every time.",
+    "Only HTTP GET requests are cached.",
     "If the browser does not support localStorage it will only cache results for the duration of the page.",
     "If you need to support browsers that do not have localStorage I recommend using a <a href='https://developer.mozilla.org/en-US/docs/DOM/Storage#localStorage'>polyfill</a>."
-  ]
+  ],
+  "examples":2020
 },
 "------------------------------------------------------------------------------",
 {
