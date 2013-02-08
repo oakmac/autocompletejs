@@ -281,7 +281,8 @@
     "If <code class='js plain'>tokenHTML</code> is a function the first argument is the option.",
     "The function should return an HTML string.",
     "If there is a <a href='docs#option_object:tokenHTML'><code class='js plain'>tokenHTML</code></a> property on the option selected it will supersede this <code class='js plain'>tokenHTML</code> property."
-  ]
+  ],
+  "examples":[4034]
 },
 "------------------------------------------------------------------------------",
 {

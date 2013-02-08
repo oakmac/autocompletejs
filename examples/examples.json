@@ -27,16 +27,6 @@
 },
 {
   "group": "Basic Usage",
-  "number": 1004,
-  "name": "Custom optionHTML"
-},
-{
-  "group": "Basic Usage",
-  "number": 1005,
-  "name": "Custom tokenHTML"
-},
-{
-  "group": "Basic Usage",
   "number": 1045,
   "name": "Multiple Widgets"
 },
@@ -140,11 +130,6 @@
 },
 {
   "group": "List Config",
-  "number": 4004,
-  "name": "highlightMatches"
-},
-{
-  "group": "List Config",
   "number": 4005,
   "name": "matchOptions"
 },
@@ -166,22 +151,12 @@
 {
   "group": "List Config",
   "number": 4034,
-  "name": "optionHTML function"
+  "name": "optionHTML and tokenHTML as functions"
 },
 {
   "group": "List Config",
   "number": 4009,
   "name": "tokenHTML"
-},
-{
-  "group": "List Config",
-  "number": 4010,
-  "name": "postProcess"
-},
-{
-  "group": "List Config",
-  "number": 4012,
-  "name": "url"
 },
 {
   "group": "List Config",
