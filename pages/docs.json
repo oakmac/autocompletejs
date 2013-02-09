@@ -9,14 +9,14 @@
   "desc":[
     "The <code class='js plain'>initialList</code> property is the first list started when the user clicks on the AutoComplete widget.",
     "It's value should be the name of a <a href='docs#list_object'>List Object</a>.",
-    "<code class='js plain'>initialList</code> is required when there are more than one List Objects on <a href='docs#config_object:lists'><code class='js plain'>lists</code></a>."
+    "<code class='js plain'>initialList</code> is required when there are more than one List Objects on <a href='docs#config_object:lists'><code class='js plain'>config.lists</code></a>."
   ],
   "examples":[1002,1003]
 },
 "------------------------------------------------------------------------------",
 {
   "name":"initialValue",
-  "type":"Array of<br />Token Groups",
+  "type":"Array of<br /><a href='docs#token_object'>Token Groups</a>",
   "req":false,
   "default":false,
   "desc":[
@@ -44,7 +44,7 @@
   "default":"<code class='js keyword'>false</code>",
   "desc":[
     "The maximum number of Token Groups allowed in the search bar.",
-    "Set <code class='js plain'>maxTokenGroups</code> to <code class='js keyword'>false</code> to allow unlimited token groups."
+    "Set <code class='js plain'>maxTokenGroups</code> to <code class='js keyword'>false</code> to allow unlimited <a href='docs#token_object'>Token Groups</a>."
   ],
   "examples":[3001]
 },
@@ -224,7 +224,7 @@
   "req":false,
   "default":false,
   "desc":[
-    "<code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a> defined on <a href='docs#config_object:lists'><code class='js plain'>lists</code></a>.",
+    "<code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a> defined on <a href='docs#config_object:lists'><code class='js plain'>config.lists</code></a>.",
     "When any option from the list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show in the dropdown.",
     "If there is a <a href='docs#option_object:children'><code class='js plain'>children</code></a> property on the Option Object selected it will supersede this <code class='js plain'>children</code> property."
   ],
@@ -338,7 +338,7 @@
   "req":false,
   "default":false,
   "desc":[
-    "<code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a> defined on <a href='docs#config_object:lists'><code class='js plain'>lists</code></a>.",
+    "<code class='js plain'>children</code> should be the name of a <a href='docs#list_object'>List Object</a> defined on <a href='docs#config_object:lists'><code class='js plain'>config.lists</code></a>.",
     "When any option from the list is selected from the dropdown, <code class='js plain'>children</code> is the name of the next list to show in the dropdown.",
     "If <code class='js plain'>children</code> is <code class='js keyword'>false</code>, the list workflow stops when the option is selected.",
     "This <code class='js plain'>children</code> property will supersede a <a href='docs#list_object:children'><code class='js plain'>children</code></a> property on the parent List Object."
@@ -545,10 +545,10 @@
 {
   "name":"removeTokenGroup(index)",
   "args":[
-    ["index", "zero-based index of the token group to remove"]
+    ["index", "zero-based index of the <a href='docs#token_object'>Token Group</a> to remove"]
   ],
   "desc":[
-    "Remove a Token Group by array index.",
+    "Remove a <a href='docs#token_object'>Token Group</a> by array index.",
     "Returns the updated value of the widget if successful.",
     "Returns <code class='js keyword'>false</code> otherwise."
   ],
@@ -572,7 +572,7 @@
 {
   "name":"setValue(value)",
   "args":[
-    ["value", "array of Token Groups"]
+    ["value", "array of <a href='docs#token_object'>Token Groups</a>"]
   ],
   "desc":[
     "Returns <code class='js keyword'>true</code> and updates the widget if <code class='js plain'>value</code> is valid.",
@@ -590,7 +590,7 @@
   "noId":true,
   "name":"val(value)",
   "args":[
-    ["value", "array of Token Groups"]
+    ["value", "array of <a href='docs#token_object'>Token Groups</a>"]
   ],
   "desc":"Alias of <a href='docs#methods:setValue'><code class='js plain'>setValue(value)</code></a>"
 },
