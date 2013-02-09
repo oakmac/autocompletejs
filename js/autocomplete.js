@@ -1870,6 +1870,7 @@ widget.addOption = function(listName, option) {
   }
 
   // add the option
+  option = expandOptionObject(option, cfg.lists[listName]);
   cfg.lists[listName].options.push(option);
   return true;
 };

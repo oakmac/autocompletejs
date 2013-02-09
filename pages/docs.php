@@ -123,6 +123,40 @@ foreach($docs['List Object'] as $prop) {
 <hr class="divider" />
 
 <div class="section">
+<h2 id="token_object">Token Object</h2>
+<div class="panel etymology">
+  <div class="word">token</div>
+  <div class="part-of-speech">Noun</div>
+  <div class="definition">A thing serving as a visible or tangible representation of something abstract.</div>
+</div>
+<p>Token Objects are what is stored on the search bar when a user selects an option from the dropdown menu.</p>
+<p>A Token Group is an array of Token Objects.</p>
+<p>The value of the search bar is an array of Token Groups.</p>
+<p>Token Objects are not explicitly defined in the AutoComplete config; they are created from an Option Object using the <a href="docs#option_object:value"><code class="js plain">option.value</code></a> and <a href="docs#option_object:tokenHTML"><code class="js plain">option.tokenHTML</code></a> properties.</p>
+<table cellspacing="0">
+<thead>
+<tr>
+  <th>Property / Type</th>
+  <th>Required</th>
+  <th>Default</th>
+  <th>Description</th>
+  <th>Example</th>
+</tr>
+</thead>
+<tbody>
+<?php
+foreach($docs['Token Object'] as $prop) {
+  if (is_array($prop) !== true) continue;
+  echo buildPropRow('token_object', $prop, $examples);
+}
+?>
+</tbody>
+</table>
+</div><!-- end div.section -->
+
+<hr class="divider" />
+
+<div class="section">
 <h2 id="methods">AutoComplete Methods</h2>
 <p>Each AutoComplete object has methods you can use to interact with the widget.</p>
 <table cellspacing="0">

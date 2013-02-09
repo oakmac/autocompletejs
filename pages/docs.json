@@ -402,7 +402,33 @@
 
 
 
-
+"Token Object":[
+"------------------------------------------------------------------------------",
+{
+  "name":"tokenHTML",
+  "type":"String",
+  "req":true,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>tokenHTML</code> is the HTML displayed in the search bar for the token.",
+    "It comes from the <a href='docs#option_object:tokenHTML'><code class='js plain'>option.tokenHTML</code></a> property."
+  ],
+  "examples":[4034]
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"value",
+  "type":["String","Number","Array","Object"],
+  "req":true,
+  "default":false,
+  "desc":[
+    "<code class='js plain'>value</code> is any <code class='js plain'>JSON.stringify()</code>-able data structure.",
+    "It comes from the <a href='docs#option_object:value'><code class='js plain'>option.value</code></a> property."
+  ],
+  "examples":[7007]
+},
+"------------------------------------------------------------------------------"
+],
 
 
 
