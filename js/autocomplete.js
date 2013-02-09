@@ -1899,7 +1899,15 @@ widget.destroy = function() {
 };
 
 widget.focus = function() {
-  startInput();
+  // Add a slight pause to let other events finish, then put the focus
+  // on the input field.
+  // If we don't do this and the user attaches this function to a button,
+  // for example, the page.click event will call stopInput before
+  // the dropdown ever has a chance to show.
+  // Another way around this would be for the user to do e.stopPropagation
+  // on their event, but that's asking a lot for the programmer and may
+  // result in unexpected behavior elsewhere.
+  setTimeout(startInput, 5);
 };
 
 // return a list object
@@ -1913,11 +1921,11 @@ widget.getList = function(name) {
 
   // do not throw error if the list does not exist
   // that's normal behavior for this function
-  if (listExists(listName) !== true) {
+  if (listExists(name) !== true) {
     return false;
   }
 
-  return cfg.lists[listName];
+  return cfg.lists[name];
 };
 
 // return all the lists
