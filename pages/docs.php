@@ -133,6 +133,7 @@ foreach($docs['List Object'] as $prop) {
 <p>A Token Group is an array of Token Objects.</p>
 <p>The value of the search bar is an array of Token Groups.</p>
 <p>Token Objects are not explicitly defined in the AutoComplete config; they are created from an Option Object using the <a href="docs#option_object:value"><code class="js plain">option.value</code></a> and <a href="docs#option_object:tokenHTML"><code class="js plain">option.tokenHTML</code></a> properties.</p>
+<p>You can use a string as shorthand for a Token Object when using the <a href="docs#methods:setValue"><code class="js plain">setValue</code></a> method.</p>
 <table cellspacing="0">
 <thead>
 <tr>
