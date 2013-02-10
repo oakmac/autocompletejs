@@ -46,17 +46,47 @@ small {
 // Examples
 //------------------------------------------------------
 div#examples_list_container {
-  li {
+  margin-top: 20px;
+  
+  h4 {
+    background: #f2f2f2;
+    border-top: 1px solid #e6e6e6;
+    border-right: 1px solid #e6e6e6;
+    border-left: 3px solid #ccc;
+    color: #555;
     cursor: pointer;
-    padding: 4px 0px;
+    font-size: 14px;
+    font-weight: normal;
+    margin: 0px;
+    padding: 15px 20px;
+  }
+  h4.active {
+    background: #4d4d4d;
+    border-top: 1px solid #1a1a1a;
+    border-right: 1px solid #1a1a1a;
+    border-left: 4px solid #1a1a1a;
+    color: #fff;
+    font-weight: bold;
+  }
+  ul {
+    border-left: 3px solid #eee;
+    border-right: 1px solid #eee;
+    margin-bottom: 0px;
+    padding: 10px 0px;
+  }
+  li {
     color: rgb(102, 102, 102);
+    cursor: pointer;
     list-style: none;
+    padding: 5px 0px 5px 20px;
   }
   li:hover {
-    color: rgb(34, 34, 34);
+    //color: rgb(34, 34, 34);
+    color: #222;
   }
   li.active {
-    color: rgb(34, 34, 34);
+    color: #222;
+    //color: rgb(34, 34, 34);
     font-weight: bold;
   }
 }
