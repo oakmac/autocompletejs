@@ -460,7 +460,7 @@
 {
   "name":"blur()",
   "desc":"Remove focus from the widget.",
-  "examples":7001
+  "examples":[7001,7056]
 },
 "------------------------------------------------------------------------------",
 {
@@ -530,6 +530,33 @@
 },
 "------------------------------------------------------------------------------",
 {
+  "name":"pressDown()",
+  "desc":[
+    "Simulates the user pressing the \"Down Arrow\" key on the input field.",
+    "Has no effect if the input field does not have focus."
+  ],
+  "examples":7056
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"pressEnter()",
+  "desc":[
+    "Simulates the user pressing the \"Enter\" key on the input field.",
+    "Has no effect if the input field does not have focus."
+  ],
+  "examples":7056
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"pressUp()",
+  "desc":[
+    "Simulates the user pressing the \"Up Arrow\" key on the input field.",
+    "Has no effect if the input field does not have focus."
+  ],
+  "examples":7056
+},
+"------------------------------------------------------------------------------",
+{
   "name":"removeList(name)",
   "args":[
     ["name", "name of the list to remove"]
@@ -553,6 +580,19 @@
     "Returns <code class='js keyword'>false</code> otherwise."
   ],
   "examples":7009
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"setInput(input)",
+  "args":[
+    ["input", "text to set the input element to"]
+  ],
+  "desc":[
+    "Puts text into the input element as if the user had typed it.",
+    "Returns <code class='js keyword'>true</code> and updates the widget if updating the input was successful.",
+    "Returns <code class='js keyword'>false</code> otherwise."
+  ],
+  "examples":7056
 },
 "------------------------------------------------------------------------------",
 {

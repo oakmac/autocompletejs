@@ -1952,11 +1952,20 @@ widget.list = function(name, list) {
   return false;
 };
 
-/*
-widget.reload = function(config) {
-  // TODO: write me
+widget.pressDown = function() {
+  if (INPUT_HAPPENING !== true) return;
+  pressDownArrow();
 };
-*/
+
+widget.pressEnter = function() {
+  if (INPUT_HAPPENING !== true) return;
+  pressEnterOrTab();
+};
+
+widget.pressUp = function() {
+  if (INPUT_HAPPENING !== true) return;
+  pressUpArrow();
+};
 
 widget.removeList = function(name) {
   // name must be valid
@@ -1998,6 +2007,18 @@ widget.removeTokenGroup = function(tokenGroupIndex) {
 
   removeTokenGroup(tokenGroupIndex);
   return getValue();
+};
+
+widget.setInput = function(input) {
+  if (typeof input !== 'string') {
+    error(4922, 'The first argument to the setInput method must be a string.');
+    return false;
+  }
+  
+  startInput();
+  inputEl.val(input);
+  pressRegularKey();
+  return true;
 };
 
 // returns true if updating the list was successful

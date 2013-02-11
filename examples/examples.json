@@ -273,6 +273,11 @@
 },
 {
   "group": "Methods",
+  "number": 7056,
+  "name": "Simulate User Input"
+},
+{
+  "group": "Methods",
   "number": 7011,
   "name": "setValue"
 },
