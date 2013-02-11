@@ -420,8 +420,9 @@ var expandValue = function(value) {
 
 // expand a single option object
 var expandOptionObject = function(option, parentList) {
-  // string becomes the value
-  if (typeof option === 'string') {
+  // string or number becomes the value
+  if (typeof option === 'string' ||
+      typeof option === 'number') {
     option = {
       optionHTML: encode(option),
       tokenHTML: encode(option),
@@ -572,6 +573,12 @@ var expandConfig = function() {
     cfg.placeholderHTML = '';
   }
 
+  // tokenSeparatorHTML
+  if (typeof cfg.tokenSeparatorHTML !== 'string' &&
+      typeof cfg.tokenSeparatorHTML !== 'function') {
+    cfg.tokenSeparatorHTML = ':';
+  }
+
   // default for showErrors is false
   if (cfg.showErrors !== 'console' && cfg.showErrors !== 'alert' &&
       typeof cfg.showErrors !== 'function') {
@@ -660,7 +667,8 @@ var buildOptionHTML = function(option, parentList) {
     return parentList.optionHTML(option);
   }
 
-  if (typeof option.value === 'string') {
+  if (typeof option.value === 'string' ||
+      typeof option.value === 'number') {
     return encode(option.value);
   }
 
@@ -767,7 +775,17 @@ var buildTokens = function(tokens) {
 
       // show child indicator
       if (j !== tokenGroup.length - 1) {
-        html += '<span class="child-indicator">:</span>';
+        html += '<span class="token-separator">';
+        if (typeof cfg.tokenSeparatorHTML === 'string') {
+          html += cfg.tokenSeparatorHTML;
+        }
+        if (typeof cfg.tokenSeparatorHTML === 'function') {
+          html += cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j+1]);
+
+          // TODO: throw error if their tokenSeparator function
+          //       didn't return a string
+        }
+        html += '</span>';
       }
     }
     html += '</div>'; // end div.token-group
@@ -1324,7 +1342,7 @@ var sendAjaxRequest = function(list, inputValue) {
 // NOTE: this is naive; I'm sure there are bugs here
 //       also it assumes valid HTML
 var findHTMLChars = function(str) {
-  var chars = str.split('');
+  var chars = (str + '').split('');
   var result = [];
 
   var inATag = false;
@@ -1524,18 +1542,11 @@ var matchOptions = function(input, list) {
   else {
   */
 
-    // set ._matchValue
-    for (var i = 0; i < options.length; i++) {
-      if (typeof options[i].value === 'string') {
-        options[i]._matchValue = options[i].value;
-      }
-      else {
-        options[i]._matchValue = findNonHTMLChars(options[i].optionHTML);
-      }
-    }
-
-    options2 = matchOptionsSpecial(options, input, list);
-
+  // set ._matchValue
+  for (var i = 0; i < options.length; i++) {
+    options[i]._matchValue = findNonHTMLChars(options[i].optionHTML);
+  }
+  options2 = matchOptionsSpecial(options, input, list);
 
   //}
 
@@ -2014,7 +2025,7 @@ widget.setInput = function(input) {
     error(4922, 'The first argument to the setInput method must be a string.');
     return false;
   }
-  
+
   startInput();
   inputEl.val(input);
   pressRegularKey();

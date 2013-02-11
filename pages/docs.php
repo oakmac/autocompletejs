@@ -26,31 +26,6 @@ foreach($docs['Config Object'] as $prop) {
   echo buildPropRow('config_object', $prop, $examples);
 }
 ?>
-<!--
-<tr id="config_object:removeTokenGroupHTML">
-  <td>NOT IMPLEMENTED YET<br /><code class='js plain'>removeTokenGroupHTML</code></td>
-  <td>String</td>
-  <td>no</td>
-  <td><code class="js string">'foo'</code></td>
-  <td>
-    <p>An HTML string used to clear a token group.</p>
-    <p>Set <code class='js plain'>removeTokenGroupHTML</code> to <code class='js keyword'>false</code> to not show a clear button.</p>
-  </td>
-  <td>
-  </td>
-</tr>
-<tr id="config_object:showClearBtn">
-  <td>NOT IMPLEMENTED YET<br /><code class='js plain'>showClearBtn</code></td>
-  <td>Boolean</td>
-  <td>no</td>
-  <td><code class='js keyword'>true</code></td>
-  <td>
-    <p>Toggle to show the clear button in the search bar.</p>
-  </td>
-  <td>
-  </td>
-</tr>
--->
 </tbody>
 </table>
 </div><!-- end div.section -->

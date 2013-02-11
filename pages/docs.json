@@ -87,7 +87,21 @@
     "If <code class='js plain'>showErrors</code> is a function then the first argument is the unique error code, the second argument is an error string, and an optional third argument is a data structure that is relevant to the error."
   ],
   "examples":[3012,3088]
-}
+},
+"------------------------------------------------------------------------------",
+{
+  "name":"tokenSeparatorHTML",
+  "type":["String","Function"],
+  "req":false,
+  "default":"<code class='js string'>':'</code>",
+  "desc":[
+    "The HTML string to put between <a href='docs#token_object'>Tokens</a> in the search bar.",
+    "If <code class='js plain'>tokenSeparatorHTML</code> is a function the first argument is the Token Object to the left of the separator, the second argument is the Token Object to the right.",
+    "The function should return an HTML string."
+  ],
+  "examples":[3015,3016]
+},
+"------------------------------------------------------------------------------"
 ],
 
 

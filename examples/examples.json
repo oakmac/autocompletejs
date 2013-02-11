@@ -97,6 +97,16 @@
   "number": 3031,
   "name": "showErrors custom"
 },
+{
+  "group": "Initial Config",
+  "number": 3015,
+  "name": "tokenSeparatorHTML string"
+},
+{
+  "group": "Initial Config",
+  "number": 3016,
+  "name": "tokenSeparatorHTML function"
+},
 "-----------------------------------------------------",
 {
   "group": "List Config",
@@ -273,13 +283,13 @@
 },
 {
   "group": "Methods",
-  "number": 7056,
-  "name": "Simulate User Input"
+  "number": 7011,
+  "name": "setValue"
 },
 {
   "group": "Methods",
-  "number": 7011,
-  "name": "setValue"
+  "number": 7056,
+  "name": "Simulate User Input"
 },
 "-----------------------------------------------------"
 ]
