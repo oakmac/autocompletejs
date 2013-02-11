@@ -66,22 +66,22 @@
 
 
 div.autocomplete_internal_container {
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size: 14px;
-	line-height: 20px;
+	border: 2px solid #ccc;
 	color: #333;
-	height: 100%;
-	width: 100%;
-	position: relative;
-  .rounded-corners(8px);
-  border: 2px solid #ccc;
-  padding: 4px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
 	font-style: normal;
-	font-weight: normal;
-
+	font-weight: normal;	
+	height: 100%;
+	line-height: 20px;
+  padding: 4px;
+	position: relative;
+	.rounded-corners(8px);
+	width: 100%;
+	
 	div.placeholder {
-		float: left;
 		color: #777;
+		float: left;
 		font-size: 16px;
 		margin: 4px 0 0 4px;
 	}
@@ -105,20 +105,17 @@ div.autocomplete_internal_container {
   }
 
 	div.token-group {
+		background: #eee;
+		border: 1px solid #ccc;
+		cursor: pointer;
 		float: left;
     margin: 4px;
 		padding: 4px 6px;
-		background: #eee;
 		.rounded-corners(6px);
-		border: 1px solid #ccc;
-		cursor: pointer;
 
     span.remove-token-group {
-      margin-right: 2px;
       font-size: 11px;
-    }
-    span.remove-token-group:hover {
-      font-weight: bold;
+			margin-right: 2px;
     }
 	}
 
@@ -131,42 +128,42 @@ div.autocomplete_internal_container {
   }
 
   ul.dropdown {
-    border: 1px solid #ccc;
-    min-width: 140px;
-    z-index: 1;
-    position: absolute;
-    background: #f6f6f6;
-    padding: 0px;
+    background: #e3e3e3;
+		border: 1px solid #ccc;
+		border-bottom: 0px;
     margin: 10px 0px 0px 0px;
-    overflow-x: visible;
-    overflow-y: auto;
     max-height: 300px;
-		font-size: 14px;
-		line-height: 20px;
+    min-width: 140px;
+		overflow-x: visible;
+    overflow-y: auto;
+		padding: 0px;
+		position: absolute;
+		z-index: 10;
 
     li {
-      list-style: none;
+      border-bottom: 1px solid #d8d8d8;
+			font-size: 13px;
+			list-style: none;
       margin: 0px;
-      padding: 3px 4px;
-      font-size: 13px;
-      border-bottom: 1px solid #f0f0f0;
-
+			padding: 4px;
+			
 			span.children-indicator {
 				float: right;
 			}
     }
 
 		li.option {
+			background: #f9f9f9;
 			cursor: pointer;
 		}
 
 		li.group {
-			background-color: #b7b7b7;
-			color: #fff;
+			color: #000;
+			font-size: 14px;
 		}
 
     li.highlighted {
-      background: blue;
+      background: #00519d;
 			color: white;
     }
   }

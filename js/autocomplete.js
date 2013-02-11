@@ -686,7 +686,7 @@ var buildOption = function(option, parentList) {
   option.optionHTML;
 
   if (typeof childrenListName === 'string') {
-    html += '<span class="children-indicator">&rarr;</span>';
+    html += '<span class="children-indicator">&#x25B8;</span>';
   }
 
   html += '</li>';
