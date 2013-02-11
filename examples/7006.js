@@ -13,6 +13,6 @@ var config = {
 };
 var widget = new AutoComplete('search_bar', config);
 
-$('#getLists_btn').on('click', function() {
+$('#getListsBtn').on('click', function() {
   console.log(widget.getLists());
 });

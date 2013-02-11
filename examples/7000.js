@@ -13,16 +13,16 @@ var widget = new AutoComplete('search_bar', {
   }
 });
 
-$('#getvalue_btn').on('click', function() {
+$('#showValueBtn').on('click', function() {
   console.log("Current value of the search bar:");
   console.log(widget.getValue());
 });
 
-$('#addoption_btn').on('click', function() {
+$('#addOptionBtn').on('click', function() {
   var kiwi = {
     value: { name: 'Kiwi', plu: 4030, inSeason: false }
   };
   widget.addOption('fruits', kiwi);
-  
-  $('#addoption_btn').css('display', 'none');
+
+  $('#addOptionBtn').css('display', 'none');
 });

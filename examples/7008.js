@@ -13,9 +13,9 @@ var config = {
 };
 var widget = new AutoComplete('search_bar', config);
 
-$('#removeList_btn').on('click', function() {
+$('#removeListBtn').on('click', function() {
   var listName = window.prompt('Which list would you like to remove?');
-  
+
   var result = widget.removeList(listName);
   if (result === false) {
     console.log('The list "' + listName + '" was NOT removed.');

@@ -4,8 +4,8 @@ $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
 ?>
 
-<!--<p>I'm working on the most wonderful homepage, but for now you'll just have to live with <a href="examples">Examples</a> and <a href="docs">Docs</a>.</p>-->
 <div id="awesome"></div>
+<input type="button" class="button rounded demo-btn" id="runAgainBtn" value="Run Again" style="display:none" />
 
 <script src="js/json3.min.js"></script>
 <script src="js/jquery-1.8.2.min.js"></script>
@@ -14,65 +14,84 @@ include(APP_PATH . 'pages/header.php');
 <script>
 var init = function() {
 
+var options1 = [
+  'the best!',
+  'so sweet.',
+  'wonderful!!!',
+  {
+    children: 'options2',
+    value: 'better than'
+  }
+];
+
+var options2 = [
+  'your middle school dance.',
+  'sliced bread.',
+  'your grammy, your aunty, your momma, your mammy.',
+  'Ezra.',
+  'a cupcake!'
+];
+
 var config = {
   tokenSeparatorHTML: '',
   initialList: 'subject',
   lists: {
     subject: [{
-      children: 'predicate',
+      children: 'options1',
       value: 'AutoCompleteJS is'
     }],
-    predicate: {
-      options: [
-        'the best!',
-        'so sweet.',
-        'amazing!',
-        {
-          children: 'predicate2',
-          value: 'better than'
-        }
-      ]
-    },
-    predicate2: {
-      options: [
-        'your middle school dance.',
-        'sliced bread.',
-        'your grammy, your aunty, your momma, your mammy.',
-        'Ezra.'
-      ]
-    }
+    options1: options1,
+    options2: options2
   }
 };
 var awesome = new AutoComplete('awesome', config);
 
-// TODO: would prefer to have some randomness here instead
-//       of the same thing every time
+var getRandomInt = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-var actions = [
-  function() { awesome.setInput('a'); },
-  function() { awesome.setInput('au'); },
-  function() { awesome.setInput('aut'); },
-  function() { awesome.setInput('auto'); },
-  function() { awesome.pressEnter(); },
-  function() { awesome.setInput('a'); },
-  function() { awesome.setInput('am'); },
-  function() { awesome.setInput('a'); },
-  function() { awesome.setInput(''); },
-  function() { awesome.setInput('b'); },
-  function() { awesome.setInput('be'); },
-  function() { awesome.setInput('bet'); },
-  function() { awesome.setInput('bett'); },
-  function() { awesome.pressEnter(); },
-  function() { awesome.setInput('s'); },
-  function() { awesome.setInput('sl'); },
-  function() { awesome.setInput('sli'); },
-  function() { awesome.pressEnter(); },
-  function() { awesome.pressDown(); },
-  function() { awesome.pressEnter(); },
-  function() { awesome.blur(); }
-];
+var createRandomPath = function() {
+  var actions = [
+    function() { $('#runAgainBtn').css('display', 'none'); },
+    function() { awesome.setInput('a'); },
+    function() { awesome.setInput('au'); },
+    function() { awesome.setInput('aut'); },
+    function() { awesome.setInput('auto'); },
+    function() { awesome.pressEnter(); }
+  ];
+
+  // give it a slightly higher chance of hitting the last option
+  var opt1Index = getRandomInt(0, options1.length + 1);
+  if (opt1Index >= options1.length) {
+    opt1Index = options1.length - 1;
+  }
+  if (opt1Index === 0) {
+    actions.push(function() {});
+  }
+  for (var i = 0; i < opt1Index; i++) {
+    actions.push(function() { awesome.pressDown(); });
+  }
+  actions.push(function() { awesome.pressEnter(); });
+
+  if (options1[opt1Index].hasOwnProperty('children') === true) {
+    var opt2Index = getRandomInt(0, options2.length - 1);
+    for (var i = 0; i < opt2Index; i++) {
+      actions.push(function() { awesome.pressDown(); });
+    }
+    actions.push(function() { awesome.pressEnter(); });
+  }
+
+  actions.push(
+    function() { awesome.blur(); },
+    function() { $('#runAgainBtn').fadeIn('fast'); }
+    //function() { $('#runAgainBtn').css('visibility', ''); }
+  );
+
+  return actions;
+};
 
 var go = function() {
+  var actions = createRandomPath();
   var interval = 500;
   for (var i = 0; i < actions.length; i++) {
     setTimeout(actions[i], i * interval);
@@ -80,6 +99,8 @@ var go = function() {
 };
 
 setTimeout(go, 500);
+
+$('#runAgainBtn').on('click', go);
 
 }; // end init()
 $(document).ready(init);

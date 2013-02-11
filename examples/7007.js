@@ -13,7 +13,7 @@ var widget = new AutoComplete('search_bar', {
   }
 });
 
-$('#getValue_btn').on('click', function() {
+$('#showValueBtn').on('click', function() {
   console.log("Current value of the search bar:");
   console.log(widget.getValue());
 });

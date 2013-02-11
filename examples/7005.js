@@ -13,9 +13,9 @@ var config = {
 };
 var widget = new AutoComplete('search_bar', config);
 
-$('#getList_btn').on('click', function() {
+$('#getListBtn').on('click', function() {
   var listName = window.prompt('Which list would you like to see?');
-  
+
   var list = widget.getList(listName);
   if (list === false) {
     console.log('The list "' + listName + '" does not exist.');
