@@ -534,9 +534,6 @@ var expandConfig = function() {
     };
   }
 
-  // TODO: showClearBtn
-  // TODO: clearBtnHTML
-
   // class prefix
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
     cfg.classPrefix = 'autocomplete';
@@ -1571,20 +1568,21 @@ var pressUpArrow = function() {
   // get the highlighted element
   var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
 
-  // no row highlighted, highlight the last list element
-  if (highlightedEl.length === 0) {
-    dropdownEl.find('li.' + CLASSES.option).last().
-      addClass(CLASSES.highlightedOption);
-    adjustDropdownScroll();
-    return;
-  }
-
-  // remove the highlight from the current element
+  // remove the highlight
   highlightedEl.removeClass(CLASSES.highlightedOption);
 
-  // highlight the previous option
-  highlightedEl.prevAll('li.' + CLASSES.option).first().
-    addClass(CLASSES.highlightedOption);
+  // get the previous options
+  var prevEl = highlightedEl.prevAll('li.' + CLASSES.option).first();
+  if (prevEl.length === 1) {
+    prevEl.addClass(CLASSES.highlightedOption);
+  }
+  // we are at the top, highlight the last option
+  else {
+    dropdownEl.find('li.' + CLASSES.option).last()
+      .addClass(CLASSES.highlightedOption);
+  }
+
+  // adjust list scrollbar
   adjustDropdownScroll();
 };
 
@@ -1592,20 +1590,21 @@ var pressDownArrow = function() {
   // get the highlighted element
   var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
 
-  // no row highlighted, highlight the first option
-  if (highlightedEl.length === 0) {
-    dropdownEl.find('li.' + CLASSES.option).first().
-      addClass(CLASSES.highlightedOption);
-    adjustDropdownScroll();
-    return;
-  }
-
-  // remove the highlight from the current element
+  // remove the highlight
   highlightedEl.removeClass(CLASSES.highlightedOption);
 
-  // highlight the next option
-  highlightedEl.nextAll('li.' + CLASSES.option).first().
-    addClass(CLASSES.highlightedOption);
+  // get the next option
+  var nextEl = highlightedEl.nextAll('li.' + CLASSES.option).first();
+  if (nextEl.length === 1) {
+    nextEl.addClass(CLASSES.highlightedOption);
+  }
+  // we are at the bottom, highlight the top option
+  else {
+    dropdownEl.find('li.' + CLASSES.option).first()
+      .addClass(CLASSES.highlightedOption);
+  }
+
+  // adjust list scrollbar
   adjustDropdownScroll();
 };
 
