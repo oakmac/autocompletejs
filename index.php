@@ -68,20 +68,13 @@ if ($URI[0] === 'download') {
   die;
 }
 
-/*
-TODO: create these
-// markup
-if ($URI[0] === 'markup') {
-  require(APP_PATH.'pages/markup.php');
-  die;
-}
-
 // license
 if ($URI[0] === 'license') {
-  require(APP_PATH.'pages/license.php');
+  // just redirect them to the GitHub page for now
+  header('HTTP/1.1 307 Temporary Redirect');
+  header('Location: https://github.com/oakmac/autocompletejs/blob/master/LICENSE');
   die;
 }
-*/
 
 // anything else 404's
 header('HTTP/1.1 404 Not Found');

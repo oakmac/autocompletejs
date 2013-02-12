@@ -13,7 +13,6 @@ var actions = [
   function() { widget.pressEnter(); },
   function() { widget.pressUp(); },
   function() { widget.pressUp(); },
-  function() { widget.pressUp(); },
   function() { widget.pressEnter(); },
   function() { widget.blur(); },
   function() { $('#runBtn').css('visibility', 'visible'); }
@@ -27,4 +26,4 @@ var simulate = function() {
 };
 
 $('#runBtn').on('click', simulate);
-setTimeout(simulate, 1000);
+setTimeout(simulate, 750);
