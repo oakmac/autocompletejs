@@ -1787,6 +1787,14 @@ var keydownInputElement = function(e) {
     return;
   }
 
+  // up arrow
+  if (keyCode === KEYS.UP) {
+    // prevent the cursor from going to the front of the input element
+    e.preventDefault();
+    pressUpArrow();
+    return;
+  }  
+  
   // down arrow
   if (keyCode === KEYS.DOWN) {
     // prevent the cursor from going to the end of the input element
@@ -1794,14 +1802,12 @@ var keydownInputElement = function(e) {
     pressDownArrow();
     return;
   }
-
-  // up arrow
-  if (keyCode === KEYS.UP) {
-    // prevent the cursor from going to the front of the input element
-    e.preventDefault();
-    pressUpArrow();
+  
+  // let left and right arrow events happen naturally inside the input element
+  // but don't execute pressRegularKey for them
+  if (keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT) {
     return;
-  }
+  }  
 
   // escape
   if (keyCode === KEYS.ESCAPE) {
