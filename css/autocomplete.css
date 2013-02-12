@@ -66,8 +66,7 @@ div.autocomplete_internal_container span.token {
 div.autocomplete_internal_container ul.dropdown {
   background: #e3e3e3;
   border: 1px solid #ccc;
-  border-bottom: 0px;
-  margin: 6px 0px 0px 0px;
+  margin: 12px 0px 0px 0px;
   max-height: 300px;
   min-width: 140px;
   overflow-x: visible;
@@ -98,4 +97,7 @@ div.autocomplete_internal_container ul.dropdown li.group {
 div.autocomplete_internal_container ul.dropdown li.highlighted {
   background: #00519d;
   color: white;
+}
+div.autocomplete_internal_container ul.dropdown li.last {
+  border-bottom: 0px;
 }

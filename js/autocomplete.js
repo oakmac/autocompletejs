@@ -877,7 +877,7 @@ var positionDropdownEl = function() {
 
   // put the dropdown directly beneath the input element
   dropdownEl.css({
-    top: (height + pos.top + 8),
+    top: (height + pos.top),
     left: pos.left
   });
 };
@@ -911,6 +911,14 @@ var updateTokens = function() {
   else {
     hidePlaceholder();
   }
+};
+
+// add a class to the first and last option
+var markFirstLastOptions = function() {
+  var optionEls = dropdownEl.find('li.' + CLASSES.option);
+  optionEls.removeClass('first last');
+  optionEls.filter(':first').addClass('first');
+  optionEls.filter(':last').addClass('last');
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
@@ -1226,6 +1234,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
 
   // update the dropdown
   dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(html);
+  markFirstLastOptions();
 
   // highlight the first option if there are no others highlighted
   if (isOptionHighlighted() === false) {
@@ -1347,31 +1356,31 @@ var findHTMLChars = function(str) {
   for (var i = 0; i < chars.length; i++) {
     if (chars[i] === '<') {
       inATag = true;
-      result.push({c: '<', html: true});
+      result.push({'char': '<', html: true});
       continue;
     }
     if (inATag === true && chars[i] === '>') {
       inATag = false;
-      result.push({c: '>', html: true});
+      result.push({'char': '>', html: true});
       continue;
     }
     if (chars[i] === '&') {
       inEscapeSequence = true;
-      result.push({c: '&', html: true});
+      result.push({'char': '&', html: true});
       continue;
     }
     if (inEscapeSequence === true && chars[i] === ';') {
       inEscapeSequence = false;
-      result.push({c: ';', html: true});
+      result.push({'char': ';', html: true});
       continue;
     }
 
     if (inATag === true || inEscapeSequence === true) {
-      result.push({c: chars[i], html: true});
+      result.push({'char': chars[i], html: true});
       continue;
     }
 
-    result.push({c: chars[i], html: false});
+    result.push({'char': chars[i], html: false});
   }
 
   return result;
@@ -1383,7 +1392,7 @@ var findNonHTMLChars = function(str) {
   var str2 = '';
   for (var i = 0; i < chars.length; i++) {
     if (chars[i].html === false) {
-      str2 += chars[i].c;
+      str2 += chars[i]['char'];
     }
   }
   return str2;
@@ -1391,37 +1400,29 @@ var findNonHTMLChars = function(str) {
 
 // add <strong> tags around all non-HTML characters in optionHTML that exist
 // in input
-// NOTE: refactor this
 var highlightMatchChars = function(optionHTML, input) {
-  var inputChars = input.split('');
+  // create an object of all the characters to be highlighted
   var charsToHighlight = {};
+  var inputChars = (input + '').split('');
   for (var i = 0; i < inputChars.length; i++) {
-    // skip anything that is not alphanumeric
-    // TODO: is this necessary?
-    if (inputChars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
-
     charsToHighlight[inputChars[i].toLowerCase()] = true;
     charsToHighlight[inputChars[i].toUpperCase()] = true;
   }
 
-  charsToHighlight = keys(charsToHighlight);
-
-  var arr = findHTMLChars(optionHTML);
+  var optionHTMLArr = findHTMLChars(optionHTML);
   var optionHTML2 = '';
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i].html === true) {
-      optionHTML2 += arr[i].c;
+  for (var i = 0; i < optionHTMLArr.length; i++) {
+    var c = optionHTMLArr[i]['char'];
+    var html = optionHTMLArr[i].html;
+
+    // character is not HTML and needs to be highlighted
+    if (html === false && charsToHighlight.hasOwnProperty(c) === true) {
+      optionHTML2 += '<strong>' + c + '</strong>';
+      continue;
     }
-    else {
-      var tmp = arr[i].c;
-      for (var j = 0; j < charsToHighlight.length; j++) {
-        if (tmp === charsToHighlight[j]) {
-          tmp = '<strong>' + tmp + '</strong>';
-          break;
-        }
-      }
-      optionHTML2 += tmp;
-    }
+
+    // else just add it to the string
+    optionHTML2 += c;
   }
 
   return optionHTML2;
@@ -1627,6 +1628,11 @@ var pressEnterOrTab = function() {
 };
 
 var pressRegularKey = function() {
+  // Sometimes it takes this long for a browser reflow to  move the
+  // input element to the next line.
+  // It's safe for this function to be called at any time.
+  setTimeout(positionDropdownEl, 150);
+
   var inputValue = inputEl.val();
 
   if (inputValue !== '') {
@@ -1682,6 +1688,7 @@ var pressRegularKey = function() {
 
   // show the dropdown
   dropdownEl.html(html);
+  markFirstLastOptions();
   highlightFirstOption();
 
   // send the AJAX request
@@ -1898,17 +1905,6 @@ widget.blur = function() {
 widget.clear = function() {
   setValue([]);
 };
-
-/*
-widget.config = function(prop, value) {
-  // TODO: write me
-  // no args, return the current config
-
-  // else set the new prop and value
-
-  // what's the difference between this function and reload?
-};
-*/
 
 widget.destroy = function() {
   destroyWidget();
