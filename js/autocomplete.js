@@ -777,7 +777,7 @@ var buildTokens = function(tokens) {
           html += cfg.tokenSeparatorHTML;
         }
         if (typeof cfg.tokenSeparatorHTML === 'function') {
-          html += cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j+1]);
+          html += cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
 
           // TODO: throw error if their tokenSeparator function
           //       didn't return a string
@@ -1301,8 +1301,8 @@ var sendAjaxRequest = function(list, inputValue) {
 
   // create the cache key
   // NOTE: we're only caching GET requests
-  //       if I could come up with a way to JSON.stringify and guarantee order, then
-  //       I think it would make sense to cache other types too
+  //       if I could come up with a way to JSON.stringify and guarantee order
+  //       then I think it would make sense to cache other types too
   var cacheKey = false;
   if (ajaxOpts.type.toUpperCase() === 'GET') {
     cacheKey = ajaxOpts.type.toUpperCase() + ' ' + ajaxOpts.url;
@@ -1325,7 +1325,7 @@ var sendAjaxRequest = function(list, inputValue) {
   if (list.cacheAjax === true && cacheKey !== false) {
     var data = getFromCache(cacheKey);
     if (data !== false) {
-      ajaxSuccess(data, list, inputValue, ajaxOpts.preProcess)
+      ajaxSuccess(data, list, inputValue, ajaxOpts.preProcess);
       return;
     }
   }
@@ -1781,7 +1781,7 @@ var keydownInputElement = function(e) {
     return;
   }
 
-  // left arrow
+  // left arrow with empty input
   if (keyCode === KEYS.LEFT && inputValue === '') {
     highlightLastTokenGroup();
     return;
@@ -1793,8 +1793,8 @@ var keydownInputElement = function(e) {
     e.preventDefault();
     pressUpArrow();
     return;
-  }  
-  
+  }
+
   // down arrow
   if (keyCode === KEYS.DOWN) {
     // prevent the cursor from going to the end of the input element
@@ -1802,12 +1802,12 @@ var keydownInputElement = function(e) {
     pressDownArrow();
     return;
   }
-  
+
   // let left and right arrow events happen naturally inside the input element
   // but don't execute pressRegularKey for them
   if (keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT) {
     return;
-  }  
+  }
 
   // escape
   if (keyCode === KEYS.ESCAPE) {
@@ -1819,7 +1819,7 @@ var keydownInputElement = function(e) {
   // NOTE: took this from jquery-tokeninput
   //       you let the keydown event finish so the input element
   //       gets updated, then you grab the value
-  //       otherwise you're re-writing the logic behind <input type="text">
+  //       otherwise you're re-writing the logic behind input elements
   setTimeout(pressRegularKey, 5);
 };
 
@@ -2096,7 +2096,7 @@ var addEvents = function() {
 
   // catch all clicks on the page
   $('html').on('click touchstart', clickPage);
-  
+
   // catch global keydown
   $(window).on('keydown', keydownWindow);
 };
