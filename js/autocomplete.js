@@ -2089,8 +2089,8 @@ var addEvents = function() {
     CLASSES.removeTokenGroup, clickRemoveTokenGroup);
 
   // catch all clicks on the page
-  $('html').on('click', clickPage);
-
+  $('html').on('click touchstart', clickPage);
+  
   // catch global keydown
   $(window).on('keydown', keydownWindow);
 };
