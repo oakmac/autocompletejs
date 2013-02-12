@@ -8,11 +8,15 @@
   <meta name="viewport" content="width=device-width">
 
   <link rel="stylesheet" href="css/foundation-3.2.5.min.css" />
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold|Droid+Sans+Mono" type="text/css" />
-  <link rel="stylesheet" href="css/prettify.css" />
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold|Droid+Sans+Mono" />
+<?php if (IN_PRODUCTION === true): ?>
+  <link rel="stylesheet" href="css/site.css" />
+  <link rel="stylesheet" href="css/autocomplete.css" />
+<?php else: ?>
   <link type="text/css" rel="stylesheet/less" href="css/site.less" />
   <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
   <script src="css/less-1.3.0.min.js"></script>
+<?php endif; ?>
 </head>
 <body>
 <?php

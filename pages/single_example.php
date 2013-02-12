@@ -5,8 +5,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title><?php echo $example['name']; ?> Example</title>
   <base href="<?php echo BASE_URL; ?>" />
+<?php if (IN_PRODUCTION === true): ?>
+  <link rel="stylesheet" href="css/autocomplete.css" />
+<?php else: ?>
   <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
   <script src="css/less-1.3.0.min.js"></script>
+<?php endif; ?>
 </head>
 <body>
 <p><a href="examples#<?php echo $example['number']; ?>">&larr; Back to all examples.</a></p>
