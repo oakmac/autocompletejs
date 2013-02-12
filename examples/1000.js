@@ -1,2 +1,2 @@
 var fruits = ['Apple', 'Banana', 'Orange'];
-var widget = new AutoComplete('example1', fruits);
+var widget = new AutoComplete('search_bar', fruits);
