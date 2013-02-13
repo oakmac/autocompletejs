@@ -94,6 +94,40 @@ var SESSION_CACHE = {};
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
+// text-related CSS properties
+var CSS_TEXT_PROPS = [
+    'font-family',
+    'font-feature-settings',
+    'font-kerning',
+    'font-language-override',
+    'font-size',
+    'font-size-adjust',
+    'font-stretch',
+    'font-style',
+    'font-variant',
+    'font-variant-ligatures',
+    'font-weight',
+    'word-spacing',
+    'letter-spacing',
+    'white-space',
+    'word-wrap',
+    'word-break',
+    'text-align',
+    'text-align-last',
+    'text-combine-horizontal',
+    'text-decoration',
+    'text-decoration-color',
+    'text-decoration-line',
+    'text-decoration-style',
+    'text-indent',
+    'text-orientation',
+    'text-overflow',
+    'text-rendering',
+    'text-shadow',
+    'text-transform',
+    'text-underline-position'
+];
+
 // constructor return object
 var widget = {};
 
@@ -942,13 +976,27 @@ var markFirstLastOptions = function() {
   listEls.filter(':last').addClass('last');
 };
 
-// TODO: revisit this and make it better for different font sizes, etc
-// http://stackoverflow.com/questions/3392493/adjust-width-of-input-field-to-its-input
-var updateInputWidth = function(text) {
-  var width = (text.length + 1) * 10;
-  if (width < 20) {
-    width = 20;
+var calcTextWidth = function(text) {
+  var dummySpanHTML = '<span style="position: absolute; top: -9999px;">' +
+    text + 'AA</span>'; // add a couple extra characters to buffer the width
+
+  var dummySpanEl = $(dummySpanHTML).insertAfter(inputEl);
+
+  dummySpanEl.attr('class', inputEl.attr('class'));
+  var textCss = {};
+  for(var i=0, len=CSS_TEXT_PROPS.length; i<len; i++) {
+    var cssProp = CSS_TEXT_PROPS[i];
+    textCss[cssProp] = inputEl.css(cssProp);
   }
+  dummySpanEl.css(textCss);
+  var width = dummySpanEl.width();
+  dummySpanEl.remove();
+
+  return width;
+};
+
+var updateInputWidth = function(text) {
+  var width = calcTextWidth(text);
   inputEl.css('width', width + 'px');
 };
 
