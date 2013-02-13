@@ -81,19 +81,6 @@ var CLASSES = {
   tokenGroup: 'token-group'
 };
 
-// HTML sentinel values
-var HTML_SENTINELS = [];
-
-// stateful
-var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-var AJAX_OBJECT = {};
-var CURRENT_LIST_NAME = false;
-var INPUT_HAPPENING = false;
-var LOCAL_STORAGE_AVAILABLE = false;
-var SESSION_CACHE = {};
-var TOKENS = [];
-var VISIBLE_OPTIONS = {};
-
 // I believe these are all the CSS properties that could effect text width
 // in an <input> element
 // https://developer.mozilla.org/en-US/docs/CSS/CSS_Reference
@@ -129,6 +116,21 @@ var CSS_TEXT_PROPS = [
   'text-transform',
   'text-underline-position'
 ];
+
+// HTML sentinel values
+var HTML_SENTINELS = [];
+
+// stateful
+var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
+var AJAX_BUFFER_LENGTH = 200;
+var AJAX_BUFFER_TIMEOUT;
+var AJAX_OBJECT = {};
+var CURRENT_LIST_NAME = false;
+var INPUT_HAPPENING = false;
+var LOCAL_STORAGE_AVAILABLE = false;
+var SESSION_CACHE = {};
+var TOKENS = [];
+var VISIBLE_OPTIONS = {};
 
 // constructor return object
 var widget = {};
@@ -591,9 +593,15 @@ var expandConfig = function() {
     };
   }
 
-  // class prefix
+  // TODO: need to document this
+  //       do we need this functionality?
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
     cfg.classPrefix = 'autocomplete';
+  }
+  
+  // TODO: need to document this
+  if (typeof cfg.ajaxBuffer === 'number' && cfg.ajaxBuffer > 0) {
+    AJAX_BUFFER_LENGTH = cfg.ajaxBuffer;
   }
 
   // default for maxTokenGroups is false
@@ -1135,10 +1143,6 @@ var startInput = function() {
 };
 
 var stopInput = function() {
-  // kill any pending AJAX requests
-  if (typeof AJAX_OBJECT.abort === 'function') {
-    AJAX_OBJECT.abort();
-  }
   hideInputEl();
   hideDropdownEl();
 
@@ -1317,6 +1321,8 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
 };
 
 var ajaxError = function(errType, list, inputValue) {
+  if (INPUT_HAPPENING !== true) return;
+  
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
 
@@ -1412,9 +1418,11 @@ var sendAjaxRequest = function(list, inputValue) {
       return;
     }
   }
-
-  // send the request
-  AJAX_OBJECT = $.ajax(ajaxOpts);
+  
+  // send the request after a short timeout
+  AJAX_BUFFER_TIMEOUT = setTimeout(function() {
+    AJAX_OBJECT = $.ajax(ajaxOpts);
+  }, AJAX_BUFFER_LENGTH);
 };
 
 // returns an array of all characters in str
@@ -1635,8 +1643,6 @@ var findCharsToMatchAgainst = function(str) {
   return str;
 };
 
-// investigate:
-// http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
   var options = deepCopy(list.options);
   
@@ -1733,6 +1739,14 @@ var pressEnterOrTab = function() {
 };
 
 var pressRegularKey = function() {
+  // clear the timeout from a previous keystroke
+  clearTimeout(AJAX_BUFFER_TIMEOUT);
+  
+  // cancel any existing AJAX request
+  if (typeof AJAX_OBJECT.abort === 'function') {
+    AJAX_OBJECT.abort();
+  }
+  
   // Sometimes it takes this long for a browser reflow to move the
   // input element to the next line.
   // It's safe for this function to be called at any time.
@@ -1743,7 +1757,7 @@ var pressRegularKey = function() {
   setTimeout(positionDropdownEl, 300);
 
   var inputValue = inputEl.val();
-
+  
   if (inputValue !== '') {
     clearTokenGroupHighlight();
     updateInputWidth(inputValue);
@@ -1757,7 +1771,8 @@ var pressRegularKey = function() {
   
   // modify the options with their custom function
   if (typeof list.matchOptions === 'function') {
-    options = list.matchOptions(inputValue, options, deepCopy(list.options), getValue());
+    options = list.matchOptions(inputValue, options, deepCopy(list.options),
+      getValue());
   }
 
   // no input, no options, no freeform, and no ajax
@@ -1798,15 +1813,12 @@ var pressRegularKey = function() {
   dropdownEl.html(html);
   markFirstLastOptions();
   highlightFirstOption();
-
+  
   // send the AJAX request
   // NOTE: we have to send the AJAX request after we've updated the DOM
   //       because of localStorage caching
-  if (list.ajaxEnabled === true) {
-    // cancel any existing AJAX request
-    if (typeof AJAX_OBJECT.abort === 'function') {
-      AJAX_OBJECT.abort();
-    }
+  if (list.ajaxEnabled === true) {    
+    // send the request
     sendAjaxRequest(list, inputValue);
   }
 };
