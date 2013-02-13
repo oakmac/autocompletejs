@@ -214,7 +214,7 @@ var storeInCache = function(key, data, duration) {
   if (typeof duration === 'number') {
     expires = now() + duration;
   }
-  
+
   var localStorageSucceeded = false;
   if (LOCAL_STORAGE_AVAILABLE === true) {
     try {
@@ -225,7 +225,7 @@ var storeInCache = function(key, data, duration) {
       // do nothing
     }
   }
-  
+
   if (localStorageSucceeded === false) {
     SESSION_CACHE[key] = data;
     SESSION_CACHE[key + ' expires'] = expires;
@@ -242,7 +242,7 @@ var isExpired = function(time) {
 // returns the data or false if it does not exist
 var getFromCache = function(key) {
   var expiresKey = key + ' expires';
-  
+
   // try localStorage first
   var localStorageSucceeded = false;
   if (LOCAL_STORAGE_AVAILABLE === true) {
@@ -253,7 +253,7 @@ var getFromCache = function(key) {
     } catch (e) {
       // do nothing
     }
-    
+
     // check the expiration date
     if (localStorageSucceeded === true &&
         isExpired(expireTime) === false &&
@@ -264,12 +264,12 @@ var getFromCache = function(key) {
       localStorageSucceeded = false;
     }
   }
-  
+
   // check the session cache
   if (localStorageSucceeded === false) {
     if (SESSION_CACHE.hasOwnProperty(expiresKey) === true) {
       var expireTime = SESSION_CACHE[expiresKey];
-      
+
       if (SESSION_CACHE.hasOwnProperty(key) === true &&
           isExpired(expireTime) === false &&
           typeof SESSION_CACHE[key] === 'string') {
@@ -277,7 +277,7 @@ var getFromCache = function(key) {
       }
     }
   }
-  
+
   return false;
 };
 
@@ -479,8 +479,9 @@ var sanityChecks = function() {
 
   // check for the correct version of jquery
   if (! (typeof window.$ && $.fn && $.fn.jquery >= MINIMUM_JQUERY_VERSION)) {
-    window.alert('AutoComplete Error 1004: Unable to find a valid version of jQuery. ' +
-      'Please include jQuery ' + MINIMUM_JQUERY_VERSION + ' (or greater) on the page.\n\nExiting...');
+    window.alert('AutoComplete Error 1004: Unable to find a valid version ' +
+      'of jQuery. Please include jQuery ' + MINIMUM_JQUERY_VERSION + ' or ' +
+      'greater on the page.\n\nExiting...');
     return false;
   }
 
@@ -2262,14 +2263,17 @@ widget.val = function(value) {
 //------------------------------------------------------------------------------
 
 var addEvents = function() {
-  // using delegate and bind to maintain compatibility with older jquery versions
+  // using delegate and bind here instead of $.on to maintain compatibility
+  // with older jquery versions
   containerEl.bind('click', clickContainerElement);
-  containerEl.delegate('input.autocomplete-input', 'keydown', keydownInputElement);
-  containerEl.delegate('li.' + CLASSES.option,'click', clickOption);
+  containerEl.delegate('input.autocomplete-input',
+    'keydown', keydownInputElement);
+  containerEl.delegate('li.' + CLASSES.option, 'click', clickOption);
   containerEl.delegate('li.' + CLASSES.option, 'mouseover', mouseoverOption);
   containerEl.delegate('div.' + CLASSES.tokenGroup, 'click', clickTokenGroup);
-  containerEl.delegate('div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup,
-   'click', clickRemoveTokenGroup);
+  containerEl.delegate(
+    'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup,
+    'click', clickRemoveTokenGroup);
 
   // catch all clicks on the page
   $('html').bind('click touchstart', clickPage);
