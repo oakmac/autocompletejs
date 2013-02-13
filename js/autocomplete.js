@@ -1684,7 +1684,7 @@ var pressEnterOrTab = function() {
 };
 
 var pressRegularKey = function() {
-  // Sometimes it takes this long for a browser reflow to  move the
+  // Sometimes it takes this long for a browser reflow to move the
   // input element to the next line.
   // It's safe for this function to be called at any time.
   // Another option would be to poll for this every 50ms or so
