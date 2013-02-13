@@ -54,6 +54,8 @@ window['AutoComplete'] = window['AutoComplete'] ||
 // Module scope variables
 //------------------------------------------------------------------------------
 
+var MINIMUM_JQUERY_VERSION = '1.4.2';
+
 var KEYS = {
   BACKSPACE: 8,
   TAB: 9,
@@ -422,14 +424,10 @@ var sanityChecks = function() {
     return false;
   }
 
-  // check that jQuery exists
-  // NOTE: what else do I need to check here?
-  //       what if they have put jQuery elsewhere - window.jQuery?
-  //       allow them to pass in their version of jquery into the constructor?
-  // TODO: what version of jQuery should I check against?
-  if (! window.$) {
-    window.alert('AutoComplete Error 1004: jQuery does not exist. ' +
-      'Please include jQuery on the page.\n\nExiting...');
+  // check for the correct version of jquery
+  if (! (typeof window.$ && $.fn && $.fn.jquery >= MINIMUM_JQUERY_VERSION)) {
+    window.alert('AutoComplete Error 1004: Unable to find a valid version of jQuery. ' +
+      'Please include jQuery ' + MINIMUM_JQUERY_VERSION + ' (or greater) on the page.\n\nExiting...');
     return false;
   }
 
@@ -598,7 +596,7 @@ var expandConfig = function() {
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
     cfg.classPrefix = 'autocomplete';
   }
-  
+
   // TODO: need to document this
   if (typeof cfg.ajaxBuffer === 'number' && cfg.ajaxBuffer > 0) {
     AJAX_BUFFER_LENGTH = cfg.ajaxBuffer;
@@ -1322,7 +1320,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
 
 var ajaxError = function(errType, list, inputValue) {
   if (INPUT_HAPPENING !== true) return;
-  
+
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
 
@@ -1418,7 +1416,7 @@ var sendAjaxRequest = function(list, inputValue) {
       return;
     }
   }
-  
+
   // send the request after a short timeout
   AJAX_BUFFER_TIMEOUT = setTimeout(function() {
     AJAX_OBJECT = $.ajax(ajaxOpts);
@@ -1645,7 +1643,7 @@ var findCharsToMatchAgainst = function(str) {
 
 var matchOptions = function(input, list) {
   var options = deepCopy(list.options);
-  
+
   // show all the options if they haven't typed anything
   if (input === '') {
     return options;
@@ -1741,12 +1739,12 @@ var pressEnterOrTab = function() {
 var pressRegularKey = function() {
   // clear the timeout from a previous keystroke
   clearTimeout(AJAX_BUFFER_TIMEOUT);
-  
+
   // cancel any existing AJAX request
   if (typeof AJAX_OBJECT.abort === 'function') {
     AJAX_OBJECT.abort();
   }
-  
+
   // Sometimes it takes this long for a browser reflow to move the
   // input element to the next line.
   // It's safe for this function to be called at any time.
@@ -1757,7 +1755,7 @@ var pressRegularKey = function() {
   setTimeout(positionDropdownEl, 300);
 
   var inputValue = inputEl.val();
-  
+
   if (inputValue !== '') {
     clearTokenGroupHighlight();
     updateInputWidth(inputValue);
@@ -1765,10 +1763,10 @@ var pressRegularKey = function() {
 
   // get the current list
   var list = cfg.lists[CURRENT_LIST_NAME];
-  
+
   // match options with the default algorithm
   var options = matchOptions(inputValue, list);
-  
+
   // modify the options with their custom function
   if (typeof list.matchOptions === 'function') {
     options = list.matchOptions(inputValue, options, deepCopy(list.options),
@@ -1813,11 +1811,11 @@ var pressRegularKey = function() {
   dropdownEl.html(html);
   markFirstLastOptions();
   highlightFirstOption();
-  
+
   // send the AJAX request
   // NOTE: we have to send the AJAX request after we've updated the DOM
   //       because of localStorage caching
-  if (list.ajaxEnabled === true) {    
+  if (list.ajaxEnabled === true) {
     // send the request
     sendAjaxRequest(list, inputValue);
   }
@@ -2202,19 +2200,20 @@ widget.val = function(value) {
 //------------------------------------------------------------------------------
 
 var addEvents = function() {
-  containerEl.on('click', clickContainerElement);
-  containerEl.on('keydown', 'input.autocomplete-input', keydownInputElement);
-  containerEl.on('click', 'li.' + CLASSES.option, clickOption);
-  containerEl.on('mouseover', 'li.' + CLASSES.option, mouseoverOption);
-  containerEl.on('click', 'div.' + CLASSES.tokenGroup, clickTokenGroup);
-  containerEl.on('click', 'div.' + CLASSES.tokenGroup + ' span.' +
-    CLASSES.removeTokenGroup, clickRemoveTokenGroup);
+  // using delegate and bind to maintain compatibility with older jquery versions
+  containerEl.bind('click', clickContainerElement);
+  containerEl.delegate('input.autocomplete-input', 'keydown', keydownInputElement);
+  containerEl.delegate('li.' + CLASSES.option,'click', clickOption);
+  containerEl.delegate('li.' + CLASSES.option, 'mouseover', mouseoverOption);
+  containerEl.delegate('div.' + CLASSES.tokenGroup, 'click', clickTokenGroup);
+  containerEl.delegate('div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup,
+   'click', clickRemoveTokenGroup);
 
   // catch all clicks on the page
-  $('html').on('click touchstart', clickPage);
+  $('html').bind('click touchstart', clickPage);
 
   // catch global keydown
-  $(window).on('keydown', keydownWindow);
+  $(window).bind('keydown', keydownWindow);
 };
 
 var initDom = function() {
