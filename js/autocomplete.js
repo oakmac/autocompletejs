@@ -70,7 +70,8 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl, inputWidthProxyEl;
+var containerEl, dropdownEl, inputEl,
+    placeholderEl, tokensEl, inputWidthProxyEl;
 
 // CSS class names
 var CLASSES = {
@@ -210,41 +211,59 @@ var now = function() {
 var storeInCache = function(key, data, duration) {
   data = JSON.stringify(data);
   if (LOCAL_STORAGE_AVAILABLE === true) {
-    localStorage.setItem(key, data);
+    try {
+      localStorage.setItem(key, data);
+    } catch (e) {
+      return false;
+    }
 
     var expires = 'never';
     if (typeof duration === 'number') {
       expires = now() + duration;
     }
-    localStorage.setItem(key + ' expires', expires);
+    
+    try {
+      localStorage.setItem(key + ' expires', expires);
+    } catch (e) {
+      return false;
+    }
   }
   else {
     SESSION_CACHE[key] = data;
   }
+  return true;
 };
 
-// TODO: need to wrap a try/catch around every call to localStorage
-//       in the case that it's full and the operation fails
-
 // returns the data or false if it does not exist
-// TODO: refactor this...
 var getFromCache = function(key) {
+  // localStorage exists
   if (LOCAL_STORAGE_AVAILABLE === true) {
-    var data = localStorage.getItem(key);
-
+    try {
+      var data = localStorage.getItem(key);  
+    } catch (e) {
+      return false;
+    }
+    
     // check the expiration date
-    var expires = localStorage.getItem(key + ' expires');
-    if (expires === 'never' ||
-        parseInt(expires, 10) > now()) {
-      if (typeof data === 'string') {
-        return JSON.parse(data);
-      }
+    try {
+      var expires = localStorage.getItem(key + ' expires');
+    } catch (e) {
+      return false;
+    }
+    
+    if ((expires === 'never' || parseInt(expires, 10) > now()) &&
+        typeof data === 'string') {
+      return JSON.parse(data);
     }
   }
-  else if (SESSION_CACHE.hasOwnProperty(key) === true &&
-           typeof SESSION_CACHE[key] === 'string') {
-    return JSON.parse(SESSION_CACHE[key]);
+  // check the session cache object
+  else {
+    if (SESSION_CACHE.hasOwnProperty(key) === true &&
+        typeof SESSION_CACHE[key] === 'string') {
+      return JSON.parse(SESSION_CACHE[key]);  
+    }
   }
+  
   return false;
 };
 
@@ -342,7 +361,7 @@ var validValue = function(value) {
   return true;
 };
 
-var validOption = function(option) {
+var validOptionObject = function(option) {
   // option can be just a string
   if (typeof option === 'string') {
     return true;
@@ -358,8 +377,28 @@ var validOption = function(option) {
 };
 
 var validListObject = function(obj) {
+  // string is ok; should be an AJAX url
+  if (typeof obj === 'string') {
+    return true;
+  }
 
-  // TODO: write me
+  // if it's an array, should be an array of Option Objects
+  // TODO: should I return false here if the Option Objects are invalid
+  //       or just skip them and move on?
+  if (isArray(obj) === true) {
+    for (var i = 0; i < obj.length; i++) {
+      if (validOptionObject(obj[i]) !== true) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  if (isObject(obj) !== true) {
+    return false;
+  }
+
+  // TODO: finish me
   // TODO: show an error when a value.children is not a valid list option
 
   return true;
@@ -707,7 +746,8 @@ var buildWidget = function() {
     '<div style="clear:both"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
   '</div>' +
-  '<span class="input-width-proxy" style="position: absolute; top: -9999px;"></span>';
+  '<span class="input-width-proxy" style="position:absolute; top:-9999px;">' +
+  '</span>';
 
   return html;
 };
@@ -841,12 +881,20 @@ var buildTokens = function(tokens) {
           html += cfg.tokenSeparatorHTML;
         }
         if (typeof cfg.tokenSeparatorHTML === 'function') {
-          html += cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
+          var customTokenSeparator =
+            cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
 
-          // TODO: throw error if their tokenSeparator function
-          //       didn't return a string
+          if (typeof customTokenSeparator === 'string') {
+            html += customTokenSeparator;
+          }
+          // throw an error if their tokenSeparator function did not
+          // return a string
+          else {
+            error(7998,
+              'Your tokenSeparatorHTML function did not return a string.');
+          }
         }
-        html += '</span>';
+        html += '</span>'; // end span.token-separator
       }
     }
     html += '</div>'; // end div.token-group
@@ -995,7 +1043,7 @@ var calcTextWidth = function(text) {
 
   // copy text-related css properties from the input element to the proxy
   var cssProps = {};
-  for(var i = 0, len = CSS_TEXT_PROPS.length; i < len; i++) {
+  for (var i = 0, len = CSS_TEXT_PROPS.length; i < len; i++) {
     var cssProp = CSS_TEXT_PROPS[i];
     cssProps[cssProp] = inputEl.css(cssProp);
   }
@@ -1284,7 +1332,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
   if (isArray(data) === true) {
     for (var i = 0; i < data.length; i++) {
       // skip any objects that are not valid Options
-      if (validOption(data[i]) !== true) continue;
+      if (validOptionObject(data[i]) !== true) continue;
 
       // expand option
       data[i] = expandOptionObject(data[i], list);
@@ -2005,7 +2053,7 @@ widget.addOption = function(listName, option) {
   }
 
   // option must be valid
-  if (validOption(option) !== true) {
+  if (validOptionObject(option) !== true) {
     error(7887, 'Invalid option passed to addOption method.', option);
     return false;
   }
