@@ -210,57 +210,71 @@ var now = function() {
 
 var storeInCache = function(key, data, duration) {
   data = JSON.stringify(data);
+  var expires = 'never';
+  if (typeof duration === 'number') {
+    expires = now() + duration;
+  }
+  
+  var localStorageSucceeded = false;
   if (LOCAL_STORAGE_AVAILABLE === true) {
     try {
       localStorage.setItem(key, data);
-    } catch (e) {
-      return false;
-    }
-
-    var expires = 'never';
-    if (typeof duration === 'number') {
-      expires = now() + duration;
-    }
-    
-    try {
       localStorage.setItem(key + ' expires', expires);
+      localStorageSucceeded = true;
     } catch (e) {
-      return false;
+      // do nothing
     }
   }
-  else {
+  
+  if (localStorageSucceeded === false) {
     SESSION_CACHE[key] = data;
+    SESSION_CACHE[key + ' expires'] = expires;
   }
-  return true;
+};
+
+var isExpired = function(time) {
+  if (time === 'never') {
+    return false;
+  }
+  return parseInt(time, 10) <= now();
 };
 
 // returns the data or false if it does not exist
 var getFromCache = function(key) {
-  // localStorage exists
+  var expiresKey = key + ' expires';
+  
+  // try localStorage first
+  var localStorageSucceeded = false;
   if (LOCAL_STORAGE_AVAILABLE === true) {
     try {
-      var data = localStorage.getItem(key);  
+      var data = localStorage.getItem(key);
+      var expireTime = localStorage.getItem(expiresKey);
+      localStorageSucceeded = true;
     } catch (e) {
-      return false;
+      // do nothing
     }
     
     // check the expiration date
-    try {
-      var expires = localStorage.getItem(key + ' expires');
-    } catch (e) {
-      return false;
-    }
-    
-    if ((expires === 'never' || parseInt(expires, 10) > now()) &&
+    if (localStorageSucceeded === true &&
+        isExpired(expireTime) === false &&
         typeof data === 'string') {
       return JSON.parse(data);
     }
+    else {
+      localStorageSucceeded = false;
+    }
   }
-  // check the session cache object
-  else {
-    if (SESSION_CACHE.hasOwnProperty(key) === true &&
-        typeof SESSION_CACHE[key] === 'string') {
-      return JSON.parse(SESSION_CACHE[key]);  
+  
+  // check the session cache
+  if (localStorageSucceeded === false) {
+    if (SESSION_CACHE.hasOwnProperty(expiresKey) === true) {
+      var expireTime = SESSION_CACHE[expiresKey];
+      
+      if (SESSION_CACHE.hasOwnProperty(key) === true &&
+          isExpired(expireTime) === false &&
+          typeof SESSION_CACHE[key] === 'string') {
+        return JSON.parse(SESSION_CACHE[key]);
+      }
     }
   }
   
