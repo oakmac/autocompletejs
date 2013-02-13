@@ -265,11 +265,12 @@
   "default":false,
   "desc":[
     "<code class='js plain'>matchOptions</code> is an optional function you can include to determine which options get shown in the dropdown when the user is typing.",
-    "The first argument to the function is the text that the user has entered, the second argument is an array of Option Objects for the current list, and the third argument is the current value of the AutoComplete widget.",
+    "The first argument to the function is the text that the user has entered, the second argument are the Option Objects matched by the default algorithm, the third argument is an array of all Option Objects for the current list, and the fourth argument is the current value of the AutoComplete widget.",
     "The function should return an array of Option Objects.",
     "You can return an array of <em>any</em> Option Objects from this function.  They do not have to come from the existing Option Objects in the list.",
     "This function gets executed with every 'keydown' event on the input element so it's in your best interest to make this function as fast as possible."
-  ]
+  ],
+  "examples":[4041]
 },
 "------------------------------------------------------------------------------",
 {

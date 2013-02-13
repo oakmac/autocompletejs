@@ -1551,8 +1551,6 @@ var matchOptionsSpecial = function(options, input, list) {
       len = options.length,
       options2 = [];
 
-  options = deepCopy(options); // necessary?
-
   // do a front match first
   for (i = 0; i < len; i++) {
     if (isFrontMatch(input, options[i]._matchValue) === true) {
@@ -1634,12 +1632,13 @@ var findCharsToMatchAgainst = function(str) {
 // investigate:
 // http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
+  var options = deepCopy(list.options);
+  
   // show all the options if they haven't typed anything
   if (input === '') {
-    return list.options;
+    return options;
   }
 
-  var options = deepCopy(list.options);
   var options2 = [];
 
   // create ._matchValue
@@ -1735,6 +1734,7 @@ var pressRegularKey = function() {
   // while input is happening. Investigate this in the future.
   setTimeout(positionDropdownEl, 100);
   setTimeout(positionDropdownEl, 200);
+  setTimeout(positionDropdownEl, 300);
 
   var inputValue = inputEl.val();
 
@@ -1743,16 +1743,15 @@ var pressRegularKey = function() {
     updateInputWidth(inputValue);
   }
 
+  // get the current list
   var list = cfg.lists[CURRENT_LIST_NAME];
-  var options = [];
-
-  // match options with their custom function
+  
+  // match options with the default algorithm
+  var options = matchOptions(inputValue, list);
+  
+  // modify the options with their custom function
   if (typeof list.matchOptions === 'function') {
-    options = list.matchOptions(inputValue, list.options, getValue());
-  }
-  // else default to mine
-  else {
-    options = matchOptions(inputValue, list);
+    options = list.matchOptions(inputValue, options, deepCopy(list.options), getValue());
   }
 
   // no input, no options, no freeform, and no ajax

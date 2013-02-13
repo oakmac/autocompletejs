@@ -150,13 +150,8 @@
 },
 {
   "group": "List Config",
-  "number": 4005,
+  "number": 4041,
   "name": "matchOptions"
-},
-{
-  "group": "List Config",
-  "number": 4006,
-  "name": "matchProperties"
 },
 {
   "group": "List Config",
