@@ -340,7 +340,7 @@ var validValue = function(value) {
   return true;
 };
 
-var validOption = function(option) {
+var validOptionObject = function(option) {
   // option can be just a string
   if (typeof option === 'string') {
     return true;
@@ -356,10 +356,30 @@ var validOption = function(option) {
 };
 
 var validListObject = function(obj) {
+  // string is ok; should be an AJAX url
+  if (typeof obj === 'string') {
+    return true;
+  }
+  
+  // if it's an array, should be an array of Option Objects
+  // TODO: should I return false here if the Option Objects are invalid
+  //       or just skip them and move on?
+  if (isArray(obj) === true) {
+    for (var i = 0; i < obj.length; i++) {
+      if (validOptionObject(obj[i]) !== true) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-  // TODO: write me
+  if (isObject(obj) !== true) {
+    return false;
+  }
+  
+  // TODO: finish me
   // TODO: show an error when a value.children is not a valid list option
-
+  
   return true;
 };
 
@@ -843,12 +863,20 @@ var buildTokens = function(tokens) {
           html += cfg.tokenSeparatorHTML;
         }
         if (typeof cfg.tokenSeparatorHTML === 'function') {
-          html += cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
-
-          // TODO: throw error if their tokenSeparator function
-          //       didn't return a string
+          var customTokenSeparator =
+            cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
+            
+          if (typeof customTokenSeparator === 'string') {
+            html += customTokenSeparator;
+          }
+          // throw an error if their tokenSeparator function did not
+          // return a string
+          else {
+            error(7998,
+              'Your tokenSeparatorHTML function did not return a string.');
+          }
         }
-        html += '</span>';
+        html += '</span>'; // end span.token-separator
       }
     }
     html += '</div>'; // end div.token-group
@@ -1286,7 +1314,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
   if (isArray(data) === true) {
     for (var i = 0; i < data.length; i++) {
       // skip any objects that are not valid Options
-      if (validOption(data[i]) !== true) continue;
+      if (validOptionObject(data[i]) !== true) continue;
 
       // expand option
       data[i] = expandOptionObject(data[i], list);
@@ -2007,7 +2035,7 @@ widget.addOption = function(listName, option) {
   }
 
   // option must be valid
-  if (validOption(option) !== true) {
+  if (validOptionObject(option) !== true) {
     error(7887, 'Invalid option passed to addOption method.', option);
     return false;
   }
