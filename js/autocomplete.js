@@ -68,7 +68,7 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl, textWidthEl;
+var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl, inputWidthProxyEl;
 
 // CSS class names
 var CLASSES = {
@@ -94,38 +94,40 @@ var SESSION_CACHE = {};
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
 
-// text-related CSS properties
+// I believe these are all the CSS properties that could effect text width
+// in an <input> element
+// https://developer.mozilla.org/en-US/docs/CSS/CSS_Reference
 var CSS_TEXT_PROPS = [
-    'font-family',
-    'font-feature-settings',
-    'font-kerning',
-    'font-language-override',
-    'font-size',
-    'font-size-adjust',
-    'font-stretch',
-    'font-style',
-    'font-variant',
-    'font-variant-ligatures',
-    'font-weight',
-    'word-spacing',
-    'letter-spacing',
-    'white-space',
-    'word-wrap',
-    'word-break',
-    'text-align',
-    'text-align-last',
-    'text-combine-horizontal',
-    'text-decoration',
-    'text-decoration-color',
-    'text-decoration-line',
-    'text-decoration-style',
-    'text-indent',
-    'text-orientation',
-    'text-overflow',
-    'text-rendering',
-    'text-shadow',
-    'text-transform',
-    'text-underline-position'
+  'font-family',
+  'font-feature-settings',
+  'font-kerning',
+  'font-language-override',
+  'font-size',
+  'font-size-adjust',
+  'font-stretch',
+  'font-style',
+  'font-variant',
+  'font-variant-ligatures',
+  'font-weight',
+  'word-spacing',
+  'letter-spacing',
+  'white-space',
+  'word-wrap',
+  'word-break',
+  'text-align',
+  'text-align-last',
+  'text-combine-horizontal',
+  'text-decoration',
+  'text-decoration-color',
+  'text-decoration-line',
+  'text-decoration-style',
+  'text-indent',
+  'text-orientation',
+  'text-overflow',
+  'text-rendering',
+  'text-shadow',
+  'text-transform',
+  'text-underline-position'
 ];
 
 // constructor return object
@@ -698,7 +700,8 @@ var buildWidget = function() {
     '<input type="text" class="autocomplete-input" />' +
     '<div style="clear:both"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
-  '</div>';
+  '</div>' +
+  '<span class="input-width-proxy" style="position: absolute; top: -9999px;"></span>';
 
   return html;
 };
@@ -976,24 +979,27 @@ var markFirstLastOptions = function() {
   listEls.filter(':last').addClass('last');
 };
 
+// given some text that is in the input element, determine
+// it's width in pixels by using a proxy <span> element with all the same
+// CSS font and text properties
 var calcTextWidth = function(text) {
-  // add the text to the dummy span with
-  textWidthEl.html(text + 'WW'); // add a couple extra characters to buffer the width
+  // add the text to the dummy span with some extra characters as a buffer
+  // NOTE: "W" seems to be the widest character in most fonts
+  inputWidthProxyEl.html(text + 'WW');
 
-  // copy calculated css styles related to text from the inputEl to the dummy span El
+  // copy text-related css properties from the input element to the proxy
   var cssProps = {};
-  for(var i=0, len=CSS_TEXT_PROPS.length; i<len; i++) {
+  for(var i = 0, len = CSS_TEXT_PROPS.length; i < len; i++) {
     var cssProp = CSS_TEXT_PROPS[i];
     cssProps[cssProp] = inputEl.css(cssProp);
   }
-  textWidthEl.css(cssProps);
+  inputWidthProxyEl.css(cssProps);
 
-  return textWidthEl.width();
+  return inputWidthProxyEl.width();
 };
 
 var updateInputWidth = function(text) {
-  var width = calcTextWidth(text);
-  inputEl.css('width', width + 'px');
+  inputEl.css('width', calcTextWidth(text) + 'px');
 };
 
 var highlightOption = function(optionEl) {
@@ -2211,13 +2217,10 @@ var initDom = function() {
   dropdownEl = containerEl.find('ul.dropdown');
   placeholderEl = containerEl.find('div.placeholder');
   tokensEl = containerEl.find('div.tokens');
+  inputWidthProxyEl = containerEl.find('span.input-width-proxy');
 
   // set the placeholder
   placeholderEl.html(cfg.placeholderHTML);
-
-  // add a dummy span element to the container for text width calculation
-  var textWidthHtml = '<span class="autocomplete-text-width-calc" style="position: absolute; top: -9999px;"></span>';
-  textWidthEl = $(textWidthHtml).appendTo(containerEl);
 };
 
 var init = function() {
