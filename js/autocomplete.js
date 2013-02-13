@@ -209,41 +209,59 @@ var now = function() {
 var storeInCache = function(key, data, duration) {
   data = JSON.stringify(data);
   if (LOCAL_STORAGE_AVAILABLE === true) {
-    localStorage.setItem(key, data);
+    try {
+      localStorage.setItem(key, data);
+    } catch (e) {
+      return false;
+    }
 
     var expires = 'never';
     if (typeof duration === 'number') {
       expires = now() + duration;
     }
-    localStorage.setItem(key + ' expires', expires);
+    
+    try {
+      localStorage.setItem(key + ' expires', expires);
+    } catch (e) {
+      return false;
+    }
   }
   else {
     SESSION_CACHE[key] = data;
   }
+  return true;
 };
 
-// TODO: need to wrap a try/catch around every call to localStorage
-//       in the case that it's full and the operation fails
-
 // returns the data or false if it does not exist
-// TODO: refactor this...
 var getFromCache = function(key) {
+  // localStorage exists
   if (LOCAL_STORAGE_AVAILABLE === true) {
-    var data = localStorage.getItem(key);
-
+    try {
+      var data = localStorage.getItem(key);  
+    } catch (e) {
+      return false;
+    }
+    
     // check the expiration date
-    var expires = localStorage.getItem(key + ' expires');
-    if (expires === 'never' ||
-        parseInt(expires, 10) > now()) {
-      if (typeof data === 'string') {
-        return JSON.parse(data);
-      }
+    try {
+      var expires = localStorage.getItem(key + ' expires');
+    } catch (e) {
+      return false;
+    }
+    
+    if ((expires === 'never' || parseInt(expires, 10) > now()) &&
+        typeof data === 'string') {
+      return JSON.parse(data);
     }
   }
-  else if (SESSION_CACHE.hasOwnProperty(key) === true &&
-           typeof SESSION_CACHE[key] === 'string') {
-    return JSON.parse(SESSION_CACHE[key]);
+  // check the session cache object
+  else {
+    if (SESSION_CACHE.hasOwnProperty(key) === true &&
+        typeof SESSION_CACHE[key] === 'string') {
+      return JSON.parse(SESSION_CACHE[key]);  
+    }
   }
+  
   return false;
 };
 
