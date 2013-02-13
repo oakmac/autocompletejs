@@ -694,7 +694,7 @@ var buildOptionHTML = function(option, parentList) {
   //       return the first thing that is a String
   //       but also throw an error
   // TODO: list validation should ensure that this never
-  //       happens though
+  //       happens
 
   // NOTE: this should never happen
   error(5783, 'Unable to create HTML string for optionHTML.', option);
@@ -726,9 +726,9 @@ var buildOptions = function(options, parentList, appendVisibleOptions) {
     VISIBLE_OPTIONS = {};
   }
 
-  var html = '';
-  var groups = getGroups(options);
-  var i;
+  var html = '',
+      groups = getGroups(options),
+      i;
 
   // sort the groups
   // TODO: need to document this
@@ -834,8 +834,8 @@ var buildNoResults = function(noResultsHTML, inputValue) {
 };
 
 var buildLoading = function(ajaxLoadingHTML, inputValue) {
-  return buildStringOrFunction(CLASSES.ajaxLoading, ajaxLoadingHTML,
-                               inputValue);
+  return buildStringOrFunction(CLASSES.ajaxLoading,
+    ajaxLoadingHTML, inputValue);
 };
 
 //------------------------------------------------------------------------------
@@ -936,10 +936,10 @@ var updateTokens = function() {
 
 // add a class to the first and last option
 var markFirstLastOptions = function() {
-  var optionEls = dropdownEl.find('li.' + CLASSES.option);
-  optionEls.removeClass('first last');
-  optionEls.filter(':first').addClass('first');
-  optionEls.filter(':last').addClass('last');
+  var listEls = dropdownEl.find('li');
+  listEls.removeClass('first last');
+  listEls.filter(':first').addClass('first');
+  listEls.filter(':last').addClass('last');
 };
 
 // TODO: revisit this and make it better for different font sizes, etc
@@ -1029,9 +1029,12 @@ var setValue = function(newValue) {
     var possibleNewValue = cfg.onChange(newValue, oldValue);
 
     // only change the value if their onChange function returned a valid value
-    // TODO: should throw an error if they return an array and it's invalid
     if (validValue(possibleNewValue) === true) {
       newValue = possibleNewValue;
+    }
+    else {
+      error(3776, 'Invalid Value returned from your custom onChange function.',
+        possibleNewValue);
     }
   }
 
@@ -1445,12 +1448,12 @@ var highlightMatchChars = function(optionHTML, input) {
     // else just add it to the string
     optionHTML2 += c;
   }
-  
+
   // do a simple string replace for special HTML characters
   // that need to be highlighted
   for (var i = 0; i < HTML.length; i++) {
     if (charsToHighlight.hasOwnProperty(HTML[i]['char']) !== true) continue;
-    
+
     optionHTML2 = optionHTML2.replace(HTML[i].htmlRegex,
       '<strong>' + HTML[i].html + '</strong>');
   }
@@ -1562,7 +1565,7 @@ var sentinelToHtmlChar = function(str) {
   for (var i = 0; i < HTML.length; i++) {
     str = str.replace(HTML_SENTINELS[i].sentinelRegex, HTML[i].html);
   }
-  return str;  
+  return str;
 };
 
 // takes an HTML string and returns a string of characters that we want
@@ -1571,16 +1574,16 @@ var sentinelToHtmlChar = function(str) {
 var findCharsToMatchAgainst = function(str) {
   // convert known HTML special characters to sentinel values
   str = htmlCharToSentinel(str);
-  
+
   // remove all HTML characters
   str = removeHTMLChars(str);
-  
+
   // bring back the HTML special characters
   str = sentinelToHtmlChar(str);
-  
+
   // decode the special chars to regular chars for our search
   str = decode(str);
-  
+
   return str;
 };
 
@@ -1686,7 +1689,8 @@ var pressRegularKey = function() {
   // It's safe for this function to be called at any time.
   // Another option would be to poll for this every 50ms or so
   // while input is happening. Investigate this in the future.
-  setTimeout(positionDropdownEl, 150);
+  setTimeout(positionDropdownEl, 100);
+  setTimeout(positionDropdownEl, 200);
 
   var inputValue = inputEl.val();
 
