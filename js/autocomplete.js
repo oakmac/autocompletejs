@@ -68,7 +68,8 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl, inputWidthProxyEl;
+var containerEl, dropdownEl, inputEl,
+    placeholderEl, tokensEl, inputWidthProxyEl;
 
 // CSS class names
 var CLASSES = {
@@ -360,7 +361,7 @@ var validListObject = function(obj) {
   if (typeof obj === 'string') {
     return true;
   }
-  
+
   // if it's an array, should be an array of Option Objects
   // TODO: should I return false here if the Option Objects are invalid
   //       or just skip them and move on?
@@ -376,10 +377,10 @@ var validListObject = function(obj) {
   if (isObject(obj) !== true) {
     return false;
   }
-  
+
   // TODO: finish me
   // TODO: show an error when a value.children is not a valid list option
-  
+
   return true;
 };
 
@@ -618,7 +619,7 @@ var expandConfig = function() {
   if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
     cfg.classPrefix = 'autocomplete';
   }
-  
+
   // TODO: need to document this
   if (typeof cfg.ajaxBuffer === 'number' && cfg.ajaxBuffer > 0) {
     AJAX_BUFFER_LENGTH = cfg.ajaxBuffer;
@@ -729,7 +730,8 @@ var buildWidget = function() {
     '<div style="clear:both"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
   '</div>' +
-  '<span class="input-width-proxy" style="position: absolute; top: -9999px;"></span>';
+  '<span class="input-width-proxy" style="position:absolute; top:-9999px;">' +
+  '</span>';
 
   return html;
 };
@@ -865,7 +867,7 @@ var buildTokens = function(tokens) {
         if (typeof cfg.tokenSeparatorHTML === 'function') {
           var customTokenSeparator =
             cfg.tokenSeparatorHTML(tokenGroup[j], tokenGroup[j + 1]);
-            
+
           if (typeof customTokenSeparator === 'string') {
             html += customTokenSeparator;
           }
@@ -1025,7 +1027,7 @@ var calcTextWidth = function(text) {
 
   // copy text-related css properties from the input element to the proxy
   var cssProps = {};
-  for(var i = 0, len = CSS_TEXT_PROPS.length; i < len; i++) {
+  for (var i = 0, len = CSS_TEXT_PROPS.length; i < len; i++) {
     var cssProp = CSS_TEXT_PROPS[i];
     cssProps[cssProp] = inputEl.css(cssProp);
   }
@@ -1350,7 +1352,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
 
 var ajaxError = function(errType, list, inputValue) {
   if (INPUT_HAPPENING !== true) return;
-  
+
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
 
@@ -1446,7 +1448,7 @@ var sendAjaxRequest = function(list, inputValue) {
       return;
     }
   }
-  
+
   // send the request after a short timeout
   AJAX_BUFFER_TIMEOUT = setTimeout(function() {
     AJAX_OBJECT = $.ajax(ajaxOpts);
@@ -1673,7 +1675,7 @@ var findCharsToMatchAgainst = function(str) {
 
 var matchOptions = function(input, list) {
   var options = deepCopy(list.options);
-  
+
   // show all the options if they haven't typed anything
   if (input === '') {
     return options;
@@ -1769,12 +1771,12 @@ var pressEnterOrTab = function() {
 var pressRegularKey = function() {
   // clear the timeout from a previous keystroke
   clearTimeout(AJAX_BUFFER_TIMEOUT);
-  
+
   // cancel any existing AJAX request
   if (typeof AJAX_OBJECT.abort === 'function') {
     AJAX_OBJECT.abort();
   }
-  
+
   // Sometimes it takes this long for a browser reflow to move the
   // input element to the next line.
   // It's safe for this function to be called at any time.
@@ -1785,7 +1787,7 @@ var pressRegularKey = function() {
   setTimeout(positionDropdownEl, 300);
 
   var inputValue = inputEl.val();
-  
+
   if (inputValue !== '') {
     clearTokenGroupHighlight();
     updateInputWidth(inputValue);
@@ -1793,10 +1795,10 @@ var pressRegularKey = function() {
 
   // get the current list
   var list = cfg.lists[CURRENT_LIST_NAME];
-  
+
   // match options with the default algorithm
   var options = matchOptions(inputValue, list);
-  
+
   // modify the options with their custom function
   if (typeof list.matchOptions === 'function') {
     options = list.matchOptions(inputValue, options, deepCopy(list.options),
@@ -1841,11 +1843,11 @@ var pressRegularKey = function() {
   dropdownEl.html(html);
   markFirstLastOptions();
   highlightFirstOption();
-  
+
   // send the AJAX request
   // NOTE: we have to send the AJAX request after we've updated the DOM
   //       because of localStorage caching
-  if (list.ajaxEnabled === true) {    
+  if (list.ajaxEnabled === true) {
     // send the request
     sendAjaxRequest(list, inputValue);
   }
