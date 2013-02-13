@@ -68,7 +68,7 @@ var KEYS = {
 };
 
 // DOM elements
-var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl;
+var containerEl, dropdownEl, inputEl, placeholderEl, tokensEl, textWidthEl;
 
 // CSS class names
 var CLASSES = {
@@ -977,22 +977,18 @@ var markFirstLastOptions = function() {
 };
 
 var calcTextWidth = function(text) {
-  var dummySpanHTML = '<span style="position: absolute; top: -9999px;">' +
-    text + 'AA</span>'; // add a couple extra characters to buffer the width
+  // add the text to the dummy span with
+  textWidthEl.html(text + 'WW'); // add a couple extra characters to buffer the width
 
-  var dummySpanEl = $(dummySpanHTML).insertAfter(inputEl);
-
-  dummySpanEl.attr('class', inputEl.attr('class'));
-  var textCss = {};
+  // copy calculated css styles related to text from the inputEl to the dummy span El
+  var cssProps = {};
   for(var i=0, len=CSS_TEXT_PROPS.length; i<len; i++) {
     var cssProp = CSS_TEXT_PROPS[i];
-    textCss[cssProp] = inputEl.css(cssProp);
+    cssProps[cssProp] = inputEl.css(cssProp);
   }
-  dummySpanEl.css(textCss);
-  var width = dummySpanEl.width();
-  dummySpanEl.remove();
+  textWidthEl.css(cssProps);
 
-  return width;
+  return textWidthEl.width();
 };
 
 var updateInputWidth = function(text) {
@@ -2219,6 +2215,10 @@ var initDom = function() {
 
   // set the placeholder
   placeholderEl.html(cfg.placeholderHTML);
+
+  // add a dummy span element to the container for text width calculation
+  var textWidthHtml = '<span class="autocomplete-text-width-calc" style="position: absolute; top: -9999px;"></span>';
+  textWidthEl = $(textWidthHtml).appendTo(containerEl);
 };
 
 var init = function() {
