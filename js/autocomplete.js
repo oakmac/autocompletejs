@@ -13,22 +13,35 @@
 ;(function() {
 
 // http://yuiblog.com/sandbox/yui/3.3.0pr3/api/escape.js.html
+var regexEscape = function(str) {
+  return (str + '').replace(/[\-#$\^*()+\[\]{}|\\,.?\s]/g, '\\$&');
+};
+
 // https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
-var HTML_CHARS = [
-  [/&/g, '&amp;'],
-  [/</g, '&lt;'],
-  [/>/g, '&gt;'],
-  [/"/g, '&quot;'],
-  [/'/g, '&#x27;'],
-  [/\//g, '&#x2F;'],
-  [/\`/g, '&#x60;']
+var HTML = [
+  { 'char': '&', html: '&amp;', charRegex: /&/g, htmlRegex: /&amp;/g },
+  { 'char': '<', html: '&lt;', charRegex: /</g, htmlRegex: /&lt;/g },
+  { 'char': '>', html: '&gt;', charRegex: />/g, htmlRegex: /&gt;/g },
+  { 'char': '"', html: '&quot;', charRegex: /"/g, htmlRegex: /&quot;/g },
+  { 'char': "'", html: '&#x27;', charRegex: /'/g, htmlRegex: /&\#x27;/g },
+  { 'char': '/', html: '&#x2F;', charRegex: /\//g, htmlRegex: /&\#x2F;/g },
+  { 'char': '`', html: '&#x60;', charRegex: /`/g, htmlRegex: /&\#x60;/g }
 ];
 
-// html escape function
+// html escape
 var encode = function(str) {
   str = str + '';
-  for (var i = 0; i < HTML_CHARS.length; i++) {
-    str = str.replace(HTML_CHARS[i][0], HTML_CHARS[i][1]);
+  for (var i = 0; i < HTML.length; i++) {
+    str = str.replace(HTML[i].charRegex, HTML[i].html);
+  }
+  return str;
+};
+
+// html decode
+var decode = function(str) {
+  str = str + '';
+  for (var i = 0; i < HTML.length; i++) {
+    str = str.replace(HTML[i].htmlRegex, HTML[i]['char']);
   }
   return str;
 };
@@ -68,6 +81,9 @@ var CLASSES = {
   tokenGroup: 'token-group'
 };
 
+// HTML sentinel values
+var HTML_SENTINELS = [];
+
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
 var AJAX_OBJECT = {};
@@ -97,13 +113,8 @@ var deepCopy = function(thing) {
   return JSON.parse(JSON.stringify(thing));
 };
 
-// http://yuiblog.com/sandbox/yui/3.3.0pr3/api/escape.js.html
-var regexEscape = function(str) {
-  return (str + '').replace(/[\-#$\^*()+\[\]{}|\\,.?\s]/g, '\\$&');
-};
-
 // copied from modernizr
-var hasLocalStorage = function() {
+LOCAL_STORAGE_AVAILABLE = (function() {
   var str = createId();
   try {
     localStorage.setItem(str, str);
@@ -112,8 +123,7 @@ var hasLocalStorage = function() {
   } catch (e) {
     return false;
   }
-};
-LOCAL_STORAGE_AVAILABLE = hasLocalStorage();
+})();
 
 var isArray = Array.isArray || function(vArg) {
   return Object.prototype.toString.call(vArg) === '[object Array]';
@@ -197,6 +207,17 @@ var getFromCache = function(key) {
   }
   return false;
 };
+
+// create HTML sentinel values
+(function() {
+  for (var i = 0; i < HTML.length; i++) {
+    var id = createId();
+    HTML_SENTINELS[i] = {
+      sentinel: id,
+      sentinelRegex: new RegExp(regexEscape(id), 'g')
+    };
+  }
+})();
 
 //------------------------------------------------------------------------------
 // Validation
@@ -1386,8 +1407,8 @@ var findHTMLChars = function(str) {
   return result;
 };
 
-// attempts to return all non-HTML characters from a string
-var findNonHTMLChars = function(str) {
+// removes all HTML tags and special characters from a string
+var removeHTMLChars = function(str) {
   var chars = findHTMLChars(str);
   var str2 = '';
   for (var i = 0; i < chars.length; i++) {
@@ -1398,8 +1419,8 @@ var findNonHTMLChars = function(str) {
   return str2;
 };
 
-// add <strong> tags around all non-HTML characters in optionHTML that exist
-// in input
+// add <strong> tags around all characters in optionHTML that exist in input
+// ignores all HTML tags and HTML special characters that we don't recognize
 var highlightMatchChars = function(optionHTML, input) {
   // create an object of all the characters to be highlighted
   var charsToHighlight = {};
@@ -1424,6 +1445,15 @@ var highlightMatchChars = function(optionHTML, input) {
     // else just add it to the string
     optionHTML2 += c;
   }
+  
+  // do a simple string replace for special HTML characters
+  // that need to be highlighted
+  for (var i = 0; i < HTML.length; i++) {
+    if (charsToHighlight.hasOwnProperty(HTML[i]['char']) !== true) continue;
+    
+    optionHTML2 = optionHTML2.replace(HTML[i].htmlRegex,
+      '<strong>' + HTML[i].html + '</strong>');
+  }
 
   return optionHTML2;
 };
@@ -1440,22 +1470,27 @@ var isSubstringMatch = function(input, str) {
 
 // does str contain all of the characters found in input?
 var isCharMatch = function(input, str) {
-  var chars = input.split(''),
-      charsObj = {},
+  input = input + '';
+  str = str + '';
+
+  if (input === '' || str === '') {
+    return false;
+  }
+
+  var inputChars = input.split(''),
+      inputCharsObj = {},
       i;
 
-  for (i = 0; i < chars.length; i++) {
-    // only look at alphanumeric
-    if (chars[i].search(/[^a-zA-Z0-9]/) !== -1) continue;
-
-    charsObj[chars[i].toLowerCase()] = 0;
+  // make a unique array of lower-case input characters
+  for (i = 0; i < inputChars.length; i++) {
+    inputCharsObj[inputChars[i].toLowerCase()] = true;
   }
-  chars = keys(charsObj);
+  inputChars = keys(inputCharsObj);
 
+  // try to find each one in str
   str = str.toLowerCase();
-
-  for (i = 0; i < chars.length; i++) {
-    if (str.indexOf(chars[i]) === -1) {
+  for (i = 0; i < inputChars.length; i++) {
+    if (str.indexOf(inputChars[i]) === -1) {
       return false;
     }
   }
@@ -1512,13 +1547,43 @@ var matchOptionsSpecial = function(options, input, list) {
   return options2;
 };
 
+// replace HTML special characters with sentinel values
+var htmlCharToSentinel = function(str) {
+  str = str + '';
+  for (var i = 0; i < HTML.length; i++) {
+    str = str.replace(HTML[i].htmlRegex, HTML_SENTINELS[i].sentinel);
+  }
+  return str;
+};
 
-// TODO: need to give them the ability to specify which matching they want
-//       ie: default is array of ['front','substring','any-char']
-//       but they should be able to change it
+// replace sentinel values with HTML special characters
+var sentinelToHtmlChar = function(str) {
+  str = str + '';
+  for (var i = 0; i < HTML.length; i++) {
+    str = str.replace(HTML_SENTINELS[i].sentinelRegex, HTML[i].html);
+  }
+  return str;  
+};
 
+// takes an HTML string and returns a string of characters that we want
+// to match against
+// removes HTML tags and HTML special characters that we don't recognize
+var findCharsToMatchAgainst = function(str) {
+  // convert known HTML special characters to sentinel values
+  str = htmlCharToSentinel(str);
+  
+  // remove all HTML characters
+  str = removeHTMLChars(str);
+  
+  // bring back the HTML special characters
+  str = sentinelToHtmlChar(str);
+  
+  // decode the special chars to regular chars for our search
+  str = decode(str);
+  
+  return str;
+};
 
-// TODO: this needs to be refactored
 // investigate:
 // http://jalada.co.uk/2009/07/31/javascript-aho-corasick-string-search-algorithm.html
 var matchOptions = function(input, list) {
@@ -1530,23 +1595,11 @@ var matchOptions = function(input, list) {
   var options = deepCopy(list.options);
   var options2 = [];
 
-  /*
-  // do they have a list of properties to match against?
-  //if (isArray(list.matchProperties) === true) {
-  if (false) {
-    // TODO: write me
-  }
-  // else try to match against the value or optionHTML
-  else {
-  */
-
-  // set ._matchValue
+  // create ._matchValue
   for (var i = 0; i < options.length; i++) {
-    options[i]._matchValue = findNonHTMLChars(options[i].optionHTML);
+    options[i]._matchValue = findCharsToMatchAgainst(options[i].optionHTML);
   }
   options2 = matchOptionsSpecial(options, input, list);
-
-  //}
 
   return options2;
 };
@@ -1631,6 +1684,8 @@ var pressRegularKey = function() {
   // Sometimes it takes this long for a browser reflow to  move the
   // input element to the next line.
   // It's safe for this function to be called at any time.
+  // Another option would be to poll for this every 50ms or so
+  // while input is happening. Investigate this in the future.
   setTimeout(positionDropdownEl, 150);
 
   var inputValue = inputEl.val();

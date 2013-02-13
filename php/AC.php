@@ -7,7 +7,7 @@ public static function buildTopBar($active_tab) {
     '' => 'Home',
     'examples' => 'Examples',
     'docs' => 'Docs',
-    'themes' => 'Themes',
+    //'themes' => 'Themes',
     'download' => 'Download',
     //'https://github.com/oakmac/autocompletejs' => 'GitHub',
   );
