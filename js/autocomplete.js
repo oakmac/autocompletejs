@@ -241,14 +241,16 @@ var isExpired = function(time) {
 
 // returns the data or false if it does not exist
 var getFromCache = function(key) {
-  var expiresKey = key + ' expires';
+  var data,
+      expireTime,
+      expiresKey = key + ' expires',
+      localStorageSucceeded = false;
 
   // try localStorage first
-  var localStorageSucceeded = false;
   if (LOCAL_STORAGE_AVAILABLE === true) {
     try {
-      var data = localStorage.getItem(key);
-      var expireTime = localStorage.getItem(expiresKey);
+      data = localStorage.getItem(key);
+      expireTime = localStorage.getItem(expiresKey);
       localStorageSucceeded = true;
     } catch (e) {
       // do nothing
@@ -268,7 +270,7 @@ var getFromCache = function(key) {
   // check the session cache
   if (localStorageSucceeded === false) {
     if (SESSION_CACHE.hasOwnProperty(expiresKey) === true) {
-      var expireTime = SESSION_CACHE[expiresKey];
+      expireTime = SESSION_CACHE[expiresKey];
 
       if (SESSION_CACHE.hasOwnProperty(key) === true &&
           isExpired(expireTime) === false &&
