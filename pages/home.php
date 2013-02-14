@@ -4,7 +4,7 @@ $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
 ?>
 
-<div class="row homepage_section">
+<div class="row section">
   <div class="ten columns">
     <div id="awesome"></div>
   </div>
@@ -13,7 +13,7 @@ include(APP_PATH . 'pages/header.php');
   </div>
 </div>
 
-<div class="homepage_section">
+<div class="section">
 <h2>Usage</h2>
 <h4>Code:</h4>
 <pre class="prettyprint">
@@ -28,11 +28,9 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 <div id="search_bar"></div>
 </div>
 
-<div class="homepage_section">
-<h2>Explore</h2>
-<a class="large button radius" href="examples">Examples</a>
-<a class="large button radius" href="docs">Documentation</a>
-<a class="large button radius" href="download">Download</a>
+<div class="section">
+<h2>Get It</h2>
+<a class="button large radius" href="releases/0.1.0/autocomplete-0.1.0.zip">Download Most Recent Version</a>
 </div>
 
 <script src="js/json3.min.js"></script>
