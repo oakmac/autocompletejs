@@ -63,11 +63,11 @@ var highlightExample = function(id) {
 var showExample = function(number) {
   var groupIndex = parseInt($('li#example_' + number)
 	  .parent('ul').attr('id').replace('group_container_', ''), 10);
-	
+
 	$('ul#group_container_' + groupIndex).css('display', '');
   highlightGroupHeader(groupIndex);
   highlightExample(number);
-	
+
   $('#example_name').html(examples[number].name);
   $('#example_single_page_link').attr('href', 'examples/' + number);
   $('#example_html_container').html(examples[number].html);
@@ -79,8 +79,8 @@ var showExample = function(number) {
 var clickExample = function() {
   var number = parseInt($(this).attr('id').replace('example_', ''), 10);
   if (examples.hasOwnProperty(number) !== true)	return;
-  
-	window.location.hash = number;
+
+  window.location.hash = number;
   loadExampleFromHash();
 };
 
@@ -139,7 +139,7 @@ function buildExampleList($examples) {
 
     $html .= '  <li id="example_'.$ex['number'].'">'.$ex['name'].'</li>'."\n";
   }
-	
+
   $html .= '</ul>'."\n";
 
   return $html;

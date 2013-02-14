@@ -4,7 +4,7 @@ $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
 ?>
 
-<div class="row">
+<div class="row homepage_section">
   <div class="ten columns">
     <div id="awesome"></div>
   </div>
@@ -13,7 +13,27 @@ include(APP_PATH . 'pages/header.php');
   </div>
 </div>
 
+<div class="homepage_section">
+<h2>Usage</h2>
+<h4>Code:</h4>
+<pre class="prettyprint">
+&lt;div id="search_bar"&gt;&lt;/div&gt;
+&lt;script src="jquery.js"&gt;&lt;/script&gt;
+&lt;script src="autocomplete.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
+&lt;/script&gt;
+</pre>
+<h4>Result:</h4>
+<div id="search_bar"></div>
+</div>
 
+<div class="homepage_section">
+<h2>Explore</h2>
+<a class="large button radius" href="examples">Examples</a>
+<a class="large button radius" href="docs">Documentation</a>
+<a class="large button radius" href="download">Download</a>
+</div>
 
 <script src="js/json3.min.js"></script>
 <script src="js/jquery-1.8.2.min.js"></script>
@@ -108,9 +128,10 @@ var go = function() {
   }
 };
 
-setTimeout(go, 500);
-
 $('#runAgainBtn').on('click', go);
+setTimeout(go, 500);
+prettyPrint();
+var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 
 }; // end init()
 $(document).ready(init);
