@@ -174,7 +174,7 @@ small {
 input.demo-btn {
   margin-top: 15px;
 }
-div.homepage_section {
+div.section {
   margin-bottom: 60px !important;
 }
 input#runAgainBtn {
@@ -278,6 +278,9 @@ td.center {
 }
 hr.divider {
   margin: 80px 0px;
+}
+div.release li {
+  list-style: none;
 }
 table#markup_example_tbl {
   width: 100%;
