@@ -208,6 +208,9 @@ var now = function() {
   return parseInt(Date.now() / 1000, 10);
 };
 
+// TODO: need to break this up into two functions
+//       one for storing in localStorage, one for
+//       storing in SESSION_CACHE
 var storeInCache = function(key, data, duration) {
   data = JSON.stringify(data);
   var expires = 'never';
@@ -240,6 +243,9 @@ var isExpired = function(time) {
 };
 
 // returns the data or false if it does not exist
+// TODO: need to break this up into two functions
+//       one for checking localStorage, one for
+//       checking SESSION_CACHE
 var getFromCache = function(key) {
   var data,
       expireTime,
@@ -760,7 +766,7 @@ var buildWidget = function() {
     '<div class="placeholder"></div>' +
     '<div class="tokens"></div>' +
     '<input type="text" class="autocomplete-input" />' +
-    '<div style="clear:both"></div>' +
+    '<div class="clear7282"></div>' +
     '<ul class="dropdown" style="display:none"></ul>' +
   '</div>' +
   '<span class="input-width-proxy" style="position:absolute; top:-9999px;">' +
@@ -828,7 +834,8 @@ var buildOptions = function(options, parentList, appendVisibleOptions) {
 
   var html = '',
       groups = getGroups(options),
-      i;
+      i,
+      j;
 
   // sort the groups
   // TODO: need to document this
@@ -850,7 +857,7 @@ var buildOptions = function(options, parentList, appendVisibleOptions) {
   for (i = 0; i < groups.length; i++) {
     html += '<li class="group">' + encode(groups[i]) + '</li>';
 
-    for (var j = 0; j < options.length; j++) {
+    for (j = 0; j < options.length; j++) {
       if (groups[i] === options[j].group) {
         html += buildOption(options[j], parentList);
       }
@@ -992,8 +999,9 @@ var moveTokenHighlightRight = function() {
   }
 };
 
+// TODO: this needs to be combined with calcTextWidth somehow
 var showInputEl = function() {
-  inputEl.val('').css('width', '20px').focus();
+  inputEl.val('').css('width', '12px').focus();
 };
 
 var hideInputEl = function() {
@@ -1066,7 +1074,14 @@ var calcTextWidth = function(text) {
   }
   inputWidthProxyEl.css(cssProps);
 
-  return inputWidthProxyEl.width();
+  var width = parseInt(inputWidthProxyEl.width(), 10);
+
+  // I don't really want the width to ever be less than 12px
+  if (width < 12) {
+    width = 12;
+  }
+
+  return width;
 };
 
 var updateInputWidth = function(text) {
@@ -1114,6 +1129,7 @@ var adjustDropdownScroll = function() {
   if ((liTop + liHeight) > ddHeight) {
     // not sure why this doesn't work exactly, but seems
     // to work better with the 6px fudge factor
+    // TODO: look into this
     dropdownEl.scrollTop(scrollTop + liTop + liHeight - ddHeight + 6);
   }
 };
@@ -1362,7 +1378,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
     }
   }
 
-  // no results :(
+  // no results
   var html = '';
   if (options.length === 0 && isOptionShowing() === false) {
     html = buildNoResults(list.noResultsHTML, inputValue);
@@ -1492,6 +1508,9 @@ var sendAjaxRequest = function(list, inputValue) {
 // with a flag indicating if the character is an HTML character
 // NOTE: this is naive; I'm sure there are bugs here
 //       also it assumes valid HTML
+// TODO: this should handle better when the user has a stray '&'
+//       in their HTML that is not escaped
+//       that's going to happen often
 var findHTMLChars = function(str) {
   var chars = (str + '').split('');
   var result = [];
@@ -1702,6 +1721,10 @@ var findCharsToMatchAgainst = function(str) {
 
   // decode the special chars to regular chars for our search
   str = decode(str);
+
+  // TODO: the above two steps could be combined to reduce
+  //       one less regex loop, but code would be harder to
+  //       understand
 
   return str;
 };

@@ -101,3 +101,6 @@ div.autocomplete_internal_container ul.dropdown li.highlighted {
 div.autocomplete_internal_container ul.dropdown li.last {
   border-bottom: 0px;
 }
+div.autocomplete_internal_container div.clear7282 {
+  clear: both;
+}
