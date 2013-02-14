@@ -4,8 +4,16 @@ $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
 ?>
 
-<div id="awesome"></div>
-<input type="button" class="button rounded demo-btn" id="runAgainBtn" value="Run Again" style="display:none" />
+<div class="row">
+  <div class="ten columns">
+    <div id="awesome"></div>
+  </div>
+  <div class="two columns">
+    <input type="button" class="button radius demo-btn" id="runAgainBtn" value="Run Again" style="display:none" />
+  </div>
+</div>
+
+
 
 <script src="js/json3.min.js"></script>
 <script src="js/jquery-1.8.2.min.js"></script>
@@ -71,20 +79,22 @@ var createRandomPath = function() {
   for (var i = 0; i < opt1Index; i++) {
     actions.push(function() { awesome.pressDown(); });
   }
-  actions.push(function() { awesome.pressEnter(); });
 
   if (options1[opt1Index].hasOwnProperty('children') === true) {
+    actions.push(function() { awesome.pressEnter(); });
+
     var opt2Index = getRandomInt(0, options2.length - 1);
     for (var i = 0; i < opt2Index; i++) {
       actions.push(function() { awesome.pressDown(); });
     }
-    actions.push(function() { awesome.pressEnter(); });
   }
 
   actions.push(
-    function() { awesome.blur(); },
+    function() {
+      awesome.pressEnter();
+      awesome.blur();
+    },
     function() { $('#runAgainBtn').fadeIn('fast'); }
-    //function() { $('#runAgainBtn').css('visibility', ''); }
   );
 
   return actions;
