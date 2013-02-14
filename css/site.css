@@ -117,6 +117,24 @@ div#footer p {
   font-size: 12px;
   margin-bottom: 0px;
 }
+div#left_footer a {
+  text-decoration: underline;
+}
+div#left_footer a:hover {
+  text-decoration: none;
+}
+div#right_footer {
+  text-align: right;
+}
+div#right_footer a {
+  color: #fff;
+  font-size: 12px;
+  padding: 0px 8px;
+  text-decoration: none;
+}
+div#right_footer a:hover {
+  text-decoration: underline;
+}
 div.row {
   background: #fff;
 }
@@ -155,6 +173,13 @@ small {
 }
 input.demo-btn {
   margin-top: 15px;
+}
+div.homepage_section {
+  margin-bottom: 60px !important;
+}
+input#runAgainBtn {
+  margin-top: 6px;
+  width: 100%;
 }
 h2#example_name {
   margin-top: 0px;
