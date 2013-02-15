@@ -4,6 +4,10 @@ $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
 ?>
 
+<div class="panel radius">
+  <h3>AutoCompleteJS is a JavaScript widget that helps your users find things quickly.</h3>
+</div>
+
 <div class="row section">
   <div class="ten columns">
     <div id="awesome"></div>
@@ -30,7 +34,10 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 
 <div class="section">
 <h2>Get It</h2>
-<a class="button large radius" href="releases/0.1.0/autocomplete-0.1.0.zip">Download Most Recent Version</a>
+<a class="button large radius" href="releases/0.1.0/autocomplete-0.1.0.zip" style="line-height: 22px">
+  Download Most Recent Version<br />
+  <small style="font-weight: normal; font-size: 12px">v0.1.0</small>
+</a>
 </div>
 
 <script src="js/json3.min.js"></script>
