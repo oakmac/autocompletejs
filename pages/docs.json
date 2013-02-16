@@ -283,7 +283,7 @@
     "An HTML string to display when there are no options to show.",
     "If <code class='js plain'>noResultsHTML</code> is a function, the first argument is the text that the user has entered and the second argument is the current value of the AutoComplete widget.",
     "The function should return an HTML string.",
-    "<code class='js plain'>noResultsHTML</code> will never be shown when <code class='js plain'>allowFreeform</code> is <code class='js keyword'>true</code>."
+    "<code class='js plain'>noResultsHTML</code> will never be shown when <a href='docs#list_object:allowFreeform'><code class='js plain'>allowFreeform</code></a> is <code class='js keyword'>true</code>."
   ]
 },
 "------------------------------------------------------------------------------",

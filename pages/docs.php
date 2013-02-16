@@ -9,6 +9,9 @@ $docs = AC::getDocs();
 <div class="section">
 <h2 id="config_object">AutoComplete Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
+<p>You define your <a href="docs#list_object">List Objects</a> - which control which options are available to the user - on the <a href="docs#config_object:lists"><code class="js plain">lists</code></a> property.</p>
+<p>As a shorthand method, you can provide an array of <a href="docs#option_object">Option Objects</a> to the config object and it will be expanded as the default list for the widget. See the <a href="examples#1000">Simple List Example</a>.</p>
+<p>As another shorthand method, you can provide a single string value and AutoComplete assumes it's an AJAX url. See the <a href="examples#2000">Simple AJAX example</a>.</p>
 <table cellspacing="0">
 <thead>
 <tr>
@@ -39,9 +42,11 @@ foreach($docs['Config Object'] as $prop) {
   <div class="part-of-speech">Noun</div>
   <div class="definition">A number of connected items or names written or printed consecutively, typically one below the other.</div>
 </div>
-<p>List Objects are the heart and soul of the AutoComplete widget. They define the options available to the user when they are typing.</p>
+<p>List Objects are the heart of the AutoComplete widget. They define the options available to the user when they are typing.</p>
 <p>The options for a List Object can be sourced directly in the JavaScript or externally with AJAX.</p>
-<p>You can define the list workflow using the <code class='js plain'>children</code> property on List Objects.</p>
+<p>You can define the list workflow using the <a href="docs#list_object:children"><code class='js plain'>children</code></a> property on List Objects.</p>
+<p>As a shorthand method, you can provide an array of <a href="docs#option_object">Option Objects</a> anywhere that expects a full List Object. See the <a href="examples#1002">Nested Lists example</a>.</p>
+<p>As another shorthand method, you can provide a single string value and AutoComplete assumes it's an AJAX url. See the <a href="examples#2002">Nested Lists with AJAX example</a>.</p>
 <table cellspacing="0">
 <thead>
 <tr>
@@ -72,8 +77,11 @@ foreach($docs['List Object'] as $prop) {
   <div class="part-of-speech">Noun</div>
   <div class="definition">A thing that is or may be chosen.</div>
 </div>
-<p>Option Objects are the "meat" of the AutoComplete widget. They are the options displayed to the user as they type.</p>
-<p>You can define the list workflow using the <code class='js plain'>children</code> property on Option Objects.</p>
+<p>Option Objects are the meat of the AutoComplete widget. They are the options displayed to the user as they type.</p>
+<p>Option Objects can hold any arbitrary value; they are not limited to what the user sees on the screen.</p>
+<p>An Option Object becomes a <a href="docs#token_object">Token Object</a> when the user selects it from the dropdown list.</p>
+<p>You can define the list workflow using the <a href="docs#option_object:children"><code class='js plain'>children</code></a> property on Option Objects.</p>
+<p>As a shorthand method, you can use a string as an Option Object. See the <a href="examples#4014">allowFreeform example</a>.</p>
 <table cellspacing="0">
 <thead>
 <tr>
