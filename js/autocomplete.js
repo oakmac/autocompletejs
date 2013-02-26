@@ -1225,7 +1225,7 @@ var stopInput = function() {
   hideInputEl();
   hideDropdownEl();
 
-  if (JSON.stringify(TOKENS) === '[]') {
+  if (TOKENS.length === 0) {
     showPlaceholder();
   }
 
