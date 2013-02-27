@@ -146,8 +146,8 @@ var widget = {};
 // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 var createId = function() {
   return 'xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/x/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
+    var r = Math.random() * 16 | 0;
+    return r.toString(16);
   });
 };
 
