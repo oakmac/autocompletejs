@@ -129,8 +129,9 @@ var AJAX_BUFFER_LENGTH = 200;
 var AJAX_BUFFER_TIMEOUT;
 var AJAX_OBJECT = {};
 var CURRENT_LIST_NAME = false;
-var INPUT_HAPPENING = false;
+var INPUT_HAS_FOCUS = false;
 var LOCAL_STORAGE_AVAILABLE = false;
+var OPTIONS_SHOWING = false;
 var SESSION_CACHE = {};
 var TOKENS = [];
 var VISIBLE_OPTIONS = {};
@@ -999,15 +1000,6 @@ var moveTokenHighlightRight = function() {
   }
 };
 
-// TODO: this needs to be combined with calcTextWidth somehow
-var showInputEl = function() {
-  inputEl.val('').css('width', '12px').focus();
-};
-
-var hideInputEl = function() {
-  inputEl.val('').css('width', '1px').blur();
-};
-
 var positionDropdownEl = function() {
   var pos = inputEl.position();
   var height = parseInt(inputEl.height(), 10);
@@ -1017,10 +1009,6 @@ var positionDropdownEl = function() {
     top: (height + pos.top),
     left: pos.left
   });
-};
-
-var hideDropdownEl = function() {
-  dropdownEl.css('display', 'none').html('');
 };
 
 var highlightFirstOption = function() {
@@ -1074,14 +1062,7 @@ var calcTextWidth = function(text) {
   }
   inputWidthProxyEl.css(cssProps);
 
-  var width = parseInt(inputWidthProxyEl.width(), 10);
-
-  // I don't really want the width to ever be less than 12px
-  if (width < 12) {
-    width = 12;
-  }
-
-  return width;
+  return parseInt(inputWidthProxyEl.width(), 10);
 };
 
 var updateInputWidth = function(text) {
@@ -1180,6 +1161,7 @@ var setValue = function(newValue) {
   ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   CURRENT_LIST_NAME = cfg.initialList;
   updateTokens();
+  positionDropdownEl();
 };
 
 // returns a unique array of groups from an array of Option Objects
@@ -1198,38 +1180,22 @@ var listExists = function(listName) {
           cfg.lists.hasOwnProperty(listName) === true);
 };
 
-var startInput = function() {
-  hidePlaceholder();
-
-  // have we hit max token groups?
-  if (typeof cfg.maxTokenGroups === 'number' &&
-      TOKENS.length >= cfg.maxTokenGroups &&
-      ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
-    return;
-  }
-
-  // update state
-  INPUT_HAPPENING = true;
-  if (listExists(CURRENT_LIST_NAME) !== true) {
-    CURRENT_LIST_NAME = cfg.initialList;
-  }
-
-  clearTokenGroupHighlight();
-  showInputEl();
+var showOptions = function(html) {
   positionDropdownEl();
-  pressRegularKey();
-  adjustDropdownScroll();
+  dropdownEl.css('display', '').html(html);
+
+  OPTIONS_SHOWING = true;
 };
 
-var stopInput = function() {
-  hideInputEl();
-  hideDropdownEl();
+var hideOptions = function() {
+  dropdownEl.css('display', 'none').html('');
 
-  if (TOKENS.length === 0) {
+  if (TOKENS.length === 0 &&
+      INPUT_HAS_FOCUS === false) {
     showPlaceholder();
   }
 
-  INPUT_HAPPENING = false;
+  OPTIONS_SHOWING = false;
 };
 
 // returns true if a tokenGroup is highlighted
@@ -1252,9 +1218,10 @@ var removeTokenGroup = function(tokenGroupIndex) {
   newTokens.splice(tokenGroupIndex, 1);
   setValue(newTokens);
 
-  if (INPUT_HAPPENING === true) {
-    stopInput();
-    startInput();
+  // show the input element if we're under maxTokenGroups
+  if (typeof cfg.maxTokenGroups === 'number' &&
+      TOKENS.length < cfg.maxTokenGroups) {
+    inputEl.css('display', '');
   }
 };
 
@@ -1315,7 +1282,7 @@ var addHighlightedOption = function() {
   // NOTE: this should never happen, but it's here for a safeguard
   if (VISIBLE_OPTIONS.hasOwnProperty(optionId) !== true) {
     error(8292, 'Could not find optionID "' + optionId + '".');
-    stopInput();
+    hideOptions();
     return;
   }
 
@@ -1348,12 +1315,28 @@ var addHighlightedOption = function() {
   }
 
   updateTokens();
-  stopInput();
-  startInput();
+
+  hideOptions();
+
+  // have we hit maxTokenGroups?
+  if (typeof cfg.maxTokenGroups === 'number' &&
+      TOKENS.length >= cfg.maxTokenGroups &&
+      ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
+    // hide the input
+    inputEl.css('display', 'none');
+  }
+  // else start the next token input
+  else {
+    inputEl.val('');
+    inputEl.focus();
+  }
 };
 
 var ajaxSuccess = function(data, list, inputValue, preProcess) {
-  if (INPUT_HAPPENING !== true) return;
+  // do nothing if they have cancelled autocomplete
+  if (INPUT_HAS_FOCUS !== true || OPTIONS_SHOWING !== true) {
+    return;
+  }
 
   // run their custom preProcess function
   if (typeof preProcess === 'function') {
@@ -1400,7 +1383,10 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
 };
 
 var ajaxError = function(errType, list, inputValue) {
-  if (INPUT_HAPPENING !== true) return;
+  // do nothing if they have cancelled autocomplete
+  if (INPUT_HAS_FOCUS !== true || OPTIONS_SHOWING !== true) {
+    return;
+  }
 
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
@@ -1463,7 +1449,7 @@ var sendAjaxRequest = function(list, inputValue) {
     error(8721,
       'AJAX url must be a string. Did you forget to include one on ajaxOpts?',
       ajaxOpts.url);
-    stopInput();
+    hideOptions();
     return;
   }
 
@@ -1499,7 +1485,7 @@ var sendAjaxRequest = function(list, inputValue) {
   }
 
   // send the request after a short timeout
-  AJAX_BUFFER_TIMEOUT = setTimeout(function() {
+  AJAX_BUFFER_TIMEOUT = window.setTimeout(function() {
     AJAX_OBJECT = $.ajax(ajaxOpts);
   }, AJAX_BUFFER_LENGTH);
 };
@@ -1807,7 +1793,7 @@ var pressDownArrow = function() {
 };
 
 var pressEscapeKey = function() {
-  stopInput();
+  hideOptions();
   clearTokenGroupHighlight();
 };
 
@@ -1837,16 +1823,18 @@ var pressRegularKey = function() {
   // input element to the next line.
   // It's safe for this function to be called at any time.
   // Another option would be to poll for this every 50ms or so
-  // while input is happening. Investigate this in the future.
-  setTimeout(positionDropdownEl, 100);
-  setTimeout(positionDropdownEl, 200);
-  setTimeout(positionDropdownEl, 300);
+  // while input is happening.
+  // TODO: Investigate this in the future.
+  window.setTimeout(positionDropdownEl, 100);
+  window.setTimeout(positionDropdownEl, 200);
+  window.setTimeout(positionDropdownEl, 300);
 
   var inputValue = inputEl.val();
 
+  updateInputWidth(inputValue);
+
   if (inputValue !== '') {
     clearTokenGroupHighlight();
-    updateInputWidth(inputValue);
   }
 
   // get the current list
@@ -1865,17 +1853,14 @@ var pressRegularKey = function() {
   // hide the dropdown and exit
   if (options.length === 0 && inputValue === '' &&
       list.ajaxEnabled === false) {
-    dropdownEl.css('display', 'none');
+    hideOptions();
     return;
   }
-
-  // else we will show something in the dropdown
-  dropdownEl.css('display', '');
 
   // no options found and no AJAX
   // show "No Results" and exit
   if (options.length === 0 && list.ajaxEnabled === false) {
-    dropdownEl.html(buildNoResults(list.noResultsHTML, inputValue));
+    showOptions(buildNoResults(list.noResultsHTML, inputValue));
     return;
   }
 
@@ -1895,8 +1880,8 @@ var pressRegularKey = function() {
     html += buildLoading(list.ajaxLoadingHTML, inputValue);
   }
 
-  // show the dropdown
-  dropdownEl.html(html);
+  // show the options
+  showOptions(html);
   markFirstLastOptions();
   highlightFirstOption();
 
@@ -1916,18 +1901,14 @@ var pressRegularKey = function() {
 var clickPage = function(e) {
   // stop input if they clicked anywhere outside the container el
   if ($(e.target).parents('#' + containerElId).length === 0) {
-    stopInput();
+    hideOptions();
   }
 };
 
 // click on the container
 var clickContainerElement = function(e) {
-  // start input if it's not already happening
-  if (INPUT_HAPPENING === false) {
-    startInput();
-  }
-  // else just put the focus on the input element
-  else {
+  // put the focus on the input element if it doesn't already have it
+  if (INPUT_HAS_FOCUS !== true) {
     inputEl.focus();
   }
 };
@@ -1935,7 +1916,8 @@ var clickContainerElement = function(e) {
 var clickTokenGroup = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
-  stopInput();
+
+  hideOptions();
 
   // remove highlight from other token groups
   clearTokenGroupHighlight();
@@ -1948,10 +1930,13 @@ var clickRemoveTokenGroup = function(e) {
   // prevent clickContainerEl and clickPage
   e.stopPropagation();
 
-  stopInput();
+  hideOptions();
+
   clearTokenGroupHighlight();
+
   $(this).parents('div.' + CLASSES.tokenGroup)
     .addClass(CLASSES.selectedTokenGroup);
+
   removeHighlightedTokenGroup();
 };
 
@@ -1971,18 +1956,68 @@ var mouseoverOption = function() {
   highlightOption(this);
 };
 
-var keydownInputElement = function(e) {
-  if (INPUT_HAPPENING !== true) return;
+var focusInput = function(e) {
+  // exit if we are already at maxTokenGroups
+  if (typeof cfg.maxTokenGroups === 'number' &&
+      TOKENS.length >= cfg.maxTokenGroups &&
+      ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP === true) {
+    return;
+  }
 
+  // update state
+  INPUT_HAS_FOCUS = true;
+  if (listExists(CURRENT_LIST_NAME) !== true) {
+    CURRENT_LIST_NAME = cfg.initialList;
+  }
+
+  hidePlaceholder();
+  clearTokenGroupHighlight();
+  positionDropdownEl();
+  pressRegularKey();
+  adjustDropdownScroll();
+};
+
+var blurInput = function(e) {
+  INPUT_HAS_FOCUS = false;
+
+  // add the placeholder if necessary
+  if (TOKENS.length === 0 &&
+      OPTIONS_SHOWING === false &&
+      inputEl.val() === '') {
+    showPlaceholder();
+  }
+};
+
+var keydownInputElement = function(e) {
   var keyCode = e.which;
   var inputValue = inputEl.val();
 
-  // enter or tab
+  // tabbing on an empty field should not break normal tab behavior
+  if (keyCode === KEYS.TAB &&
+      inputValue === '') {
+    hideOptions();
+    return;
+  }
+
+  // tabbing on a field with no options showing should
+  // act like a normal tab
+  if (keyCode === KEYS.TAB && OPTIONS_SHOWING === false) {
+    return;
+  }
+
+  // enter
   if (keyCode === KEYS.ENTER ||
-      keyCode === KEYS.NUMPAD_ENTER ||
-      keyCode === KEYS.TAB) {
+      keyCode === KEYS.NUMPAD_ENTER) {
     e.preventDefault();
-    pressEnterOrTab();
+    addHighlightedOption();
+    return;
+  }
+
+  // tab
+  if (keyCode === KEYS.TAB &&
+      inputValue !== '') {
+    e.preventDefault();
+    addHighlightedOption();
     return;
   }
 
@@ -2033,13 +2068,14 @@ var keydownInputElement = function(e) {
   //       you let the keydown event finish so the input element
   //       gets updated, then you grab the value
   //       otherwise you're re-writing the logic behind input elements
-  setTimeout(pressRegularKey, 5);
+  window.setTimeout(pressRegularKey, 5);
 };
 
 // keydown anywhere on the page
 var keydownWindow = function(e) {
   // ignore if input is open or no token groups are highlighted
-  if (INPUT_HAPPENING === true ||
+  if (INPUT_HAS_FOCUS === true ||
+      OPTIONS_SHOWING === true ||
       isTokenGroupHighlighted() !== true) {
     return;
   }
@@ -2105,7 +2141,8 @@ widget.addOption = function(listName, option) {
 };
 
 widget.blur = function() {
-  stopInput();
+  inputEl.blur();
+  hideOptions();
 };
 
 widget.clear = function() {
@@ -2120,12 +2157,14 @@ widget.focus = function() {
   // Add a slight pause to let other events finish, then put the focus
   // on the input field.
   // If we don't do this and the user attaches this function to a button,
-  // for example, the page.click event will call stopInput before
+  // for example, the page.click event will call hideOptions before
   // the dropdown ever has a chance to show.
   // Another way around this would be for the user to do e.stopPropagation
   // on their event, but that's asking a lot for the programmer and may
   // result in unexpected behavior elsewhere.
-  setTimeout(startInput, 5);
+  window.setTimeout(function() {
+    inputEl.focus();
+  }, 5);
 };
 
 // return a list object
@@ -2171,17 +2210,17 @@ widget.list = function(name, list) {
 };
 
 widget.pressDown = function() {
-  if (INPUT_HAPPENING !== true) return;
+  if (OPTIONS_SHOWING !== true) return;
   pressDownArrow();
 };
 
 widget.pressEnter = function() {
-  if (INPUT_HAPPENING !== true) return;
+  if (OPTIONS_SHOWING !== true) return;
   pressEnterOrTab();
 };
 
 widget.pressUp = function() {
-  if (INPUT_HAPPENING !== true) return;
+  if (OPTIONS_SHOWING !== true) return;
   pressUpArrow();
 };
 
@@ -2233,7 +2272,7 @@ widget.setInput = function(input) {
     return false;
   }
 
-  startInput();
+  inputEl.focus();
   inputEl.val(input);
   pressRegularKey();
   return true;
@@ -2288,11 +2327,13 @@ widget.val = function(value) {
 //------------------------------------------------------------------------------
 
 var addEvents = function() {
-  // using delegate and bind here instead of $.on to maintain compatibility
-  // with older jquery versions
+  // NOTE: using delegate and bind here instead of $.on to
+  // maintain compatibility with older jquery versions
   containerEl.bind('click', clickContainerElement);
-  containerEl.delegate('input.autocomplete-input',
-    'keydown', keydownInputElement);
+  containerEl.delegate('input.autocomplete-input', 'keydown',
+    keydownInputElement);
+  containerEl.delegate('input.autocomplete-input', 'focus', focusInput);
+  containerEl.delegate('input.autocomplete-input', 'blur', blurInput);
   containerEl.delegate('li.' + CLASSES.option, 'click', clickOption);
   containerEl.delegate('li.' + CLASSES.option, 'mouseover', mouseoverOption);
   containerEl.delegate('div.' + CLASSES.tokenGroup, 'click', clickTokenGroup);
