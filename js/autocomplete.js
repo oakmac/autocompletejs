@@ -1030,7 +1030,9 @@ var highlightLastTokenGroup = function() {
 var updateTokens = function() {
   var tokenHTML = buildTokens(TOKENS);
   tokensEl.html(tokenHTML);
-  if (tokenHTML === '') {
+
+  // update placeholder
+  if (tokenHTML === '' && INPUT_HAS_FOCUS === false) {
     showPlaceholder();
   }
   else {
