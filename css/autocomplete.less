@@ -11,28 +11,28 @@
           border-radius: @radius;
 }
 .rounded-top-left(@radius: @pad1) {
-	-webkit-border-top-left-radius: @radius;
+  -webkit-border-top-left-radius: @radius;
       -moz-border-radius-topleft: @radius;
-	        border-top-left-radius: @radius;
+          border-top-left-radius: @radius;
 }
 .rounded-top-right(@radius: @pad1) {
-	-webkit-border-top-right-radius: @radius;
+  -webkit-border-top-right-radius: @radius;
       -moz-border-radius-topright: @radius;
-	        border-top-right-radius: @radius;
+          border-top-right-radius: @radius;
 }
 .rounded-bottom-left(@radius: @pad1) {
-	-webkit-border-bottom-left-radius: @radius;
+  -webkit-border-bottom-left-radius: @radius;
       -moz-border-radius-bottomleft: @radius;
-	        border-bottom-left-radius: @radius;
+          border-bottom-left-radius: @radius;
 }
 .rounded-bottom-right(@radius: @pad1) {
   -webkit-border-bottom-right-radius: @radius;
-	    -moz-border-radius-bottomright: @radius;
-	        border-bottom-right-radius: @radius;
+      -moz-border-radius-bottomright: @radius;
+          border-bottom-right-radius: @radius;
 }
 .rounded-top(@radius: @pad1) {
-	.rounded-top-left(@radius);
-	.rounded-top-right(@radius);
+  .rounded-top-left(@radius);
+  .rounded-top-right(@radius);
 }
 .rounded-bottom(@radius: @pad1) {
   .rounded-bottom-left(@radius);
@@ -45,13 +45,13 @@
 
 // linear gradient
 .linear-gradient(@start, @end) {
-	background: @end;
-	background: -moz-linear-gradient(top, @start 0%, @end 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@start), color-stop(100%,@end));
-	background: -webkit-linear-gradient(top, @start 0%, @end 100%);
-	background: -o-linear-gradient(top, @start 0%, @end 100%);
-	background: -ms-linear-gradient(top, @start 0%, @end 100%);
-	background: linear-gradient(top, @start 0%, @end 100%);
+  background: @end;
+  background: -moz-linear-gradient(top, @start 0%, @end 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@start), color-stop(100%,@end));
+  background: -webkit-linear-gradient(top, @start 0%, @end 100%);
+  background: -o-linear-gradient(top, @start 0%, @end 100%);
+  background: -ms-linear-gradient(top, @start 0%, @end 100%);
+  background: linear-gradient(top, @start 0%, @end 100%);
 }
 
 // transitions
@@ -66,103 +66,103 @@
 
 
 div.autocomplete_internal_container {
-	border: 2px solid #ccc;
-	color: #333;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 14px;
-	font-style: normal;
-	font-weight: normal;
-	line-height: 20px;
+  border: 2px solid #ccc;
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 20px;
   padding: 4px;
-	.rounded-corners(8px);
+  .rounded-corners(8px);
 
-	div.placeholder {
-		color: #777;
-		float: left;
-		font-size: 16px;
-		line-height: 20px;
-		margin: 10px 0 0 0;
-	}
+  div.placeholder {
+    color: #777;
+    float: left;
+    font-size: 16px;
+    line-height: 20px;
+    margin: 10px 0 0 0;
+  }
 
   input.autocomplete-input {
     background: transparent;
-		border: 0px;
-		-webkit-box-shadow: none;
+    border: 0px;
+    -webkit-box-shadow: none;
        -moz-box-shadow: none;
-			      box-shadow: none;
+            box-shadow: none;
     color: #000;
-		float: left;
-		font-size: 16px;
-		height: 20px;
-		line-height: 20px;
-		margin: 10px 0px;
-		outline: none;
-		padding: 0px;
-		vertical-align: middle;
-		width: 120px;
+    float: left;
+    font-size: 16px;
+    height: 20px;
+    line-height: 20px;
+    margin: 10px 0px;
+    outline: none;
+    padding: 0px;
+    vertical-align: middle;
+    width: 120px;
   }
 
-	div.token-group {
-		background: #eee;
-		border: 1px solid #ccc;
-		cursor: pointer;
-		float: left;
+  div.token-group {
+    background: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    float: left;
     margin: 4px;
-		padding: 4px 6px;
-		.rounded-corners(6px);
+    padding: 4px 6px;
+    .rounded-corners(6px);
 
     span.remove-token-group {
       font-size: 11px;
-			margin-right: 2px;
+      margin-right: 2px;
     }
-	}
+  }
 
-	div.selected {
-		.linear-gradient(#d2e6fd, #b0d1f9);
-	}
+  div.selected {
+    .linear-gradient(#d2e6fd, #b0d1f9);
+  }
 
   span.token {
-		margin: 0px 2px;
+    margin: 0px 2px;
   }
 
   ul.dropdown {
     background: #e3e3e3;
-		border: 1px solid #ccc;
+    border: 1px solid #ccc;
     margin: 12px 0px 0px 0px;
     max-height: 300px;
     min-width: 140px;
-		overflow-x: visible;
+    overflow-x: visible;
     overflow-y: auto;
-		padding: 0px;
-		position: absolute;
-		z-index: 10;
+    padding: 0px;
+    position: absolute;
+    z-index: 10;
 
     li {
       background: #f9f9f9;
       border-bottom: 1px solid #d8d8d8;
-			font-size: 13px;
-			list-style: none;
+      font-size: 13px;
+      list-style: none;
       margin: 0px;
-			padding: 4px;
+      padding: 4px;
 
-			span.children-indicator {
-				float: right;
-			}
+      span.children-indicator {
+        float: right;
+      }
     }
 
-		li.option {
-			cursor: pointer;
-		}
+    li.option {
+      cursor: pointer;
+    }
 
-		li.group {
-			background: #e3e3e3;
-			color: #000;
-			font-size: 14px;
-		}
+    li.group {
+      background: #e3e3e3;
+      color: #000;
+      font-size: 14px;
+    }
 
     li.highlighted {
       background: #00519d;
-			color: white;
+      color: white;
     }
 
     // don't show a border on the last option
