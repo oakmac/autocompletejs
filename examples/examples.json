@@ -273,11 +273,6 @@
 },
 {
   "group": "Methods",
-  "number": 7010,
-  "name": "setList"
-},
-{
-  "group": "Methods",
   "number": 7011,
   "name": "setValue"
 },

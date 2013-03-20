@@ -15,6 +15,7 @@ var widget = new AutoComplete('search_bar', config);
 
 $('#removeListBtn').on('click', function() {
   var listName = window.prompt('Which list would you like to remove?');
+  if (! listName) return;
 
   var result = widget.removeList(listName);
   if (result === false) {

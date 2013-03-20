@@ -56,15 +56,15 @@ var highlightGroupHeader = function(groupIndex) {
 };
 
 var highlightExample = function(id) {
-	$('div#examples_list_container li').removeClass('active');
+  $('div#examples_list_container li').removeClass('active');
   $('li#example_' + id).addClass('active');
 };
 
 var showExample = function(number) {
   var groupIndex = parseInt($('li#example_' + number)
-	  .parent('ul').attr('id').replace('group_container_', ''), 10);
+    .parent('ul').attr('id').replace('group_container_', ''), 10);
 
-	$('ul#group_container_' + groupIndex).css('display', '');
+  $('ul#group_container_' + groupIndex).css('display', '');
   highlightGroupHeader(groupIndex);
   highlightExample(number);
 
@@ -78,7 +78,7 @@ var showExample = function(number) {
 
 var clickExample = function() {
   var number = parseInt($(this).attr('id').replace('example_', ''), 10);
-  if (examples.hasOwnProperty(number) !== true)	return;
+  if (examples.hasOwnProperty(number) !== true) return;
 
   window.location.hash = number;
   loadExampleFromHash();
@@ -95,18 +95,18 @@ var loadExampleFromHash = function() {
 
 var clickGroupHeader = function() {
   var groupIndex = parseInt($(this).attr('id').replace('group_header_', ''), 10);
-	var examplesEl = $('ul#group_container_' + groupIndex);
-	if (examplesEl.css('display') === 'none') {
-		examplesEl.slideDown('fast');
-	}
-	else {
-		examplesEl.slideUp('fast');
-	}
+  var examplesEl = $('ul#group_container_' + groupIndex);
+  if (examplesEl.css('display') === 'none') {
+    examplesEl.slideDown('fast');
+  }
+  else {
+    examplesEl.slideUp('fast');
+  }
 };
 
 var init = function() {
   $('#examples_list_container').on('click', 'li', clickExample);
-	$('#examples_list_container').on('click', 'h4', clickGroupHeader);
+  $('#examples_list_container').on('click', 'h4', clickGroupHeader);
   loadExampleFromHash();
 };
 $(document).ready(init);
@@ -121,18 +121,18 @@ include(APP_PATH.'pages/footer.php');
 function buildExampleList($examples) {
   $html = '';
   $currentGroup = false;
-	$currentGroupIndex = 0;
+  $currentGroupIndex = 0;
   foreach ($examples as $ex) {
 
     // temporary
-	  if ($ex['js'] === '') continue;
+    if ($ex['js'] === '') continue;
 
     if ($ex['group'] !== $currentGroup) {
       if ($currentGroup !== false) {
         $html .= '</ul>'."\n";
       }
       $currentGroup = $ex['group'];
-			$currentGroupIndex++;
+      $currentGroupIndex++;
       $html .= '<h4 id="group_header_'.$currentGroupIndex.'">'.$currentGroup.'</h4>'."\n";
       $html .= '<ul id="group_container_'.$currentGroupIndex.'" style="display:none">'."\n";
     }

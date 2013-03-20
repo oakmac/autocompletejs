@@ -37,13 +37,17 @@ public static function buildTopBar($active_tab) {
 
 // returns an array of all the examples
 public static function getExamples() {
-  $examples = self::getExamplesJSON();
+  $examples = self::getJSON('examples/examples.json');
+  $examples2 = array();
   for ($i = 0; $i < count($examples); $i++) {
-    $num = (int) $examples[$i]['number'];
-    $examples[$i]['html'] = trim(file_get_contents(APP_PATH.'examples/'.$num.'.html'));
-    $examples[$i]['js']   = trim(file_get_contents(APP_PATH.'examples/'.$num.'.js'));
+    if (is_array($examples[$i]) !== true) continue;
+
+    $example = $examples[$i];
+    $example['html'] = trim(file_get_contents(APP_PATH.'examples/'.$example['number'].'.html'));
+    $example['js'] = trim(file_get_contents(APP_PATH.'examples/'.$example['number'].'.js'));
+    array_push($examples2, $example);
   }
-  return $examples;
+  return $examples2;
 }
 
 // get the html and js file for an example
@@ -72,21 +76,6 @@ public static function getDocs() {
 //---------------------------------------------------
 // Private Functions
 //---------------------------------------------------
-
-// TODO: combine this with getJSON below
-private static function getExamplesJSON() {
-  $examples = json_decode(file_get_contents(APP_PATH.'examples/examples.json'), true);
-  if (is_array($examples) !== true) {
-    echo 'examples.json is not valid JSON';
-    die;
-  }
-  $examples2 = array();
-  foreach ($examples as $e) {
-    if (is_array($e) !== true) continue;
-    array_push($examples2, $e);
-  }
-  return $examples2;
-}
 
 // this is mostly for my sanity when I'm editing the JSON and forget a comma
 private static function getJSON($filename) {

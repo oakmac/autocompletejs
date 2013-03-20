@@ -54,6 +54,9 @@ window['AutoComplete'] = window['AutoComplete'] ||
 // Module scope variables
 //------------------------------------------------------------------------------
 
+var AJAX_BUFFER_LENGTH = 200;
+var HTML_SENTINELS = [];
+var LOCAL_STORAGE_AVAILABLE = false;
 var MINIMUM_JQUERY_VERSION = '1.4.2';
 
 var KEYS = {
@@ -74,7 +77,7 @@ var containerEl, dropdownEl, inputEl,
     placeholderEl, tokensEl, inputWidthProxyEl;
 
 // CSS class names
-var CLASSES = {
+var CSS = {
   ajaxError: 'ajax-error',
   ajaxLoading: 'ajax-loading',
   highlightedOption: 'highlighted',
@@ -120,17 +123,12 @@ var CSS_TEXT_PROPS = [
   'text-underline-position'
 ];
 
-// HTML sentinel values
-var HTML_SENTINELS = [];
-
 // stateful
 var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-var AJAX_BUFFER_LENGTH = 200;
 var AJAX_BUFFER_TIMEOUT;
 var AJAX_OBJECT = {};
 var CURRENT_LIST_NAME = false;
 var INPUT_HAS_FOCUS = false;
-var LOCAL_STORAGE_AVAILABLE = false;
 var OPTIONS_SHOWING = false;
 var SESSION_CACHE = {};
 var TOKENS = [];
@@ -678,6 +676,14 @@ var expandConfig = function() {
     cfg.onChange = false;
   }
 
+  /*
+  // TODO: add this?
+  // onFocus must be a function
+  if (typeof cfg.onFocus !== 'function') {
+    cfg.onFocus = false;
+  }
+  */
+
   // set an initiaValue
   if (cfg.hasOwnProperty('initialValue') === true) {
     // check that the initialValue is valid
@@ -754,6 +760,9 @@ var expandConfig = function() {
     cfg.initialList = listNames[0];
   }
 
+  // initialize the current list
+  CURRENT_LIST_NAME = cfg.initialList;
+
   return true;
 };
 
@@ -814,7 +823,7 @@ var buildOption = function(option, parentList) {
 
   var childrenListName = getChildrenListName(option, parentList);
 
-  var html = '<li class="' + CLASSES.option + '" ' +
+  var html = '<li class="' + CSS.option + '" ' +
   'data-option-id="' + encode(optionId) + '">' +
   option.optionHTML;
 
@@ -891,9 +900,9 @@ var buildTokens = function(tokens) {
   for (var i = 0; i < tokens.length; i++) {
     var tokenGroup = tokens[i];
 
-    html += '<div class="' + CLASSES.tokenGroup + '"' +
+    html += '<div class="' + CSS.tokenGroup + '"' +
     ' data-token-group-index="' + i + '">' +
-    '<span class="' + CLASSES.removeTokenGroup + '">&times;</span>';
+    '<span class="' + CSS.removeTokenGroup + '">&times;</span>';
 
     for (var j = 0; j < tokenGroup.length; j++) {
       html += '<span class="token">' +
@@ -950,7 +959,7 @@ var buildNoResults = function(noResultsHTML, inputValue) {
 };
 
 var buildLoading = function(ajaxLoadingHTML, inputValue) {
-  return buildStringOrFunction(CLASSES.ajaxLoading,
+  return buildStringOrFunction(CSS.ajaxLoading,
     ajaxLoadingHTML, inputValue);
 };
 
@@ -967,36 +976,36 @@ var showPlaceholder = function() {
 };
 
 var moveTokenHighlightLeft = function() {
-  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
+  var selectedEl = tokensEl.find('div.' + CSS.selectedTokenGroup);
 
   // exit if there is not a selected token
   if (selectedEl.length !== 1) return;
 
-  var prev = selectedEl.prev('div.' + CLASSES.tokenGroup);
-  selectedEl.removeClass(CLASSES.selectedTokenGroup);
+  var prev = selectedEl.prev('div.' + CSS.tokenGroup);
+  selectedEl.removeClass(CSS.selectedTokenGroup);
   if (prev.length === 1) {
-    prev.addClass(CLASSES.selectedTokenGroup);
+    prev.addClass(CSS.selectedTokenGroup);
   }
   else {
-    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':last')
-      .addClass(CLASSES.selectedTokenGroup);
+    tokensEl.find('div.' + CSS.tokenGroup).filter(':last')
+      .addClass(CSS.selectedTokenGroup);
   }
 };
 
 var moveTokenHighlightRight = function() {
-  var selectedEl = tokensEl.find('div.' + CLASSES.selectedTokenGroup);
+  var selectedEl = tokensEl.find('div.' + CSS.selectedTokenGroup);
 
   // exit if there is not a selected token
   if (selectedEl.length !== 1) return;
 
-  var next = selectedEl.next('div.' + CLASSES.tokenGroup);
-  selectedEl.removeClass(CLASSES.selectedTokenGroup);
+  var next = selectedEl.next('div.' + CSS.tokenGroup);
+  selectedEl.removeClass(CSS.selectedTokenGroup);
   if (next.length === 1) {
-    next.addClass(CLASSES.selectedTokenGroup);
+    next.addClass(CSS.selectedTokenGroup);
   }
   else {
-    tokensEl.find('div.' + CLASSES.tokenGroup).filter(':first')
-      .addClass(CLASSES.selectedTokenGroup);
+    tokensEl.find('div.' + CSS.tokenGroup).filter(':first')
+      .addClass(CSS.selectedTokenGroup);
   }
 };
 
@@ -1012,19 +1021,19 @@ var positionDropdownEl = function() {
 };
 
 var highlightFirstOption = function() {
-  highlightOption(dropdownEl.find('li.' + CLASSES.option).filter(':first'));
+  highlightOption(dropdownEl.find('li.' + CSS.option).filter(':first'));
 };
 
 var clearTokenGroupHighlight = function() {
-  tokensEl.find('div.' + CLASSES.tokenGroup).
-    removeClass(CLASSES.selectedTokenGroup);
+  tokensEl.find('div.' + CSS.tokenGroup).
+    removeClass(CSS.selectedTokenGroup);
 };
 
 var highlightLastTokenGroup = function() {
-  tokensEl.find('div.' + CLASSES.tokenGroup).
-    removeClass(CLASSES.selectedTokenGroup).
+  tokensEl.find('div.' + CSS.tokenGroup).
+    removeClass(CSS.selectedTokenGroup).
     filter(':last').
-    addClass(CLASSES.selectedTokenGroup);
+    addClass(CSS.selectedTokenGroup);
 };
 
 var updateTokens = function() {
@@ -1067,22 +1076,23 @@ var calcTextWidth = function(text) {
   return parseInt(inputWidthProxyEl.width(), 10);
 };
 
-var updateInputWidth = function(text) {
-  inputEl.css('width', calcTextWidth(text) + 'px');
+var updateInputWidth = function() {
+  var inputText = inputEl.val();
+  inputEl.css('width', calcTextWidth(inputText) + 'px');
 };
 
 var highlightOption = function(optionEl) {
   // remove highlighted from all values in the list
-  dropdownEl.find('li.' + CLASSES.option).
-    removeClass(CLASSES.highlightedOption);
+  dropdownEl.find('li.' + CSS.option).
+    removeClass(CSS.highlightedOption);
 
   // add highlight class to the value clicked
-  $(optionEl).addClass(CLASSES.highlightedOption);
+  $(optionEl).addClass(CSS.highlightedOption);
 };
 
 var adjustDropdownScroll = function() {
   // find the highlighted option
-  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+  var highlightedEl = dropdownEl.find('li.' + CSS.highlightedOption);
 
   // exit if we did not find one
   if (highlightedEl.length !== 1) return;
@@ -1092,9 +1102,9 @@ var adjustDropdownScroll = function() {
 
   // if the first option is selected, set scrollTop to it's highest in case
   // there is a group <li> above it
-  if (dropdownEl.find('li.' + CLASSES.option).
+  if (dropdownEl.find('li.' + CSS.option).
         filter(':first').
-        hasClass(CLASSES.highlightedOption) === true) {
+        hasClass(CSS.highlightedOption) === true) {
     dropdownEl.scrollTop(-1);
     return;
   }
@@ -1121,11 +1131,36 @@ var adjustDropdownScroll = function() {
 // Control Flow / Data Manipulation
 //------------------------------------------------------------------------------
 
-var removeList = function(listName) {
-  delete cfg.lists[listName];
-  if (CURRENT_LIST_NAME === listName) {
-    CURRENT_LIST_NAME = cfg.initialList;
+var setCurrentList = function(listName) {
+  // run the onEnd function for the outgoing list
+  if (cfg.lists[CURRENT_LIST_NAME].hasOwnProperty('onEnd') === true &&
+      typeof cfg.lists[CURRENT_LIST_NAME].onEnd === 'function') {
+    cfg.lists[CURRENT_LIST_NAME].onEnd();
   }
+
+  // sanity check: make sure the listName exists
+  if (listExists(listName) !== true) {
+    listName = cfg.initialList;
+  }
+
+  // assign the new list
+  CURRENT_LIST_NAME = listName;
+
+  // run the onStart function for the new list
+  if (cfg.lists[CURRENT_LIST_NAME].hasOwnProperty('onStart') === true &&
+      typeof cfg.lists[CURRENT_LIST_NAME].onStart === 'function') {
+    cfg.lists[CURRENT_LIST_NAME].onStart();
+  }
+};
+
+var removeList = function(listName) {
+  // if they are deleting the current list, reset to the initialList
+  if (CURRENT_LIST_NAME === listName) {
+    setCurrentList(cfg.initialList);
+  }
+
+  // delete the list
+  delete cfg.lists[listName];
 };
 
 var destroyWidget = function() {
@@ -1160,8 +1195,8 @@ var setValue = function(newValue) {
 
   // update state
   TOKENS = newValue;
-  ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-  CURRENT_LIST_NAME = cfg.initialList;
+  //ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
+  //setCurrentList(cfg.initialList);
   updateTokens();
   positionDropdownEl();
 };
@@ -1185,7 +1220,6 @@ var listExists = function(listName) {
 var showOptions = function(html) {
   positionDropdownEl();
   dropdownEl.css('display', '').html(html);
-
   OPTIONS_SHOWING = true;
 };
 
@@ -1203,7 +1237,7 @@ var hideOptions = function() {
 // returns true if a tokenGroup is highlighted
 // false otherwise
 var isTokenGroupHighlighted = function() {
-  return (tokensEl.find('div.' + CLASSES.selectedTokenGroup).length === 1);
+  return (tokensEl.find('div.' + CSS.selectedTokenGroup).length === 1);
 };
 
 var removeTokenGroup = function(tokenGroupIndex) {
@@ -1212,7 +1246,7 @@ var removeTokenGroup = function(tokenGroupIndex) {
   // if we are removing the last token group, then the next token will start
   // a new token group
   if (tokenGroupIndex === (TOKENS.length - 1)) {
-    CURRENT_LIST_NAME = cfg.initialList;
+    setCurrentList(cfg.initialList);
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
@@ -1232,7 +1266,7 @@ var removeHighlightedTokenGroup = function() {
   if (isTokenGroupHighlighted() !== true) return;
 
   var tokenGroupIndex = parseInt(tokensEl
-    .find('div.' + CLASSES.selectedTokenGroup)
+    .find('div.' + CSS.selectedTokenGroup)
     .attr('data-token-group-index'), 10);
 
   // make sure the token group index is valid
@@ -1270,11 +1304,14 @@ var getChildrenListName = function(option, parentList) {
   return false;
 };
 
+// TODO: need to separate this function into "getHighlightedOptions"
+//       and "addOption(optionObject)", which we can expose to the user
+// or maybe it's addToken(optionObject) ?
 var addHighlightedOption = function() {
   // get the highlighted value
-  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+  var highlightedEl = dropdownEl.find('li.' + CSS.highlightedOption);
 
-  // do nothing if no entry is highlighted
+  // do nothing if no option is highlighted
   if (highlightedEl.length !== 1) return;
 
   // get the option object
@@ -1307,18 +1344,17 @@ var addHighlightedOption = function() {
   var childrenListName = getChildrenListName(option, list);
   // this option has children, move to the next list
   if (typeof childrenListName === 'string') {
-    CURRENT_LIST_NAME = childrenListName;
+    setCurrentList(childrenListName);
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = false;
   }
   // no children, start a new token group
   else {
-    CURRENT_LIST_NAME = cfg.initialList;
+    setCurrentList(cfg.initialList);
     ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
   }
 
-  updateTokens();
-
   hideOptions();
+  inputEl.val('');
 
   // have we hit maxTokenGroups?
   if (typeof cfg.maxTokenGroups === 'number' &&
@@ -1329,7 +1365,6 @@ var addHighlightedOption = function() {
   }
   // else start the next token input
   else {
-    inputEl.val('');
     inputEl.focus();
   }
 };
@@ -1375,7 +1410,7 @@ var ajaxSuccess = function(data, list, inputValue, preProcess) {
   }
 
   // update the dropdown
-  dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(html);
+  dropdownEl.find('li.' + CSS.ajaxLoading).replaceWith(html);
   markFirstLastOptions();
 
   // highlight the first option if there are no others highlighted
@@ -1393,7 +1428,7 @@ var ajaxError = function(errType, list, inputValue) {
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
 
-  var errorMsg = '<li class="' + CLASSES.ajaxError + '">';
+  var errorMsg = '<li class="' + CSS.ajaxError + '">';
   if (typeof list.ajaxErrorHTML === 'string') {
     errorMsg += list.ajaxErrorHTML;
   }
@@ -1401,7 +1436,7 @@ var ajaxError = function(errType, list, inputValue) {
     errorMsg += list.ajaxErrorHTML(errType, inputValue, getValue());
   }
   errorMsg += '</li>';
-  dropdownEl.find('li.' + CLASSES.ajaxLoading).replaceWith(errorMsg);
+  dropdownEl.find('li.' + CSS.ajaxLoading).replaceWith(errorMsg);
 };
 
 var sendAjaxRequest = function(list, inputValue) {
@@ -1738,12 +1773,12 @@ var matchOptions = function(input, list) {
 
 // returns true if there is an option showing in the dropdown
 var isOptionShowing = function() {
-  return (dropdownEl.find('li.' + CLASSES.option).length > 0);
+  return (dropdownEl.find('li.' + CSS.option).length > 0);
 };
 
 // returns true if an option is highlighted in the dropdown
 var isOptionHighlighted = function() {
-  return (dropdownEl.find('li.' + CLASSES.highlightedOption).length !== 0);
+  return (dropdownEl.find('li.' + CSS.highlightedOption).length !== 0);
 };
 
 //------------------------------------------------------------------------------
@@ -1752,20 +1787,20 @@ var isOptionHighlighted = function() {
 
 var pressUpArrow = function() {
   // get the highlighted element
-  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+  var highlightedEl = dropdownEl.find('li.' + CSS.highlightedOption);
 
   // remove the highlight
-  highlightedEl.removeClass(CLASSES.highlightedOption);
+  highlightedEl.removeClass(CSS.highlightedOption);
 
   // get the previous options
-  var prevEl = highlightedEl.prevAll('li.' + CLASSES.option).first();
+  var prevEl = highlightedEl.prevAll('li.' + CSS.option).first();
   if (prevEl.length === 1) {
-    prevEl.addClass(CLASSES.highlightedOption);
+    prevEl.addClass(CSS.highlightedOption);
   }
   // we are at the top, highlight the last option
   else {
-    dropdownEl.find('li.' + CLASSES.option).last()
-      .addClass(CLASSES.highlightedOption);
+    dropdownEl.find('li.' + CSS.option).last()
+      .addClass(CSS.highlightedOption);
   }
 
   // adjust list scrollbar
@@ -1774,20 +1809,20 @@ var pressUpArrow = function() {
 
 var pressDownArrow = function() {
   // get the highlighted element
-  var highlightedEl = dropdownEl.find('li.' + CLASSES.highlightedOption);
+  var highlightedEl = dropdownEl.find('li.' + CSS.highlightedOption);
 
   // remove the highlight
-  highlightedEl.removeClass(CLASSES.highlightedOption);
+  highlightedEl.removeClass(CSS.highlightedOption);
 
   // get the next option
-  var nextEl = highlightedEl.nextAll('li.' + CLASSES.option).first();
+  var nextEl = highlightedEl.nextAll('li.' + CSS.option).first();
   if (nextEl.length === 1) {
-    nextEl.addClass(CLASSES.highlightedOption);
+    nextEl.addClass(CSS.highlightedOption);
   }
   // we are at the bottom, highlight the top option
   else {
-    dropdownEl.find('li.' + CLASSES.option).first()
-      .addClass(CLASSES.highlightedOption);
+    dropdownEl.find('li.' + CSS.option).first()
+      .addClass(CSS.highlightedOption);
   }
 
   // adjust list scrollbar
@@ -1813,11 +1848,12 @@ var pressEnterOrTab = function() {
 };
 
 var pressRegularKey = function() {
-  // clear the timeout from a previous keystroke
-  clearTimeout(AJAX_BUFFER_TIMEOUT);
+  // clear the ajax timeout from a previous keystroke
+  window.clearTimeout(AJAX_BUFFER_TIMEOUT);
 
   // cancel any existing AJAX request
-  if (typeof AJAX_OBJECT.abort === 'function') {
+  if (AJAX_OBJECT.hasOwnProperty('abort') === true &&
+      typeof AJAX_OBJECT.abort === 'function') {
     AJAX_OBJECT.abort();
   }
 
@@ -1833,8 +1869,7 @@ var pressRegularKey = function() {
 
   var inputValue = inputEl.val();
 
-  updateInputWidth(inputValue);
-
+  // remove token group highlight if they are typing
   if (inputValue !== '') {
     clearTokenGroupHighlight();
   }
@@ -1846,7 +1881,8 @@ var pressRegularKey = function() {
   var options = matchOptions(inputValue, list);
 
   // modify the options with their custom function
-  if (typeof list.matchOptions === 'function') {
+  if (list.hasOwnProperty('matchOptions') === true &&
+      typeof list.matchOptions === 'function') {
     options = list.matchOptions(inputValue, options, deepCopy(list.options),
       getValue());
   }
@@ -1884,6 +1920,8 @@ var pressRegularKey = function() {
 
   // show the options
   showOptions(html);
+
+  // TODO: should these be in showOptions?
   markFirstLastOptions();
   highlightFirstOption();
 
@@ -1925,7 +1963,7 @@ var clickTokenGroup = function(e) {
   clearTokenGroupHighlight();
 
   // highlight this token group
-  $(this).addClass(CLASSES.selectedTokenGroup);
+  $(this).addClass(CSS.selectedTokenGroup);
 };
 
 var clickRemoveTokenGroup = function(e) {
@@ -1936,8 +1974,8 @@ var clickRemoveTokenGroup = function(e) {
 
   clearTokenGroupHighlight();
 
-  $(this).parents('div.' + CLASSES.tokenGroup)
-    .addClass(CLASSES.selectedTokenGroup);
+  $(this).parents('div.' + CSS.tokenGroup)
+    .addClass(CSS.selectedTokenGroup);
 
   removeHighlightedTokenGroup();
 };
@@ -1968,14 +2006,21 @@ var focusInput = function(e) {
 
   // update state
   INPUT_HAS_FOCUS = true;
+
+  // sanity check / safeguard
+  // TODO: is this necessary?
   if (listExists(CURRENT_LIST_NAME) !== true) {
-    CURRENT_LIST_NAME = cfg.initialList;
+    setCurrentList(cfg.initialList);
   }
 
   hidePlaceholder();
   clearTokenGroupHighlight();
   positionDropdownEl();
+
+  // simulate keypress
   pressRegularKey();
+
+  // TODO: should this be here?
   adjustDropdownScroll();
 };
 
@@ -1990,7 +2035,7 @@ var blurInput = function(e) {
   }
 };
 
-var keydownInputElement = function(e) {
+var keydownInput = function(e) {
   var keyCode = e.which;
   var inputValue = inputEl.val();
 
@@ -2155,7 +2200,7 @@ widget.destroy = function() {
   destroyWidget();
 };
 
-widget.focus = function() {
+widget.focus = function(callback) {
   // Add a slight pause to let other events finish, then put the focus
   // on the input field.
   // If we don't do this and the user attaches this function to a button,
@@ -2166,6 +2211,9 @@ widget.focus = function() {
   // result in unexpected behavior elsewhere.
   window.setTimeout(function() {
     inputEl.focus();
+    if (typeof callback === 'function') {
+      callback();
+    }
   }, 5);
 };
 
@@ -2313,11 +2361,11 @@ widget.setValue = function(value) {
 // shorthand for getValue and setValue
 widget.val = function(value) {
   if (arguments.length === 0) {
-    return getValue();
+    return widget.getValue();
   }
 
   if (arguments.length === 1) {
-    return setValue(value);
+    return widget.setValue(value);
   }
 
   error(9992, 'Wrong number of arguments passed to val method.');
@@ -2332,15 +2380,16 @@ var addEvents = function() {
   // NOTE: using delegate and bind here instead of $.on to
   // maintain compatibility with older jquery versions
   containerEl.bind('click', clickContainerElement);
-  containerEl.delegate('input.autocomplete-input', 'keydown',
-    keydownInputElement);
+  containerEl.delegate('input.autocomplete-input', 'keydown', keydownInput);
+  containerEl.delegate('input.autocomplete-input', 'change keyup', 
+    updateInputWidth);
   containerEl.delegate('input.autocomplete-input', 'focus', focusInput);
   containerEl.delegate('input.autocomplete-input', 'blur', blurInput);
-  containerEl.delegate('li.' + CLASSES.option, 'click', clickOption);
-  containerEl.delegate('li.' + CLASSES.option, 'mouseover', mouseoverOption);
-  containerEl.delegate('div.' + CLASSES.tokenGroup, 'click', clickTokenGroup);
+  containerEl.delegate('li.' + CSS.option, 'click', clickOption);
+  containerEl.delegate('li.' + CSS.option, 'mouseover', mouseoverOption);
+  containerEl.delegate('div.' + CSS.tokenGroup, 'click', clickTokenGroup);
   containerEl.delegate(
-    'div.' + CLASSES.tokenGroup + ' span.' + CLASSES.removeTokenGroup,
+    'div.' + CSS.tokenGroup + ' span.' + CSS.removeTokenGroup,
     'click', clickRemoveTokenGroup);
 
   // catch all clicks on the page
