@@ -2247,11 +2247,11 @@ widget.getValue = function() {
 
 // alias for widget.getList and widget.setList
 widget.list = function(name, list) {
-  if (arguments.length === 0) {
+  if (arguments.length === 1) {
     return widget.getList(name);
   }
 
-  if (arguments.length === 1) {
+  if (arguments.length === 2) {
     return widget.setList(name, list);
   }
 
