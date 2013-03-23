@@ -2245,14 +2245,14 @@ widget.getValue = function() {
   return getValue();
 };
 
-// shorthand for getList, setList
+// alias for widget.getList and widget.setList
 widget.list = function(name, list) {
   if (arguments.length === 0) {
-    return getList(name);
+    return widget.getList(name);
   }
 
   if (arguments.length === 1) {
-    return setList(name, list);
+    return widget.setList(name, list);
   }
 
   error(5938, 'Wrong number of arguments passed to list method.');
@@ -2358,7 +2358,7 @@ widget.setValue = function(value) {
   return true;
 };
 
-// shorthand for getValue and setValue
+// alias for widget.getValue and widget.setValue
 widget.val = function(value) {
   if (arguments.length === 0) {
     return widget.getValue();
