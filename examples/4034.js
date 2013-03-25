@@ -34,7 +34,7 @@ var buildToken = function(option) {
 };
 
 var config = {
-  placeholderHTML: 'Search Users',
+  placeholderHTML: 'Select Users',
   lists: {
     users: {
       optionHTML: buildOption,

@@ -620,10 +620,6 @@ var expandListObject = function(list) {
     list.highlightMatches = true;
   }
 
-  //if (typeof list.matchProperties === 'string') {
-  //  list.matchProperties = [list.matchProperties];
-  //}
-
   // noResultsHTML default
   if (typeof list.noResultsHTML !== 'string' &&
       typeof list.noResultsHTML !== 'function') {
@@ -1499,7 +1495,7 @@ var sendAjaxRequest = function(list, inputValue) {
   //       then I think it would make sense to cache other types too
   var cacheKey = false;
   if (ajaxOpts.type.toUpperCase() === 'GET') {
-    cacheKey = ajaxOpts.type.toUpperCase() + ' ' + ajaxOpts.url;
+    cacheKey = 'GET ' + ajaxOpts.url;
   }
 
   // create callbacks

@@ -155,7 +155,7 @@
   "desc":[
     "Internally, AutoComplete uses the jQuery <a href='http://api.jquery.com/jQuery.ajax/' target='_blank'><code class='js plain'>$.ajax()</code></a> method to make AJAX requests.",
     "If provided, <code class='js plain'>ajaxOpts</code> will be called with <a href='http://api.jquery.com/jQuery.extend/'><code class='js plain'>$.extend()</code></a> against the default settings.",
-    "You can override any <code class='js plain'>$.ajax()</code> parameter except: <code class='js plain'>async</code>, <code class='js plain'>complete</code>, <code class='js plain'>error</code>, <code class='js plain'>statusCode</code>, <code class='js plain'>success</code> (ie: parameters that influence control flow)",
+    "You can override any <code class='js plain'>$.ajax()</code> parameter except: <code class='js plain'>async</code>, <code class='js plain'>complete</code>, <code class='js plain'>error</code>, <code class='js plain'>statusCode</code>, <code class='js plain'>success</code> (ie: parameters that effect control flow)",
     "If <code class='js plain'>ajaxOpts</code> is a function the first argument is the text that the user has typed and the second argument is the current value of the AutoComplete widget.",
     "The function should return an object to pass to <code class='js plain'>$.ajax()</code>."
   ],
@@ -403,7 +403,7 @@
   "req":true,
   "default":false,
   "desc":[
-    "<code class='js plain'>value</code> is what gets saved in the Token when the user selects the option from the dropdown list.",
+    "<code class='js plain'>value</code> is what gets saved in the <a href='docs#token_object'>Token Object</a> when the user selects the option from the dropdown list.",
     "<code class='js plain'>value</code> can be anything that is safe to call <code class='js plain'>JSON.stringify()</code> on."
   ]
 },
@@ -741,7 +741,7 @@
 {
   "id":3776,
   "desc":"Invalid Value returned from your custom onChange function.",
-  "fix":"If you specify an <a href='docs#config_object:onChange'><code class='js plain'>onChange</code></a> function, it must return an array of <a href='docs#token_object'>Token Objects</a>."
+  "fix":"If you specify an <a href='docs#config_object:onChange'><code class='js plain'>onChange</code></a> function, it must return an array of <a href='docs#token_object'>Token Groups</a>."
 },
 {
   "id":4823,
