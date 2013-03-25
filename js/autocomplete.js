@@ -202,12 +202,10 @@ var tmpl = function(str, obj, htmlEscape) {
   return str;
 };
 
-// IE7 / 8 fix
-Date.now = Date.now || function() { return +new Date; };
-
 // returns the current time in seconds
 var now = function() {
-  return parseInt(Date.now() / 1000, 10);
+  // NOTE: Date.now() is not supported in IE7 or IE8
+  return parseInt(new Date().getTime() / 1000, 10);
 };
 
 // TODO: need to break this up into two functions
