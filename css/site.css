@@ -175,11 +175,10 @@ input.demo-btn {
   margin-top: 15px;
 }
 div.section {
-  margin-bottom: 60px !important;
+  padding: 0px 0px 15px 0px;
 }
 input#runAgainBtn {
-  margin-top: 6px;
-  width: 100%;
+  margin-top: 12px;
 }
 h2#example_name {
   margin-top: 0px;

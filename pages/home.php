@@ -8,14 +8,12 @@ include(APP_PATH . 'pages/header.php');
   <h3>AutoCompleteJS is a JavaScript widget that helps your users find things quickly.</h3>
 </div>
 
-<div class="row section">
-  <div class="ten columns">
-    <div id="awesome"></div>
-  </div>
-  <div class="two columns">
-    <input type="button" class="button radius demo-btn" id="runAgainBtn" value="Run Again" style="display:none" />
-  </div>
+<div class="section">
+  <div id="awesome"></div>
+  <input type="button" class="button radius demo-btn" id="runAgainBtn" value="Run Again" style="visibility:hidden" />
 </div>
+
+<hr />
 
 <div class="section">
 <h2>Usage</h2>
@@ -31,6 +29,8 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 <h4>Result:</h4>
 <div id="search_bar"></div>
 </div>
+
+<hr />
 
 <div class="section">
 <h2>Get It</h2>
@@ -85,7 +85,7 @@ var getRandomInt = function(min, max) {
 
 var createRandomPath = function() {
   var actions = [
-    function() { $('#runAgainBtn').css('display', 'none'); },
+    function() { $('#runAgainBtn').css('visibility', 'hidden'); },
     function() { awesome.setInput('a'); },
     function() { awesome.setInput('au'); },
     function() { awesome.setInput('aut'); },
@@ -119,7 +119,7 @@ var createRandomPath = function() {
       awesome.pressEnter();
       awesome.blur();
     },
-    function() { $('#runAgainBtn').fadeIn('fast'); }
+    function() { $('#runAgainBtn').css('visibility', ''); }
   );
 
   return actions;
