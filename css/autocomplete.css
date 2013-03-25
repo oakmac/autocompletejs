@@ -88,11 +88,6 @@ div.autocomplete_internal_container ul.dropdown li span.children-indicator {
 div.autocomplete_internal_container ul.dropdown li.option {
   cursor: pointer;
 }
-div.autocomplete_internal_container ul.dropdown li.group {
-  background: #e3e3e3;
-  color: #000;
-  font-size: 14px;
-}
 div.autocomplete_internal_container ul.dropdown li.highlighted {
   background: #00519d;
   color: white;

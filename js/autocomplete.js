@@ -833,42 +833,14 @@ var buildOption = function(option, parentList) {
   return html;
 };
 
-// TODO: this function could be more efficient
 var buildOptions = function(options, parentList, appendVisibleOptions) {
   if (appendVisibleOptions !== true) {
     VISIBLE_OPTIONS = {};
   }
 
-  var html = '',
-      groups = getGroups(options),
-      i,
-      j;
-
-  // sort the groups
-  // TODO: need to document this
-  if (typeof parentList.groupSort === 'function') {
-    groups.sort(parentList.groupSort);
-  }
-  else {
-    groups.sort();
-  }
-
-  // build all options without groups first
-  for (i = 0; i < options.length; i++) {
-    if (typeof options[i].group !== 'string') {
-      html += buildOption(options[i], parentList);
-    }
-  }
-
-  // build the groups
-  for (i = 0; i < groups.length; i++) {
-    html += '<li class="group">' + encode(groups[i]) + '</li>';
-
-    for (j = 0; j < options.length; j++) {
-      if (groups[i] === options[j].group) {
-        html += buildOption(options[j], parentList);
-      }
-    }
+  var html = '';
+  for (var i = 0, len = options.length; i < len; i++) {
+    html += buildOption(options[i], parentList);
   }
 
   return html;
@@ -1100,7 +1072,6 @@ var adjustDropdownScroll = function() {
   var scrollTop = dropdownEl.scrollTop();
 
   // if the first option is selected, set scrollTop to it's highest in case
-  // there is a group <li> above it
   if (dropdownEl.find('li.' + CSS.option).
         filter(':first').
         hasClass(CSS.highlightedOption) === true) {
@@ -1198,17 +1169,6 @@ var setValue = function(newValue) {
   //setCurrentList(cfg.initialList);
   updateTokens();
   positionDropdownEl();
-};
-
-// returns a unique array of groups from an array of Option Objects
-var getGroups = function(options) {
-  var groups = {};
-  for (var i = 0; i < options.length; i++) {
-    if (typeof options[i].group === 'string') {
-      groups[options[i].group] = 0;
-    }
-  }
-  return keys(groups);
 };
 
 var listExists = function(listName) {
@@ -1744,7 +1704,7 @@ var findCharsToMatchAgainst = function(str) {
   // decode the special chars to regular chars for our search
   str = decode(str);
 
-  // TODO: the above two steps could be combined to reduce
+  // NOTE: the above two steps could be combined to reduce
   //       one less regex loop, but code would be harder to
   //       understand
 
