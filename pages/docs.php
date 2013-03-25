@@ -249,7 +249,7 @@ function buildPropRow($propType, $prop, $examples) {
 
   // property and type
   $html .= '  <td>'."\n";
-  $html .= buildPropertyAndType($prop['name'], $prop['type']);
+  $html .= buildPropertyAndType($propType, $prop['name'], $prop['type']);
   $html .= '  </td>'."\n";
 
   // required
@@ -292,7 +292,7 @@ function buildMethodRow($method, $examples) {
   }
 
   // name
-  $html .= '  <td><code class="js plain">'.$method['name'].'</code></td>'."\n";
+  $html .= '  <td><a href="docs#methods:'.$nameNoParens.'"><code class="js plain">'.$method['name'].'</code></a></td>'."\n";
 
   // args
   if (array_key_exists('args', $method) === true) {
@@ -332,8 +332,8 @@ function getExampleByNumber($number, $examples) {
   return false;
 }
 
-function buildPropertyAndType($name, $type) {
-  $html  = '    <p><code class="js plain">'.$name.'</code></p>'."\n";
+function buildPropertyAndType($section, $name, $type) {
+  $html  = '    <p><a href="docs#'.$section.':'.$name.'"><code class="js plain">'.$name.'</code></a></p>'."\n";
   $html .= '    <p>'.buildType($type).'</p>'."\n";
   return $html;
 }
@@ -404,7 +404,7 @@ function buildErrorRow($error) {
   $html .= '<tr id="errors:'.$error['id'].'">'."\n";
 
   // id
-  $html .= '  <td class="center">'.$error['id'].'</td>'."\n";
+  $html .= '  <td class="center"><a href="docs#errors:'.$error['id'].'">'.$error['id'].'</a></td>'."\n";
 
   // desc
   $html .= '  <td>'.htmlspecialchars($error['desc']).'</td>'."\n";
