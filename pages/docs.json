@@ -704,7 +704,7 @@
 {
   "id":2535,
   "desc":"The list object for list \"<listName>\" is invalid.",
-  "fix":"The structure of your <a href='docs#list_object'>List Object</a> is incorrect."
+  "fix":"The structure of your <a href='docs#list_object'>List Object</a> is invalid."
 },
 {
   "id":2642,
@@ -719,7 +719,7 @@
 {
   "id":2732,
   "desc":"The list object passed to the setList method is not valid.",
-  "fix":"The structure of your <a href='docs#list_object'>List Object</a> is incorrect."
+  "fix":"The structure of your <a href='docs#list_object'>List Object</a> is invalid."
 },
 {
   "id":2789,
