@@ -81,6 +81,7 @@ var CSS = {
   ajaxError: 'ajax-error',
   ajaxLoading: 'ajax-loading',
   highlightedOption: 'highlighted',
+  noResults: 'no-results',
   option: 'option',
   removeTokenGroup: 'remove-token-group',
   selectedTokenGroup: 'selected',
@@ -420,8 +421,8 @@ var validListObject = function(obj) {
     return false;
   }
 
-  // TODO: finish me
   // TODO: show an error when a value.children is not a valid list option
+  // TODO: what else do we need to validate on the List Object?
 
   return true;
 };
@@ -782,32 +783,51 @@ var buildWidget = function() {
   return html;
 };
 
-// TODO: throw error if their optionHTML function did not return a string
-// TODO: need to revisit this; was very distracted when I last re-factored it
 var buildOptionHTML = function(option, parentList) {
+  // optionHTML on the option object
   if (typeof option.optionHTML === 'string') {
     return option.optionHTML;
   }
 
+  // parent list has optionHTML as a string template
   if (typeof parentList.optionHTML === 'string' &&
       isObject(option.value) === true) {
     return tmpl(parentList.optionHTML, option.value, true);
   }
 
+  // parent list has optionHTML as a function
   if (typeof parentList.optionHTML === 'function') {
-    return parentList.optionHTML(option);
+    var html = parentList.optionHTML(option);
+    if (typeof html === 'string') {
+      return html;
+    }
+
+    // throw error if their optionHTML function did not return a string
+    error(3843, 'optionHTML function did not return a string.', option);
   }
 
+  // value is a string or number
   if (typeof option.value === 'string' ||
       typeof option.value === 'number') {
     return encode(option.value);
   }
 
-  // TODO: I should iterate through the .value here and
-  //       return the first thing that is a String
-  //       but also throw an error
-  // TODO: list validation should ensure that this never
-  //       happens
+  // TODO: list validation should ensure that we never get here
+
+  // last-ditch effort: iterate through option.value and print
+  // the first thing that is a string
+  if (isObject(option.value) === true) {
+    for (var i in option.value) {
+      if (option.hasOwnProperty(i) !== true) continue;
+      if (typeof option[i] === 'string') {
+
+        error(3193, 'Could not find a valid value for optionHTML. ' +
+          'Resorted to using value property "' + i + '"', option);
+
+        return encode(option[i]);
+      }
+    }
+  }
 
   // NOTE: this should never happen
   error(5783, 'Unable to create HTML string for optionHTML.', option);
@@ -877,7 +897,7 @@ var buildTokens = function(tokens) {
 
     for (var j = 0; j < tokenGroup.length; j++) {
       html += '<span class="token">' +
-      tokenGroup[j].tokenHTML + '</span>';
+        tokenGroup[j].tokenHTML + '</span>';
 
       // show child indicator
       if (j !== tokenGroup.length - 1) {
@@ -926,12 +946,11 @@ var buildStringOrFunction = function(cssClass, strOrFn, inputValue) {
 };
 
 var buildNoResults = function(noResultsHTML, inputValue) {
-  return buildStringOrFunction('no-results', noResultsHTML, inputValue);
+  return buildStringOrFunction(CSS.noResults, noResultsHTML, inputValue);
 };
 
 var buildLoading = function(ajaxLoadingHTML, inputValue) {
-  return buildStringOrFunction(CSS.ajaxLoading,
-    ajaxLoadingHTML, inputValue);
+  return buildStringOrFunction(CSS.ajaxLoading, ajaxLoadingHTML, inputValue);
 };
 
 //------------------------------------------------------------------------------
