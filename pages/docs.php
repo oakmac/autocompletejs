@@ -7,7 +7,7 @@ $docs = AC::getDocs();
 ?>
 
 <div class="section">
-<h2 id="config_object">AutoComplete Config Object</h2>
+<h2 id="config_object">Config Object</h2>
 <p>The Config Object initializes the AutoComplete widget.</p>
 <p>You define your <a href="docs#list_object">List Objects</a> - which control which options are available to the user - on the <a href="docs#config_object:lists"><code class="js plain">lists</code></a> property.</p>
 <p>As a shorthand method, you can provide an array of <a href="docs#option_object">Option Objects</a> to the config object and it will be expanded as the default list for the widget. See the <a href="examples#1000">Simple List Example</a>.</p>
@@ -141,7 +141,7 @@ foreach($docs['Token Object'] as $prop) {
 <hr class="divider" />
 
 <div class="section">
-<h2 id="methods">AutoComplete Methods</h2>
+<h2 id="methods">Methods</h2>
 <p>Each AutoComplete object has methods you can use to interact with the widget.</p>
 <table cellspacing="0">
 <thead>
@@ -157,6 +157,39 @@ foreach($docs['Token Object'] as $prop) {
 foreach($docs['Methods'] as $method) {
   if (is_array($method) !== true) continue;
   echo buildMethodRow($method, $examples);
+}
+?>
+</tbody>
+</table>
+</div><!-- end div.section -->
+
+<hr class="divider" />
+
+<div class="section">
+<h2 id="errors">Errors</h2>
+<!--
+<div class="panel etymology">
+  <div class="word">error</div>
+  <div class="part-of-speech">Noun</div>
+  <div class="definition">A mistake.</div>
+</div>
+-->
+<p>AutoComplete has an error system designed to inform you when you use the API incorrectly.</p>
+<p>Every alert has a unique code associated with it and you can control how the errors are presented with the <a href="docs#config_object:showErrors">showErrors</a> config option.</p>
+<table cellspacing="0">
+<thead>
+<tr>
+  <th style="width: 75px">Error ID</th>
+  <th style="width: 45%">Error Text</th>
+  <th>More Information</th>
+</tr>
+</thead>
+<tbody>
+<?php
+
+foreach($docs['Errors'] as $error) {
+  if (is_array($error) !== true) continue;
+  echo buildErrorRow($error);
 }
 ?>
 </tbody>
@@ -361,6 +394,39 @@ function buildExample($ex, $allExamples) {
 
     $html .= '    <p><a href="examples#'.$exNum.'">'.$example['name'].'</a></p>'."\n";
   }
+  return $html;
+}
+
+function buildErrorRow($error) {
+  $html = '';
+
+  // table row
+  $html .= '<tr id="errors:'.$error['id'].'">'."\n";
+
+  // id
+  $html .= '  <td class="center">'.$error['id'].'</td>'."\n";
+
+  // desc
+  $html .= '  <td>'.htmlspecialchars($error['desc']).'</td>'."\n";
+
+  // more information
+  if (array_key_exists('fix', $error) === true) {
+    if (is_array($error['fix']) !== true) {
+      $error['fix'] = array($error['fix']);
+    }
+
+    $html .= '  <td>'."\n";
+    foreach ($error['fix'] as $p) {
+      $html .= '    <p>'.$p.'</p>'."\n";
+    }
+    $html .= '  </td>'."\n";
+  }
+  else {
+    $html .= '  <td><small>n/a</small></td>'."\n";
+  }
+
+  $html .= "</tr>\n";
+
   return $html;
 }
 

@@ -488,7 +488,7 @@ var sanityChecks = function() {
   if (! (typeof window.$ && $.fn && $.fn.jquery >= MINIMUM_JQUERY_VERSION)) {
     window.alert('AutoComplete Error 1004: Unable to find a valid version ' +
       'of jQuery. Please include jQuery ' + MINIMUM_JQUERY_VERSION + ' or ' +
-      'greater on the page.\n\nExiting...');
+      'higher on the page.\n\nExiting...');
     return false;
   }
 
@@ -693,7 +693,7 @@ var expandConfig = function() {
     }
     // else show an error
     else {
-      error(6447, 'Invalid value passed to initialValue', cfg.initialValue);
+      error(6447, 'Invalid value passed to initialValue.', cfg.initialValue);
     }
   }
 
@@ -720,7 +720,7 @@ var expandConfig = function() {
 
     // check the list name
     if (validListName(i) !== true) {
-      error(2642, 'You cannot use the empty string for a list name.');
+      error(2642, 'You cannot use an empty string for a list name.');
       delete cfg.lists[i];
       continue;
     }
@@ -754,7 +754,7 @@ var expandConfig = function() {
 
   if (listExists(cfg.initialList) !== true) {
     error(2728, 'initialList "' + cfg.initialList + '" does not exist ' +
-      'on the lists object');
+      'on the lists object.');
 
     // set initialList to the first list in lists
     cfg.initialList = listNames[0];
@@ -895,6 +895,8 @@ var buildTokenHTML = function(option, parentList) {
   return buildOptionHTML(option, parentList);
 };
 
+// TODO: reduce the level of indentation in this function
+//       code smell
 var buildTokens = function(tokens) {
   var html = '';
   for (var i = 0; i < tokens.length; i++) {
@@ -2340,7 +2342,8 @@ widget.setList = function(name, list) {
 
   // list must be valid
   if (validListObject(list) !== true) {
-    error(2732, 'The list object passed to setList method is not valid.', list);
+    error(2732,
+      'The list object passed to the setList method is not valid.', list);
     return false;
   }
 
@@ -2351,7 +2354,7 @@ widget.setList = function(name, list) {
 
 widget.setValue = function(value) {
   if (validValue(value) !== true) {
-    error(6823, 'Invalid value passed to setValue method.', value);
+    error(6823, 'Invalid value passed to the setValue method.', value);
     return false;
   }
   setValue(expandValue(value));
@@ -2381,7 +2384,7 @@ var addEvents = function() {
   // maintain compatibility with older jquery versions
   containerEl.bind('click', clickContainerElement);
   containerEl.delegate('input.autocomplete-input', 'keydown', keydownInput);
-  containerEl.delegate('input.autocomplete-input', 'change keyup', 
+  containerEl.delegate('input.autocomplete-input', 'change keyup',
     updateInputWidth);
   containerEl.delegate('input.autocomplete-input', 'focus', focusInput);
   containerEl.delegate('input.autocomplete-input', 'blur', blurInput);
