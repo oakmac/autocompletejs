@@ -1254,6 +1254,11 @@ var removeHighlightedTokenGroup = function() {
   }
 
   removeTokenGroup(tokenGroupIndex);
+
+  if (INPUT_HAS_FOCUS === true) {
+    hideOptions();
+    focusInput();
+  }
 };
 
 var createTokenFromOption = function(option) {
@@ -1924,7 +1929,7 @@ var clickPage = function(e) {
 };
 
 // click on the container
-var clickContainerElement = function(e) {
+var clickContainerElement = function() {
   // put the focus on the input element if it doesn't already have it
   if (INPUT_HAS_FOCUS !== true) {
     inputEl.focus();
@@ -1974,7 +1979,7 @@ var mouseoverOption = function() {
   highlightOption(this);
 };
 
-var focusInput = function(e) {
+var focusInput = function() {
   // exit if we are already at maxTokenGroups
   if (typeof cfg.maxTokenGroups === 'number' &&
       TOKENS.length >= cfg.maxTokenGroups &&
@@ -2002,7 +2007,7 @@ var focusInput = function(e) {
   adjustDropdownScroll();
 };
 
-var blurInput = function(e) {
+var blurInput = function() {
   INPUT_HAS_FOCUS = false;
 
   // add the placeholder if necessary
