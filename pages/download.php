@@ -6,10 +6,21 @@ include(APP_PATH . 'pages/header.php');
 
 <div class="section">
 <h1>Downloads</h1>
-<a class="button large radius" href="releases/0.1.0/autocomplete-0.1.0.zip" style="line-height: 22px">
+<a class="button large radius" href="releases/0.2.0/autocomplete-0.2.0.zip" style="line-height: 22px">
   Download Most Recent Version<br />
-  <small style="font-weight: normal; font-size: 12px">v0.1.0</small>
+  <small style="font-weight: normal; font-size: 12px">v0.2.0</small>
 </a>
+</div>
+
+<div class="section release">
+<h4>v0.2.0 <small>released 25 Mar 2013</small></h4>
+<ul>
+  <li><a href="releases/0.2.0/autocomplete-0.2.0.zip">autocomplete-0.2.0.zip</a> <small>68.3 KB</small></li>
+  <li><a href="releases/0.2.0/autocomplete-0.2.0.js">autocomplete-0.2.0.js</a> <small>65.0 KB</small></li>
+  <li><a href="releases/0.2.0/autocomplete-0.2.0.min.js">autocomplete-0.2.0.min.js</a> <small>20.9KB</small></li>
+  <li><a href="releases/0.2.0/autocomplete-0.2.0.css">autocomplete-0.2.0.css</a> <small>2.89 KB</small></li>
+  <li><a href="releases/0.2.0/autocomplete-0.2.0.min.css">autocomplete-0.2.0.min.css</a> <small>2.32 KB</small></li>
+</ul>
 </div>
 
 <div class="section release">

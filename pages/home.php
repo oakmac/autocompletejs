@@ -34,9 +34,9 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 
 <div class="section">
 <h2>Get It</h2>
-<a class="button large radius" href="releases/0.1.0/autocomplete-0.1.0.zip" style="line-height: 22px">
+<a class="button large radius" href="releases/0.2.0/autocomplete-0.2.0.zip" style="line-height: 22px">
   Download Most Recent Version<br />
-  <small style="font-weight: normal; font-size: 12px">v0.1.0</small>
+  <small style="font-weight: normal; font-size: 12px">v0.2.0</small>
 </a>
 </div>
 

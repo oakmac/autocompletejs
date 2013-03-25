@@ -1,5 +1,5 @@
 /*!
- * AutoCompleteJS JavaScript Widget
+ * AutoCompleteJS v0.2.0
  * http://autocompletejs.com/
  *
  * Copyright 2013 Chris Oakman
