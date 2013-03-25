@@ -202,6 +202,9 @@ var tmpl = function(str, obj, htmlEscape) {
   return str;
 };
 
+// IE7 / 8 fix
+Date.now = Date.now || function() { return +new Date; };
+
 // returns the current time in seconds
 var now = function() {
   return parseInt(Date.now() / 1000, 10);
