@@ -35,6 +35,8 @@ foreach ($examples as $ex) {
 
   // temporary
   if ($ex['js'] === '') continue;
+  if (array_key_exists('hidden', $ex) === true &&
+      $ex['hidden'] === true) continue;
 
   echo "\n";
   echo 'examples["'.$ex['number'].'"] = {'."\n";
@@ -126,6 +128,8 @@ function buildExampleList($examples) {
 
     // temporary
     if ($ex['js'] === '') continue;
+    if (array_key_exists('hidden', $ex) === true &&
+        $ex['hidden'] === true) continue;
 
     if ($ex['group'] !== $currentGroup) {
       if ($currentGroup !== false) {

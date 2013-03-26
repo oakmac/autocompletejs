@@ -85,7 +85,8 @@
 {
   "group": "Initial Config",
   "number": 3088,
-  "name": "showErrors alert"
+  "name": "showErrors alert",
+  "hidden":true
 },
 {
   "group": "Initial Config",
