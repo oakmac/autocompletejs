@@ -1,26 +1,25 @@
 {
-    name: "AutoCompleteJS",
-    version: "0.2.0",
-    description: "AutoCompleteJS is a JavaScript widget that helps your users find things quickly.",
-    main: [
-        "./releases/0.2.0/autocomplete-0.2.0.min.js",
-        "./releases/0.2.0/autocomplete-0.2.0.min.css"
-    ],
-    homepage: "http://autocompletejs.com/",
-    dependencies: {
-        jquery: ">= 1.8.x"
-    },
-    keywords: [
-        "autocomplete",
-        "autosuggest",
-        "tokeninput",
-        "input"
-    ],
-    author: {
-        name: "Chris Oakman",
-        web: "http://oakmac.com/"
-    },
-    license: [
-        "http://www.opensource.org/licenses/mit-license.php"
-    ]
+  "name": "AutoCompleteJS",
+  "version": "0.2.0",
+  "description": "AutoCompleteJS is a JavaScript widget that helps your users find things quickly.",
+  "main": [
+    "./releases/0.2.0/autocomplete-0.2.0.min.js",
+    "./releases/0.2.0/autocomplete-0.2.0.min.css"
+  ],
+  "homepage": "http://autocompletejs.com/",
+  "dependencies": {
+    "jquery": ">= 1.4.2"
+  },
+  "keywords": [
+    "autocomplete",
+    "autosuggest",
+    "tokeninput",
+    "input"
+  ],
+  "author": {
+    "name": "Chris Oakman"
+  },
+  "license": [
+    "http://www.opensource.org/licenses/mit-license.php"
+  ]
 }
