@@ -37,7 +37,7 @@ public static function buildTopBar($active_tab) {
 
 // returns an array of all the examples
 public static function getExamples() {
-  $examples = self::getJSON('examples/examples.json');
+  $examples = self::getJSON('examples.json');
   $examples2 = array();
   for ($i = 0; $i < count($examples); $i++) {
     if (is_array($examples[$i]) !== true) continue;
@@ -68,9 +68,23 @@ public static function getExample($number) {
 }
 
 public static function getDocs() {
-  $docs = self::getJSON('pages/docs.json');
-  // TODO: strip the "----------------"
+  $docs = self::getJSON('docs.json');
+
+  // strip the "----------------" comments
+  foreach ($docs as $key => $value) {
+    $arr = array();
+    for ($i = 0; $i < count($value); $i++) {
+      if (is_array($value[$i]) !== true) continue;
+      array_push($arr, $value[$i]);
+    }
+    $docs[$key] = $arr;
+  }
+
   return $docs;
+}
+
+public static function getReleases() {
+  return self::getJSON('releases.json');
 }
 
 //---------------------------------------------------
@@ -79,7 +93,7 @@ public static function getDocs() {
 
 // this is mostly for my sanity when I'm editing the JSON and forget a comma
 private static function getJSON($filename) {
-  $data = json_decode(file_get_contents(APP_PATH.$filename), true);
+  $data = json_decode(file_get_contents(APP_PATH.'/data/'.$filename), true);
   if (is_array($data) !== true) {
     echo $filename.' is not valid JSON';
     die;

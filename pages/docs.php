@@ -25,7 +25,6 @@ $docs = AC::getDocs();
 <tbody>
 <?php
 foreach($docs['Config Object'] as $prop) {
-  if (is_array($prop) !== true) continue;
   echo buildPropRow('config_object', $prop, $examples);
 }
 ?>
@@ -60,7 +59,6 @@ foreach($docs['Config Object'] as $prop) {
 <tbody>
 <?php
 foreach($docs['List Object'] as $prop) {
-  if (is_array($prop) !== true) continue;
   echo buildPropRow('list_object', $prop, $examples);
 }
 ?>
@@ -94,8 +92,7 @@ foreach($docs['List Object'] as $prop) {
 </thead>
 <tbody>
 <?php
-  foreach($docs['Option Object'] as $prop) {
-  if (is_array($prop) !== true) continue;
+foreach($docs['Option Object'] as $prop) {
   echo buildPropRow('option_object', $prop, $examples);
 }
 ?>
@@ -130,7 +127,6 @@ foreach($docs['List Object'] as $prop) {
 <tbody>
 <?php
 foreach($docs['Token Object'] as $prop) {
-  if (is_array($prop) !== true) continue;
   echo buildPropRow('token_object', $prop, $examples);
 }
 ?>
@@ -155,7 +151,6 @@ foreach($docs['Token Object'] as $prop) {
 <tbody>
 <?php
 foreach($docs['Methods'] as $method) {
-  if (is_array($method) !== true) continue;
   echo buildMethodRow($method, $examples);
 }
 ?>
@@ -186,9 +181,7 @@ foreach($docs['Methods'] as $method) {
 </thead>
 <tbody>
 <?php
-
 foreach($docs['Errors'] as $error) {
-  if (is_array($error) !== true) continue;
   echo buildErrorRow($error);
 }
 ?>
