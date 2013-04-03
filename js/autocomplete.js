@@ -1053,7 +1053,7 @@ var markFirstLastOptions = function() {
 var calcTextWidth = function(text) {
   // add the text to the dummy span with some extra characters as a buffer
   // NOTE: "W" seems to be the widest character in most fonts
-  inputWidthProxyEl.html(text + 'WW');
+  inputWidthProxyEl.html(encode(text) + 'WW');
 
   // copy text-related css properties from the input element to the proxy
   var cssProps = {};
