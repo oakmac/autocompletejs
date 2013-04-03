@@ -281,6 +281,9 @@ hr.divider {
 div.release li {
   list-style: none;
 }
+ul.disc li {
+  list-style: disc;
+}
 table#markup_example_tbl {
   width: 100%;
   margin-bottom: 400px;

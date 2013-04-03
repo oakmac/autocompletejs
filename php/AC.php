@@ -84,7 +84,24 @@ public static function getDocs() {
 }
 
 public static function getReleases() {
-  return self::getJSON('releases.json');
+  $releases = self::getJSON('releases.json');
+
+  
+  $releases2 = array();
+  foreach ($releases as $release) {
+    // strip the "----------------" comments
+    if (is_array($release) !== true) continue;
+
+    // ignore unreleased versions
+    if (array_key_exists('released', $release) === true &&
+        $release['released'] === false) {
+      continue;
+    }
+
+    array_push($releases2, $release);
+  }
+
+  return $releases2;
 }
 
 //---------------------------------------------------

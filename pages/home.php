@@ -2,6 +2,8 @@
 $page_title = 'Home';
 $active_nav_tab = 'Home';
 include(APP_PATH . 'pages/header.php');
+$releases = AC::getReleases();
+$mostRecentVersion = $releases[0]['version'];
 ?>
 
 <div class="panel radius">
@@ -34,9 +36,9 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 
 <div class="section">
 <h2>Get It</h2>
-<a class="button large radius" href="releases/0.2.0/autocomplete-0.2.0.zip" style="line-height: 22px">
+<a class="button large radius" href="releases/<?php echo $mostRecentVersion; ?>/autocomplete-<?php echo $mostRecentVersion; ?>.zip" style="line-height: 22px">
   Download Most Recent Version<br />
-  <small style="font-weight: normal; font-size: 12px">v0.2.0</small>
+  <small style="font-weight: normal; font-size: 12px">v<?php echo $mostRecentVersion; ?></small>
 </a>
 </div>
 
@@ -141,6 +143,7 @@ var widget = new AutoComplete('search_bar', ['Apple', 'Banana', 'Orange']);
 }; // end init()
 $(document).ready(init);
 </script>
+
 <?php
 include(APP_PATH . 'pages/footer.php');
 ?>

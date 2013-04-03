@@ -2,37 +2,24 @@
 $page_title = 'Download';
 $active_nav_tab = 'Download';
 include(APP_PATH . 'pages/header.php');
+$releases = AC::getReleases();
+$mostRecentVersion = $releases[0]['version'];
 ?>
 
 <div class="section">
 <h1>Downloads</h1>
-<a class="button large radius" href="releases/0.2.0/autocomplete-0.2.0.zip" style="line-height: 22px">
+<a class="button large radius" href="releases/<?php echo $mostRecentVersion; ?>/autocomplete-<?php echo $mostRecentVersion; ?>.zip" style="line-height: 22px">
   Download Most Recent Version<br />
-  <small style="font-weight: normal; font-size: 12px">v0.2.0</small>
+  <small style="font-weight: normal; font-size: 12px">v<?php echo $mostRecentVersion; ?></small>
 </a>
 </div>
 
-<div class="section release">
-<h4>v0.2.0 <small>released 25 Mar 2013</small></h4>
-<ul>
-  <li><a href="releases/0.2.0/autocomplete-0.2.0.zip">autocomplete-0.2.0.zip</a> <small>68.3 KB</small></li>
-  <li><a href="releases/0.2.0/autocomplete-0.2.0.js">autocomplete-0.2.0.js</a> <small>65.0 KB</small></li>
-  <li><a href="releases/0.2.0/autocomplete-0.2.0.min.js">autocomplete-0.2.0.min.js</a> <small>20.9KB</small></li>
-  <li><a href="releases/0.2.0/autocomplete-0.2.0.css">autocomplete-0.2.0.css</a> <small>2.89 KB</small></li>
-  <li><a href="releases/0.2.0/autocomplete-0.2.0.min.css">autocomplete-0.2.0.min.css</a> <small>2.32 KB</small></li>
-</ul>
-</div>
-
-<div class="section release">
-<h4>v0.1.0 <small>released 14 Feb 2013</small></h4>
-<ul>
-  <li><a href="releases/0.1.0/autocomplete-0.1.0.zip">autocomplete-0.1.0.zip</a> <small>24.1 KB</small></li>
-  <li><a href="releases/0.1.0/autocomplete-0.1.0.js">autocomplete-0.1.0.js</a> <small>60.4 KB</small></li>
-  <li><a href="releases/0.1.0/autocomplete-0.1.0.min.js">autocomplete-0.1.0.min.js</a> <small>20.0KB</small></li>
-  <li><a href="releases/0.1.0/autocomplete-0.1.0.css">autocomplete-0.1.0.css</a> <small>2.92 KB</small></li>
-  <li><a href="releases/0.1.0/autocomplete-0.1.0.min.css">autocomplete-0.1.0.min.css</a> <small>2.44 KB</small></li>
-</ul>
-</div>
+<?php
+foreach ($releases as $release) {
+  if (array_key_exists('released', $release) === true && $release['released'] === false) continue;
+  echo buildRelease($release);
+}
+?>
 
 <div class="section">
 <h4>Development</h4>
@@ -41,4 +28,30 @@ include(APP_PATH . 'pages/header.php');
 
 <?php
 include(APP_PATH . 'pages/footer.php');
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
+function buildRelease($release) {
+  $v = $release['version'];
+
+  $html  = '<div class="section release">'."\n";
+  $html .= '<h4>v'.$v.' <small>released on '.$release['date'].'</small></h4>'."\n";
+  $html .= '<ul>'."\n";
+  foreach ($release['files'] as $file) {
+    $html .= '  <li><a href="releases/'.$v.'/'.$file['name'].'">'.$file['name'].'</a> <small>'.$file['size'].'</small></li>'."\n";
+  }
+  $html .= '</ul>'."\n";
+  $html .= '<h6>Changes:</h6>'."\n";
+  $html .= '<ul class="disc">'."\n";
+  foreach ($release['changes'] as $change) {
+    $html .= '  <li>'.htmlspecialchars($change).'</li>'."\n";
+  }
+  $html .= '</ul>'."\n";
+  $html .= '</div>'."\n\n";
+
+  return $html;
+}
+
 ?>
