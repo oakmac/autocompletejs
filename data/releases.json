@@ -2,8 +2,7 @@
 "-----------------------------------------------------------------",
 {
   "version":"0.2.1",
-  "released":false,
-  "date":"03 Apr 2013",
+  "date":"09 Apr 2013",
   "changes":[
     "Fix bug with escaping HTML when calculating the width of the input element"
   ],
