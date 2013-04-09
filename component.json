@@ -1,10 +1,10 @@
 {
   "name": "AutoCompleteJS",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AutoCompleteJS is a JavaScript widget that helps your users find things quickly.",
   "main": [
-    "./releases/0.2.0/autocomplete-0.2.0.min.js",
-    "./releases/0.2.0/autocomplete-0.2.0.min.css"
+    "./releases/0.2.1/autocomplete-0.2.1.min.js",
+    "./releases/0.2.1/autocomplete-0.2.1.min.css"
   ],
   "homepage": "http://autocompletejs.com/",
   "dependencies": {
