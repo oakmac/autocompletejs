@@ -47,7 +47,7 @@ var decode = function(str) {
 };
 
 window['AutoComplete'] = window['AutoComplete'] ||
-  function(containerElId, cfg) {
+  function(containerElOrId, cfg) {
 'use strict';
 
 //------------------------------------------------------------------------------
@@ -461,20 +461,41 @@ var error = function(code, msg, obj) {
 // NOTE: these are just being alerted and not going through the normal
 //       error process because they happen before any config is loaded
 var sanityChecks = function() {
-  // container ID must be a string
-  if (typeof containerElId !== 'string' || containerElId === '') {
-    window.alert('AutoComplete Error 1001: ' +
-      'The first argument to AutoComplete() must be a non-empty string.' +
-      '\n\nExiting...');
-    return false;
+  // if containerId is a string, it must be the ID of a DOM node
+  if (typeof containerElOrId === 'string') {
+    // cannot be empty
+    if (containerElOrId === '') {
+      window.alert('AutoComplete Error 1037: ' +
+        'The first argument to AutoComplete() cannot be an empty string.' +
+        '\n\nExiting...');
+      return false;
+    }
+
+    // make sure the container element exists in the DOM
+    var el = document.getElementById(containerElOrId);
+    if (! el) {
+      window.alert('AutoComplete Error 1002: Element with id "' +
+        containerElOrId + '" does not exist in the DOM.' +
+        '\n\nExiting...');
+      return false;
+    }
+
+    // set the containerEl
+    containerEl = $(el);
   }
 
-  // make sure the container element exists in the DOM
-  if (! document.getElementById(containerElId)) {
-    window.alert('AutoComplete Error 1002: ' +
-      'Element with id "' + containerElId + '" does not exist in the DOM.' +
-      '\n\nExiting...');
-    return false;
+  // else it must be something that becomes a jQuery collection
+  // with size 1
+  // ie: a single DOM node or jQuery object
+  else {
+    containerEl = $(containerElOrId);
+
+    if (containerEl.length !== 1) {
+      window.alert('AutoComplete Error 1044: The first argument to ' +
+        'AutoComplete() must be an ID or a single DOM node.' + 
+        '\n\nExiting...');
+      return false;
+    }
   }
 
   // JSON must exist
@@ -1923,7 +1944,7 @@ var pressRegularKey = function() {
 
 var clickPage = function(e) {
   // stop input if they clicked anywhere outside the container el
-  if ($(e.target).parents('#' + containerElId).length === 0) {
+  if ($(e.target).parents().index(containerEl) === -1) {
     hideOptions();
   }
 };
@@ -2384,9 +2405,6 @@ var addEvents = function() {
 };
 
 var initDom = function() {
-  // get the container element
-  containerEl = $('#' + containerElId);
-
   // build the markup inside the container
   containerEl.html(buildWidget());
 

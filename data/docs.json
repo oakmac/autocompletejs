@@ -651,16 +651,11 @@
 
 "Errors":[
 {
-  "id":1001,
-  "desc":"The first argument to AutoComplete() must be a non-empty string.",
-  "fix":"The first argument to the AutoComplete constructor should be the id of a DOM element."
-},
-{
   "id":1002,
   "desc":"Element with id \"<id>\" does not exist in the DOM.",
   "fix":[
     "AutoComplete could not find your element with <code class='js plain'>document.getElementById</code>.",
-    "Please note that the first argument should just be the id string, not a CSS selector (ie: <code class='js string'>\"search_bar\"</code>, not <code class='js string'>\"#search_bar\"</code>)."
+    "Please note that if you pass a string as the first argument to the AutoComplete() constructor it should be the value of a DOM id, not a CSS selector (ie: <code class='js string'>\"search_bar\"</code>, not <code class='js string'>\"#search_bar\"</code>)."
   ]
 },
 {
@@ -677,6 +672,16 @@
   "id":1005,
   "desc":"You must include at least one List Object on lists.",
   "fix":"The <a href='docs#config_object:lists'><code class='js plain'>lists</code></a> config is mandatory and must include at least one <a href='docs#list_object'>List Object</a>."
+},
+{
+  "id":1037,
+  "desc":"The first argument to AutoComplete() cannot be an empty string.",
+  "fix":"The first argument to the AutoComplete() constructor should be the id of a DOM element or a reference to a single DOM element."
+},
+{
+  "id":1044,
+  "desc":"The first argument to AutoComplete() must be an ID or a single DOM node.",
+  "fix":"The first argument to the AutoComplete() constructor should be the id of a DOM element or a reference to a single DOM element."
 },
 {
   "id":1273,
