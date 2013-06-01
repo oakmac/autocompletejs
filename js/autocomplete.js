@@ -154,6 +154,29 @@ var deepCopy = function(thing) {
   return JSON.parse(JSON.stringify(thing));
 };
 
+// parse a semantic versioning string
+var parseSemVer = function(version) {
+  var tmp = version.split('.');
+  return {
+    major: parseInt(tmp[0], 10),
+    minor: parseInt(tmp[1], 10),
+    patch: parseInt(tmp[2], 10)
+  };
+};
+
+// returns true if version is >= minimum
+var compareSemVer = function(version, minimum) {
+  version = parseSemVer(version);
+  minimum = parseSemVer(minimum);
+
+  var versionNum = (version.major * 10000 * 10000) + 
+    (version.minor * 10000) + version.patch;
+  var minimumNum = (minimum.major * 10000 * 10000) + 
+    (minimum.minor * 10000) + minimum.patch;
+
+  return (versionNum >= minimumNum);
+};
+
 // copied from modernizr
 LOCAL_STORAGE_AVAILABLE = (function() {
   var str = createId();
@@ -508,7 +531,8 @@ var sanityChecks = function() {
   }
 
   // check for the correct version of jquery
-  if (! (typeof window.$ && $.fn && $.fn.jquery >= MINIMUM_JQUERY_VERSION)) {
+  if (! (typeof window.$ && $.fn && $.fn.jquery &&
+      compareSemVer($.fn.jquery, MINIMUM_JQUERY_VERSION) === true)) {
     window.alert('AutoComplete Error 1004: Unable to find a valid version ' +
       'of jQuery. Please include jQuery ' + MINIMUM_JQUERY_VERSION + ' or ' +
       'higher on the page.\n\nExiting...');
