@@ -5,7 +5,8 @@
   "date":"09 Apr 2013",
   "released":false,
   "changes":[
-    "Allow DOM element to be passed to AutoComplete constructor"
+    "Allow DOM element to be passed to AutoComplete constructor",
+    "Fix bug with jQuery detection code"
   ],
   "files":[
     { "name":"autocomplete-0.3.0.zip", "size":"68.3 KB" },
