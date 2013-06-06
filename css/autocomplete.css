@@ -1,4 +1,8 @@
-div.autocomplete_internal_container {
+div.clear-53545 {
+  clear: both;
+}
+
+div.autocomplete-container-7a26d {
   border: 2px solid #ccc;
   color: #333;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -11,14 +15,16 @@ div.autocomplete_internal_container {
   -moz-border-radius: 8px;
   border-radius: 8px;
 }
-div.autocomplete_internal_container div.placeholder {
+
+div.placeholder-d722a {
   color: #777;
   float: left;
   font-size: 16px;
   line-height: 20px;
   margin: 10px 0 0 0;
 }
-div.autocomplete_internal_container input.autocomplete-input {
+
+input.input-8f2fe {
   background: transparent;
   border: 0px;
   -webkit-box-shadow: none;
@@ -35,7 +41,8 @@ div.autocomplete_internal_container input.autocomplete-input {
   vertical-align: middle;
   width: 120px;
 }
-div.autocomplete_internal_container div.token-group {
+
+div.token-group-c7334 {
   background: #eee;
   border: 1px solid #ccc;
   cursor: pointer;
@@ -46,11 +53,13 @@ div.autocomplete_internal_container div.token-group {
   -moz-border-radius: 6px;
   border-radius: 6px;
 }
-div.autocomplete_internal_container div.token-group span.remove-token-group {
+
+span.remove-token-group-53474 {
   font-size: 11px;
   margin-right: 2px;
 }
-div.autocomplete_internal_container div.selected {
+
+div.selected-token-group-359b9 {
   background: #b0d1f9;
   background: -moz-linear-gradient(top,#d2e6fd 0%,#b0d1f9 100%);
   background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#d2e6fd),color-stop(100%,#b0d1f9));
@@ -59,10 +68,12 @@ div.autocomplete_internal_container div.selected {
   background: -ms-linear-gradient(top,#d2e6fd 0%,#b0d1f9 100%);
   background: linear-gradient(top,#d2e6fd 0%,#b0d1f9 100%);
 }
-div.autocomplete_internal_container span.token {
+
+span.token-container-75233 {
   margin: 0px 2px;
 }
-div.autocomplete_internal_container ul.dropdown {
+
+ul.dropdown-a3d44 {
   background: #e3e3e3;
   border: 1px solid #ccc;
   margin: 12px 0px 0px 0px;
@@ -74,7 +85,8 @@ div.autocomplete_internal_container ul.dropdown {
   position: absolute;
   z-index: 10;
 }
-div.autocomplete_internal_container ul.dropdown li {
+
+li.list-item-d13e9 {
   background: #f9f9f9;
   border-bottom: 1px solid #d8d8d8;
   font-size: 13px;
@@ -82,19 +94,20 @@ div.autocomplete_internal_container ul.dropdown li {
   margin: 0px;
   padding: 4px;
 }
-div.autocomplete_internal_container ul.dropdown li span.children-indicator {
-  float: right;
-}
-div.autocomplete_internal_container ul.dropdown li.option {
+
+li.option-7b59f {
   cursor: pointer;
 }
-div.autocomplete_internal_container ul.dropdown li.highlighted {
+
+li.highlighted-ea4c1 {
   background: #00519d;
   color: white;
 }
-div.autocomplete_internal_container ul.dropdown li.last {
+
+li.last-option-c1e64 {
   border-bottom: 0px;
 }
-div.autocomplete_internal_container div.clear7282 {
-  clear: both;
+
+span.children-indicator-ca540 {
+  float: right;
 }

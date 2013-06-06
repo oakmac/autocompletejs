@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="css/autocomplete.css" />
 <?php else: ?>
   <link type="text/css" rel="stylesheet/less" href="css/site.less" />
-  <link type="text/css" rel="stylesheet/less" href="css/autocomplete.less" />
+  <link rel="stylesheet" href="css/autocomplete.css" />
   <script src="css/less-1.3.0.min.js"></script>
 <?php endif; ?>
 </head>

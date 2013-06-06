@@ -54,10 +54,10 @@ window['AutoComplete'] = window['AutoComplete'] ||
 // Module scope variables
 //------------------------------------------------------------------------------
 
-var AJAX_BUFFER_LENGTH = 200;
-var HTML_SENTINELS = [];
-var LOCAL_STORAGE_AVAILABLE = false;
-var MINIMUM_JQUERY_VERSION = '1.4.2';
+var AJAX_BUFFER_LENGTH = 200,
+  HTML_SENTINELS = [],
+  LOCAL_STORAGE_AVAILABLE = false,
+  MINIMUM_JQUERY_VERSION = '1.4.2';
 
 var KEYS = {
   BACKSPACE: 8,
@@ -78,14 +78,27 @@ var containerEl, dropdownEl, inputEl,
 
 // CSS class names
 var CSS = {
-  ajaxError: 'ajax-error',
-  ajaxLoading: 'ajax-loading',
-  highlightedOption: 'highlighted',
-  noResults: 'no-results',
-  option: 'option',
-  removeTokenGroup: 'remove-token-group',
-  selectedTokenGroup: 'selected',
-  tokenGroup: 'token-group'
+  ajaxError: 'ajax-error-8fd89',
+  ajaxLoading: 'ajax-loading-72914',
+  autocompleteContainer: 'autocomplete-container-7a26d',
+  childrenIndicator: 'children-indicator-ca540',
+  clear: 'clear-53545',
+  dropdown: 'dropdown-a3d44',
+  firstOption: 'first-option-96d82',
+  highlightedOption: 'highlighted-ea4c1',
+  input: 'input-8f2fe',
+  inputWidthProxy: 'input-width-proxy-1c13e',
+  lastOption: 'last-option-c1e64',
+  listItem: 'list-item-d13e9',
+  noResults: 'no-results-902b5',
+  option: 'option-7b59f',
+  placeholder: 'placeholder-d722a',
+  removeTokenGroup: 'remove-token-group-53474',
+  selectedTokenGroup: 'selected-token-group-359b9',
+  tokensContainer: 'tokens-6a7a0',
+  token: 'token-75233',
+  tokenGroup: 'token-group-c7334',
+  tokenSeparator: 'token-separator-359b9'
 };
 
 // I believe these are all the CSS properties that could effect text width
@@ -125,15 +138,15 @@ var CSS_TEXT_PROPS = [
 ];
 
 // stateful
-var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true;
-var AJAX_BUFFER_TIMEOUT;
-var AJAX_OBJECT = {};
-var CURRENT_LIST_NAME = false;
-var INPUT_HAS_FOCUS = false;
-var OPTIONS_SHOWING = false;
-var SESSION_CACHE = {};
-var TOKENS = [];
-var VISIBLE_OPTIONS = {};
+var ADD_NEXT_TOKEN_TO_NEW_TOKEN_GROUP = true,
+  AJAX_BUFFER_TIMEOUT,
+  AJAX_OBJECT = {},
+  CURRENT_LIST_NAME = false,
+  INPUT_HAS_FOCUS = false,
+  OPTIONS_SHOWING = false,
+  SESSION_CACHE = {},
+  TOKENS = [],
+  VISIBLE_OPTIONS = {};
 
 // constructor return object
 var widget = {};
@@ -696,12 +709,6 @@ var expandConfig = function() {
   }
 
   // TODO: need to document this
-  //       do we need this functionality?
-  if (typeof cfg.classPrefix !== 'string' || cfg.classPrefix === '') {
-    cfg.classPrefix = 'autocomplete';
-  }
-
-  // TODO: need to document this
   if (typeof cfg.ajaxBuffer === 'number' && cfg.ajaxBuffer > 0) {
     AJAX_BUFFER_LENGTH = cfg.ajaxBuffer;
   }
@@ -814,16 +821,15 @@ var expandConfig = function() {
 //------------------------------------------------------------------------------
 
 var buildWidget = function() {
-  var html = '' +
-  '<div class="' + cfg.classPrefix + '_internal_container">' +
-    '<div class="placeholder"></div>' +
-    '<div class="tokens"></div>' +
-    '<input type="text" class="autocomplete-input" />' +
-    '<div class="clear7282"></div>' +
-    '<ul class="dropdown" style="display:none"></ul>' +
+  var html = '<div class="' + CSS.autocompleteContainer + '">' +
+    '<div class="' + CSS.placeholder + '"></div>' +
+    '<div class="' + CSS.tokensContainer + '"></div>' +
+    '<input type="text" class="' + CSS.input + '" />' +
+    '<div class="' + CSS.clear + '"></div>' +
+    '<ul class="' + CSS.dropdown + '" style="display:none"></ul>' +
   '</div>' +
-  '<span class="input-width-proxy" style="position:absolute; top:-9999px;">' +
-  '</span>';
+  '<span class="' + CSS.inputWidthProxy + '" style="position:absolute; ' +
+  'top:-9999px;"></span>';
 
   return html;
 };
@@ -885,12 +891,13 @@ var buildOption = function(option, parentList) {
 
   var childrenListName = getChildrenListName(option, parentList);
 
-  var html = '<li class="' + CSS.option + '" ' +
+  var html = '<li class="' + CSS.listItem + ' ' + CSS.option + '" ' +
   'data-option-id="' + encode(optionId) + '">' +
   option.optionHTML;
 
+  // TODO: make this configurable
   if (typeof childrenListName === 'string') {
-    html += '<span class="children-indicator">&#x25B8;</span>';
+    html += '<span class="' + CSS.childrenIndicator + '">&#x25B8;</span>';
   }
 
   html += '</li>';
@@ -938,15 +945,16 @@ var buildTokens = function(tokens) {
 
     html += '<div class="' + CSS.tokenGroup + '"' +
     ' data-token-group-index="' + i + '">' +
+    // TODO: make this customizable
     '<span class="' + CSS.removeTokenGroup + '">&times;</span>';
 
     for (var j = 0; j < tokenGroup.length; j++) {
-      html += '<span class="token">' +
+      html += '<span class="' + CSS.token + '">' +
         tokenGroup[j].tokenHTML + '</span>';
 
       // show child indicator
       if (j !== tokenGroup.length - 1) {
-        html += '<span class="token-separator">';
+        html += '<span class="' + CSS.tokenSeparator + '">';
         if (typeof cfg.tokenSeparatorHTML === 'string') {
           html += cfg.tokenSeparatorHTML;
         }
@@ -974,7 +982,7 @@ var buildTokens = function(tokens) {
 };
 
 var buildStringOrFunction = function(cssClass, strOrFn, inputValue) {
-  var html = '<li class="' + cssClass + '">';
+  var html = '<li class="' + CSS.listItem + ' ' + cssClass + '">';
   var type = typeof strOrFn;
   if (type === 'string') {
     html += strOrFn;
@@ -1087,9 +1095,9 @@ var updateTokens = function() {
 // add a class to the first and last option
 var markFirstLastOptions = function() {
   var listEls = dropdownEl.find('li');
-  listEls.removeClass('first last');
-  listEls.filter(':first').addClass('first');
-  listEls.filter(':last').addClass('last');
+  listEls.removeClass(CSS.firstOption + ' ' + CSS.lastOption);
+  listEls.filter(':first').addClass(CSS.firstOption);
+  listEls.filter(':last').addClass(CSS.lastOption);
 };
 
 // given some text that is in the input element, determine
@@ -1167,6 +1175,7 @@ var adjustDropdownScroll = function() {
 
 var setCurrentList = function(listName) {
   // run the onEnd function for the outgoing list
+  // TODO: either document this or remove it
   if (cfg.lists[CURRENT_LIST_NAME].hasOwnProperty('onEnd') === true &&
       typeof cfg.lists[CURRENT_LIST_NAME].onEnd === 'function') {
     cfg.lists[CURRENT_LIST_NAME].onEnd();
@@ -1181,6 +1190,7 @@ var setCurrentList = function(listName) {
   CURRENT_LIST_NAME = listName;
 
   // run the onStart function for the new list
+  // TODO: either document this or remove it
   if (cfg.lists[CURRENT_LIST_NAME].hasOwnProperty('onStart') === true &&
       typeof cfg.lists[CURRENT_LIST_NAME].onStart === 'function') {
     cfg.lists[CURRENT_LIST_NAME].onStart();
@@ -1456,7 +1466,7 @@ var ajaxError = function(errType, list, inputValue) {
   // ignore aborts, they are handled elsewhere and are expected behavior
   if (errType === 'abort') return;
 
-  var errorMsg = '<li class="' + CSS.ajaxError + '">';
+  var errorMsg = '<li class="' + CSS.listItem + ' ' + CSS.ajaxError + '">';
   if (typeof list.ajaxErrorHTML === 'string') {
     errorMsg += list.ajaxErrorHTML;
   }
@@ -2409,17 +2419,15 @@ var addEvents = function() {
   // NOTE: using delegate and bind here instead of $.on to
   // maintain compatibility with older jquery versions
   containerEl.bind('click', clickContainerElement);
-  containerEl.delegate('input.autocomplete-input', 'keydown', keydownInput);
-  containerEl.delegate('input.autocomplete-input', 'change keyup',
-    updateInputWidth);
-  containerEl.delegate('input.autocomplete-input', 'focus', focusInput);
-  containerEl.delegate('input.autocomplete-input', 'blur', blurInput);
+  containerEl.delegate('input.' + CSS.input, 'keydown', keydownInput);
+  containerEl.delegate('input.' + CSS.input, 'change keyup', updateInputWidth);
+  containerEl.delegate('input.' + CSS.input, 'focus', focusInput);
+  containerEl.delegate('input.' + CSS.input, 'blur', blurInput);
   containerEl.delegate('li.' + CSS.option, 'click', clickOption);
   containerEl.delegate('li.' + CSS.option, 'mouseover', mouseoverOption);
   containerEl.delegate('div.' + CSS.tokenGroup, 'click', clickTokenGroup);
-  containerEl.delegate(
-    'div.' + CSS.tokenGroup + ' span.' + CSS.removeTokenGroup,
-    'click', clickRemoveTokenGroup);
+  containerEl.delegate('span.' + CSS.removeTokenGroup, 'click', 
+    clickRemoveTokenGroup);
 
   // catch all clicks on the page
   $('html').bind('click touchstart', clickPage);
@@ -2433,11 +2441,11 @@ var initDom = function() {
   containerEl.html(buildWidget());
 
   // grab elements in memory
-  inputEl = containerEl.find('input.autocomplete-input');
-  dropdownEl = containerEl.find('ul.dropdown');
-  placeholderEl = containerEl.find('div.placeholder');
-  tokensEl = containerEl.find('div.tokens');
-  inputWidthProxyEl = containerEl.find('span.input-width-proxy');
+  inputEl = containerEl.find('input.' + CSS.input);
+  dropdownEl = containerEl.find('ul.' + CSS.dropdown);
+  placeholderEl = containerEl.find('div.' + CSS.placeholder);
+  tokensEl = containerEl.find('div.' + CSS.tokensContainer);
+  inputWidthProxyEl = containerEl.find('span.' + CSS.inputWidthProxy);
 
   // set the placeholder
   placeholderEl.html(cfg.placeholderHTML);
