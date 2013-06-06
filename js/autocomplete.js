@@ -182,9 +182,9 @@ var compareSemVer = function(version, minimum) {
   version = parseSemVer(version);
   minimum = parseSemVer(minimum);
 
-  var versionNum = (version.major * 10000 * 10000) + 
+  var versionNum = (version.major * 10000 * 10000) +
     (version.minor * 10000) + version.patch;
-  var minimumNum = (minimum.major * 10000 * 10000) + 
+  var minimumNum = (minimum.major * 10000 * 10000) +
     (minimum.minor * 10000) + minimum.patch;
 
   return (versionNum >= minimumNum);
@@ -528,7 +528,7 @@ var sanityChecks = function() {
 
     if (containerEl.length !== 1) {
       window.alert('AutoComplete Error 1044: The first argument to ' +
-        'AutoComplete() must be an ID or a single DOM node.' + 
+        'AutoComplete() must be an ID or a single DOM node.' +
         '\n\nExiting...');
       return false;
     }
@@ -2426,7 +2426,7 @@ var addEvents = function() {
   containerEl.delegate('li.' + CSS.option, 'click', clickOption);
   containerEl.delegate('li.' + CSS.option, 'mouseover', mouseoverOption);
   containerEl.delegate('div.' + CSS.tokenGroup, 'click', clickTokenGroup);
-  containerEl.delegate('span.' + CSS.removeTokenGroup, 'click', 
+  containerEl.delegate('span.' + CSS.removeTokenGroup, 'click',
     clickRemoveTokenGroup);
 
   // catch all clicks on the page
