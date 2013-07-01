@@ -5,6 +5,7 @@
   "date":"09 Apr 2013",
   "released":false,
   "changes":[
+    "Give unique CSS class names to all elements"
     "Allow DOM element to be passed to AutoComplete constructor",
     "Fix bug with jQuery detection code"
   ],
