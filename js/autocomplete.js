@@ -1,12 +1,12 @@
 /*!
- * AutoCompleteJS JavaScript Widget
+ * autocomplete.js $version$
  * http://autocompletejs.com/
  *
  * Copyright 2013 Chris Oakman
  * Released under the MIT license
  * http://autocompletejs.com/license
  *
- * Date: 25 Mar 2013
+ * Date: $date$
  */
 
 // start anonymous scope
