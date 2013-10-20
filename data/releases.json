@@ -1,20 +1,35 @@
 [
 "-----------------------------------------------------------------",
 {
-  "version":"0.3.0",
-  "date":"09 Apr 2013",
+  "version":"0.4.0",
+  "date":"XXX",
   "released":false,
   "changes":[
-    "Give unique CSS class names to all elements"
-    "Allow DOM element to be passed to AutoComplete constructor",
-    "Fix bug with jQuery detection code"
+
   ],
   "files":[
-    { "name":"autocomplete-0.3.0.zip", "size":"68.3 KB" },
-    { "name":"autocomplete-0.3.0.js", "size":"65.0 KB" },
-    { "name":"autocomplete-0.3.0.min.js", "size":"20.9 KB" },
-    { "name":"autocomplete-0.3.0.css", "size":"2.89 KB" },
-    { "name":"autocomplete-0.3.0.min.css", "size":"2.32 KB" }
+    { "name":"autocomplete-0.4.0.zip", "size":"68.3 KB" },
+    { "name":"autocomplete-0.4.0.js", "size":"65.0 KB" },
+    { "name":"autocomplete-0.4.0.min.js", "size":"20.9 KB" },
+    { "name":"autocomplete-0.4.0.css", "size":"2.89 KB" },
+    { "name":"autocomplete-0.4.0.min.css", "size":"2.32 KB" }
+  ]
+},
+"-----------------------------------------------------------------",
+{
+  "version":"0.3.0",
+  "date":"20 Oct 2013",
+  "changes":[
+    "Allow DOM element to be passed to AutoComplete constructor (GitHub Issue #67)",
+    "Fix bug with jQuery detection code (GitHub Issue #72)",
+    "Give unique CSS class names to all elements (GitHub Issue #73)"
+  ],
+  "files":[
+    { "name":"autocomplete-0.3.0.zip", "size":"87.2 KB" },
+    { "name":"autocomplete-0.3.0.js", "size":"64.4 KB" },
+    { "name":"autocomplete-0.3.0.min.js", "size":"21.9 KB" },
+    { "name":"autocomplete-0.3.0.css", "size":"2.3 KB" },
+    { "name":"autocomplete-0.3.0.min.css", "size":"1.9 KB" }
   ]
 },
 "-----------------------------------------------------------------",
