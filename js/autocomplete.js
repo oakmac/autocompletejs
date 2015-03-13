@@ -892,15 +892,14 @@ var buildOption = function(option, parentList) {
   var childrenListName = getChildrenListName(option, parentList);
 
   var html = '<li class="' + CSS.listItem + ' ' + CSS.option + '" ' +
-  'data-option-id="' + encode(optionId) + '">' +
-  option.optionHTML;
+  'data-option-id="' + encode(optionId) + '">';
 
   // TODO: make this configurable
   if (typeof childrenListName === 'string') {
     html += '<span class="' + CSS.childrenIndicator + '">&#x25B8;</span>';
   }
 
-  html += '</li>';
+  html += option.optionHTML + '</li>';
 
   return html;
 };
