@@ -16,7 +16,6 @@
 </head>
 <body>
 <p><a href="examples#<?php echo $example['number']; ?>">&larr; Back to all examples.</a></p>
-<p><a href="examples/<?php echo $example['number']; ?>.js">See the code for this example.</a></p>
 
 <!-- start example code --->
 <?php echo $example['html'] . "\n"; ?>
@@ -30,13 +29,11 @@
 <?php endif; ?>
 <script src="js/autocomplete.js"></script>
 <script>
-var init = function() {
-
-//--- start example code ---
+function init() {
+//----- Start Example Code -----
 <?php echo $example['js'] . "\n"; ?>
-//--- end example code ---
-
-}; // end init()
+//----- End Example Code -----
+} // end init()
 $(document).ready(init);
 </script>
 </body>

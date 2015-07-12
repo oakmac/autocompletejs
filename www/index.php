@@ -4,10 +4,10 @@
 if (get_magic_quotes_gpc()) { $_REQUEST = array_map('stripslashes', $_REQUEST); $_GET = array_map('stripslashes', $_GET); $_POST = array_map('stripslashes', $_POST); $_COOKIE = array_map('stripslashes', $_COOKIE); }
 
 // config
-require('php/config.php');
+require('.config.php');
 
 // load AC functions
-require('php/AC.php');
+require(APP_PATH.'php/AC.php');
 
 // poor man's routing :)
 $URI = explode('/', $_SERVER['REQUEST_URI']);

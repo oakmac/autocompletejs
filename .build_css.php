@@ -6,11 +6,11 @@ if (defined('STDIN') !== true) die;
 require('php/less.inc.php');
 $less = new lessc;
 
-$lessFiles = glob('css/*.less');
+$lessFiles = glob('www/css/*.less');
 foreach ($lessFiles as $f) {
   // we can skip this file
   // temporary solution...
-  if ($f === 'css/prettify.less') continue;
+  if ($f === 'www/css/prettify.less') continue;
 
   echo 'compiling '.$f.'...';
   $cssFileName = str_replace('.less', '.css', $f);
