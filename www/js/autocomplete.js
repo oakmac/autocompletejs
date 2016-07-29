@@ -2044,6 +2044,8 @@ var focusInput = function() {
 
   // update state
   INPUT_HAS_FOCUS = true;
+  // Add focus to autocomplete div
+  jQuery(autocompleteDiv).addClass('focus');
 
   // sanity check / safeguard
   // TODO: is this necessary?
@@ -2064,6 +2066,8 @@ var focusInput = function() {
 
 var blurInput = function() {
   INPUT_HAS_FOCUS = false;
+  // Remove focus from autocomplete div
+  jQuery(autocompleteDiv).removeClass('focus');
 
   // add the placeholder if necessary
   if (TOKENS.length === 0 &&
