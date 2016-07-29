@@ -27,6 +27,17 @@ div.autocomplete-container-7a26d {
   border-radius: 8px;
 }
 
+div.autocomplete-container-7a26d.focus {
+  border-bottom-color: #66afe9;
+  border-left-color: #66afe9;
+  border-right-color: #66afe9;
+  border-top-color: #66afe9;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
+  outline-color: -moz-use-text-color;
+  outline-style: none;
+  outline-width: 0;
+}
+
 div.placeholder-d722a {
   color: #777;
   float: left;
